@@ -7,28 +7,26 @@ star chart
 
 ## Tools
 
-- Django or Flask
+- Flask
 
-- [Skyfield](https://rhodesmill.org/skyfield/)
-
-- SVG library for python? Draw on canvas with JS?
+- [D3-celestial](https://github.com/ofrohn/d3-celestial)
 
 - Javascript
 
-## Projections
+## Tutorials
 
-- https://www.projectpluto.com/project.htm#which_proj
+- https://realpython.com/handling-email-confirmation-in-flask/
 
-- On Stellarium, stereographic or fish-eye.
+## Things to copy
 
-## For reference
+- Sky map: https://heavens-above.com/skychart2.aspx
 
-- https://www.deepskylog.org/index.php?indexAction=view_atlaspagesv
+- [DeepSkyLog](https://www.deepskylog.org/index.php?indexAction=view_atlaspagesv)
 
-- https://github.com/ofrohn/d3-celestial
+    - Generates atlases for every object: [example](https://www.deepskylog.org/atlas.pdf.php?zoom=17&object=M+18)
 
-- https://github.com/skyfielders/python-skyfield/issues/109
+    - Shows images for every object: [example](https://archive.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r=0+24+5.0&d=-72+-5&e=J2000&h=60.0&w=60&f=gif&c=none&fov=NONE&v3=)
 
-- https://www.cloudynights.com/topic/598191-star-map-projection-models-for-dummies-needed-here/
+- [Catalogs and observation lists](http://www.messier.seds.org/xtra/similar/catalogs.html)
 
 
