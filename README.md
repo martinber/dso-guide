@@ -17,6 +17,8 @@ star chart
 
 - https://realpython.com/handling-email-confirmation-in-flask/
 
+- [HMAC explanation](https://www.ida.liu.se/~TDP024/labs/hmacarticle.pdf)
+
 ## Things to copy
 
 - Sky map: https://heavens-above.com/skychart2.aspx
@@ -73,3 +75,9 @@ Las cosas a implementar serían:
 
     - Página web con código javascript que accede a la Web API para tomar
         información y muestra el mapa con la librería d3-celestial.
+
+## Desarrollo
+
+### Selección de servidor SQL
+
+- SQLite: Liviano y simple. Lo maloqes
