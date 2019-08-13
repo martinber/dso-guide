@@ -21,7 +21,8 @@ location = [
 
 @app.route('/api/v1/resources/all', methods = ['GET'])
 def get_all_locations():
-    return jsonify(location)
-
+    resp = jsonify(location)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 app.run()
