@@ -38,7 +38,7 @@ var config = {
 
     // TODO
     // ID of parent element, e.g. div, null = html-body
-    container: null,
+    container: "content",
 
     // Path/URL to data files, empty = subfolder 'data'
     datapath: "/data/",

@@ -1,5 +1,35 @@
-/* canvas */
-/* { */
-	/* width: 400px; */
-	/* height: 400px; */
-/* } */
+body
+{
+	font-family: sans-serif;
+	background-color: #333333;
+	color: #EEEEEE;
+}
+
+a
+{
+	color: #AAAAFF;
+}
+
+header
+{
+	background-color: #555555;
+	padding: 0.5em;
+}
+
+footer
+{
+	background-color: #555555;
+	padding: 0.5em;
+}
+
+main#content
+{
+	margin: 0 auto;
+	max-width: 50em;
+
+}
+
+#celestial-map
+{
+
+}

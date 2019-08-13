@@ -7,18 +7,41 @@
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 
+		<!-- For mobiles -->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!--
+			The below three lines are a fix to get HTML5 semantic elements working
+			in old versions of Internet Explorer.
+			From https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure
+		-->
+		<!--[if lt IE 9]>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+		<![endif]-->
+
+		<!-- TODO -->
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=47BKnLQyQq">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=47BKnLQyQq">
+
 		<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
 		<script type="text/javascript" src="/lib/celestial.0.6.min.js"></script>
+		<link rel="stylesheet" href="normalize.css" />
 		<link rel="stylesheet" href="style.css" />
 	</head>
 
 	<body>
+
 		<header>
 			<h1>Dark Sky Planner</h1>
 		</header>
-		<div id="celestial-map"></div>
-		<script type="text/javascript" src="script.js"></script>
+
+		<main id="content">
+
+			<div id="celestial-map"></div>
+
+		</main>
+
 		<footer>
 			<p><a href="https://github.com/martinber/dark-sky-planner">GitHub</a></p>
 			</p>
@@ -30,5 +53,9 @@
 				<a href="http://armchairastronautics.blogspot.com/" rel="author">Olaf Frohn</a>.
 			</p>
 		</footer>
+
+		<script type="text/javascript" src="script.js"></script>
+
 	</body>
+
 </html>
