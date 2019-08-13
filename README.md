@@ -24,6 +24,8 @@ star chart
 
 - [HMAC explanation](https://www.ida.liu.se/~TDP024/labs/hmacarticle.pdf)
 
+- [API requests from JS](https://stackoverflow.com/questions/36975619/how-to-call-a-rest-web-service-api-from-javascript)
+
 ## Things to copy
 
 - Sky map: https://heavens-above.com/skychart2.aspx

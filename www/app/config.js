@@ -1,6 +1,4 @@
-// const canvas = document.getElementById('sky_canvas');
-
-var config = {
+export var config = {
 
     // Default width, 0 = full parent element width; height is determined by
     // projection
@@ -38,7 +36,7 @@ var config = {
 
     // TODO
     // ID of parent element, e.g. div, null = html-body
-    container: "content",
+    container: "celestial-map",
 
     // Path/URL to data files, empty = subfolder 'data'
     datapath: "/data/",
@@ -261,5 +259,3 @@ var config = {
     }
 };
 
-// Display map with the configuration above or any subset therof
-Celestial.display(config);
