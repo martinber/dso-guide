@@ -36,7 +36,7 @@ export var config = {
 
     // TODO
     // ID of parent element, e.g. div, null = html-body
-    container: "celestial-map",
+    container: "celestial-container",
 
     // Path/URL to data files, empty = subfolder 'data'
     datapath: "/data/",

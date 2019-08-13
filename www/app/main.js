@@ -2,7 +2,7 @@ import { config } from "./config.js";
 
 
 // Display map with the configuration above or any subset therof
-// Celestial.display(config);
+Celestial.display(config);
 
 
 function button_test() {
