@@ -1,0 +1,77 @@
+Lista de comandos que se pueden utilizar en SQL:
+
+- SELECT * FROM nombre-de-tabla; Muestra todas las columnas de la tabla
+- SELECT columna1, columna2, ... FROM nombre-de-tabla; Muestra de la tabla, las columnas deseadas
+- SELECT DISTINCT columna FROM nombre-de-tabla;
+
+- SELECT columna1,... FROM nombre-de-tabla WHERE condición; Selecciona de una tabla, las colunmas que quieras, de acuerdo a una condición (ej WHERE Usuario = 'nombre')
+- SELECT columna1, columna2, ... FROM nombre-de-tabla 
+	* WHERE condición1 AND condición2 ...; 
+	* WHERE condición1 OR condición2 ...;
+	* WHERE NOT condición;
+	* ORDER BY culumna1, columna2 ... ASC/DESC;
+	* WHERE columna IS NULL; WHERE columna IS NOT NULL;
+
+- INSERT INTO nombre-de-tabla (columna1, columna2 ...) VALUES (valor1, valor2 ...); si le das valor a toda la tabla, no hace falta especificar las columnas
+- UPDATE nombre-de-tabla SET columna1 = valor1, columna2 = valor2, ... WHERE condición; cambiar valores de una columna
+- DELETE FROM nombre-de-tabla WHERE condición;
+- DELETE FROM table_name; Borra todo el contenido de la tabla, pero no la tabla
+
+Para tablas:
+- CREATE TABLE table_name (
+    columna1 datatype,
+    columna2 datatype,
+    columna3 datatype,
+   .... ); datatype puede ser int, char(size), varchar(size)
+
+- DROP TABLE table_name; borra la tabla
+- TRUNCATE TABLE table_name; igual que el de delete from tabla, borra el contenido pero no la tabla
+- ALTER TABLE table_name
+	* ADD column_name datatype;
+	* DROP COLUMN column_name;
+	* ALTER COLUMN column_name datatype; 
+
+- CREATE TABLE table_name (
+    column1 datatype constraint,
+    column2 datatype constraint,
+    column3 datatype constraint,
+    ... );
+Constraint pueden ser:
+
+    * NOT NULL - Ensures that a column cannot have a NULL value
+    * UNIQUE - Ensures that all values in a column are different
+    * PRIMARY KEY - A combination of a NOT NULL and UNIQUE. Uniquely identifies each row in a table
+    * FOREIGN KEY - Uniquely identifies a row/record in another table
+    * CHECK - Ensures that all values in a column satisfies a specific condition
+    * DEFAULT - Sets a default value for a column when no value is specified
+    * INDEX - Used to create and retrieve data from the database very quickly
+Tambien se puede poner seguido a una constraint, AUTO_INCREMENT para que vaya aumentando algun valor
+
+Mas info en https://www.w3schools.com/sql/default.asp
+
+En Python hay que hacer lo siguiente:
+
+- import sqlite3
+
+
+Iniciar y cerrar una conexión con la base de datos:
+- con_bd = sqlite3.connect('contactos.db')
+- con_bd.close()
+
+Declarar y cerrar un cursor:
+- cursor_agenda = con_bd.cursor()
+- cursor_agenda.close()
+
+Añadir registro a la tabla agenda:
+- reg = (1, "A", "a@a.a", 1)
+- cursor_agenda.execute("INSERT INTO agenda VALUES(?,?,?,?)", reg)
+
+Completar la transacción de inserción de registro:
+- con_bd.commit()
+
+Consultar todos los registros de la tabla agenda:
+- cursor_agenda.execute("SELECT * FROM agenda")
+- for registro in cursor_agenda:
+    print(registro)
+
+Mas info en https://python-para-impacientes.blogspot.com/2014/02/bases-de-datos-sqlite3.html
