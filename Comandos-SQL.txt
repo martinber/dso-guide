@@ -4,7 +4,8 @@ Lista de comandos que se pueden utilizar en SQL:
 - SELECT columna1, columna2, ... FROM nombre-de-tabla; Muestra de la tabla, las columnas deseadas
 - SELECT DISTINCT columna FROM nombre-de-tabla;
 
-- SELECT columna1,... FROM nombre-de-tabla WHERE condición; Selecciona de una tabla, las colunmas que quieras, de acuerdo a una condición (ej WHERE Usuario = 'nombre')
+- SELECT columna1,... FROM nombre-de-tabla WHERE condición; Selecciona de una tabla, las colunmas que quieras,
+de acuerdo a una condición (ej WHERE Usuario = 'nombre')
 - SELECT columna1, columna2, ... FROM nombre-de-tabla 
 	* WHERE condición1 AND condición2 ...; 
 	* WHERE condición1 OR condición2 ...;
@@ -12,7 +13,8 @@ Lista de comandos que se pueden utilizar en SQL:
 	* ORDER BY culumna1, columna2 ... ASC/DESC;
 	* WHERE columna IS NULL; WHERE columna IS NOT NULL;
 
-- INSERT INTO nombre-de-tabla (columna1, columna2 ...) VALUES (valor1, valor2 ...); si le das valor a toda la tabla, no hace falta especificar las columnas
+- INSERT INTO nombre-de-tabla (columna1, columna2 ...) VALUES (valor1, valor2 ...); si le das valor a toda la tabla,
+no hace falta especificar las columnas
 - UPDATE nombre-de-tabla SET columna1 = valor1, columna2 = valor2, ... WHERE condición; cambiar valores de una columna
 - DELETE FROM nombre-de-tabla WHERE condición;
 - DELETE FROM table_name; Borra todo el contenido de la tabla, pero no la tabla
@@ -30,12 +32,7 @@ Para tablas:
 	* ADD column_name datatype;
 	* DROP COLUMN column_name;
 	* ALTER COLUMN column_name datatype; 
-
-- CREATE TABLE table_name (
-    column1 datatype constraint,
-    column2 datatype constraint,
-    column3 datatype constraint,
-    ... );
+	
 Constraint pueden ser:
 
     * NOT NULL - Ensures that a column cannot have a NULL value
