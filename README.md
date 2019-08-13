@@ -11,6 +11,11 @@ star chart
 
 - [D3-celestial](https://github.com/ofrohn/d3-celestial)
 
+  - Looking at the source of
+    [this example](https://armchairastronautics.blogspot.com/p/skymap.html)
+    apparently we need D3 version 3 and D3-geo-projection version 0 (but I use
+    version 1 because version 0 returns 404).
+
 - Javascript
 
 ## Tutorials
