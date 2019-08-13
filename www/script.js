@@ -3,6 +3,6 @@
 Celestial.display({
   location: true,
   projection: "airy",
-  datapath: "../data/",
+  datapath: "/data/",
   planets:  { show: true }
 });
