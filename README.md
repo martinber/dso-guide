@@ -48,6 +48,8 @@ star chart
 
     - Hashing, salt
 
+		- Captcha
+
 ## Things to copy
 
 - Sky map: https://heavens-above.com/skychart2.aspx
@@ -124,6 +126,11 @@ Las cosas a implementar serían:
 
 - Después un día decidimos lo más específico posible los requerimientos para
     definir bien: Las tablas SQL y la API REST.
+
+- Después nos dimos cuenta que lo que hacemos en javascript se llama AJAX.
+
+- Al principio ibamos a usar javascript puro pero cuando llegamos a hacer la
+	  parte de AJAX empezamos a usar jQuery
 
 ### Selección de servidor SQL
 

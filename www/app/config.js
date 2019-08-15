@@ -19,7 +19,8 @@ export var config = {
     adaptable: true,
 
     // Enable zooming and rotation with mousewheel and dragging
-    interactive: true,
+    // interactive: true,
+    interactive: false,
 
     // Display form for interactive settings
     form: false,
