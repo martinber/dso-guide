@@ -10,6 +10,8 @@ a
 	color: #AAAAFF;
 }
 
+/* HEADER ------------------------------------------------------------- */
+
 header
 {
 	background-color: #555555;
@@ -51,17 +53,20 @@ header #user-controls form div input
 	min-width: 1em;
 }
 
+/* FOOTER ------------------------------------------------------------- */
+
 footer
 {
 	background-color: #555555;
 	padding: 0.5em;
 }
 
+/* CONTENT ------------------------------------------------------------ */
+
 main#content
 {
 	margin: 0 auto;
 	max-width: 50em;
-
 }
 
 #celestial-map
