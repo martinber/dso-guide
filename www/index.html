@@ -75,7 +75,26 @@
 			<button id="test-button">Test</button>
 			<p id="test-text"></p>
 
-			<div id="celestial-container"><div id="celestial-map"></div></div>
+			<section id="celestial-container"><div id="celestial-map"></div></section>
+
+			<section id="user-data">
+
+				<p>Observing location. Formated as signed degrees, e.g. -23.235</p>
+				<form id="location-form" action="">
+					<div>
+						<label for="location-lat">Latitude:</label>
+						<input id="location-lat" name="lat" type="text" required />
+					</div>
+					<div>
+						<label for="location-long">Longitude:</label>
+						<input id="location-long" name="long" type="text" required />
+					</div>
+					<div>
+						<button type="location-submit">Update</button>
+					</div>
+				</form>
+
+			</section>
 
 		</main>
 
