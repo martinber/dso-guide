@@ -22,9 +22,31 @@ star chart
 
 - https://realpython.com/handling-email-confirmation-in-flask/
 
+- [API requests from JS](https://stackoverflow.com/questions/36975619/how-to-call-a-rest-web-service-api-from-javascript)
+
+- https://stackoverflow.com/questions/33861987/sql-music-playlist-database-design
+
+- https://launchschool.com/books/sql/read/table_relationships
+
+### Security
+
+- https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+
 - [HMAC explanation](https://www.ida.liu.se/~TDP024/labs/hmacarticle.pdf)
 
-- [API requests from JS](https://stackoverflow.com/questions/36975619/how-to-call-a-rest-web-service-api-from-javascript)
+- https://stackoverflow.com/questions/549/the-definitive-guide-to-form-based-website-authentication
+
+- https://www.owasp.org/index.php/Main_Page
+
+- Check:
+
+    - XSS
+
+    - CSRF
+
+    - SQL Injection
+
+    - Hashing, salt
 
 ## Things to copy
 
@@ -85,6 +107,28 @@ Las cosas a implementar serían:
 
 ## Desarrollo
 
+- Primero investigamos un poco por arriba antes de mandar la consigna para saber
+    si era realizable. También determinamos medio general hasta donde queremos
+    llegar, las tecnologías a usar y las funcionalidades de la app
+
+- Después de enviar la consigna hicimos unas pruebas rápidas para asegurarnos
+    que vamos bien.
+
+    - Martin hizo un HTML, CSS y JS para probar si d3-celestial funciona y si es
+        fácil hacer una consulta a una API REST desde JS
+
+    - Augusto hizo un programa en python y flask para ver si es facil hacer la
+        REST API
+
+    - Ignacio se instaló SQLite y se aprendió el lenguaje SQL
+
+- Después un día decidimos lo más específico posible los requerimientos para
+    definir bien: Las tablas SQL y la API REST.
+
 ### Selección de servidor SQL
 
-- SQLite: Liviano y simple. Lo maloqes
+- SQLite:
+
+- MySQL:
+
+
