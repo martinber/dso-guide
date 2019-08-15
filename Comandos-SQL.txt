@@ -42,14 +42,17 @@ Constraint pueden ser:
     * CHECK - Ensures that all values in a column satisfies a specific condition
     * DEFAULT - Sets a default value for a column when no value is specified
     * INDEX - Used to create and retrieve data from the database very quickly
+
 Tambien se puede poner seguido a una constraint, AUTO_INCREMENT para que vaya aumentando algun valor
+
+Para hacer vinculo entre tablas se usa :
+
 
 Mas info en https://www.w3schools.com/sql/default.asp
 
 En Python hay que hacer lo siguiente:
 
 - import sqlite3
-
 
 Iniciar y cerrar una conexión con la base de datos:
 - con_bd = sqlite3.connect('contactos.db')
