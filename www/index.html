@@ -26,6 +26,7 @@
 		<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
 		<script type="text/javascript" src="/lib/celestial.0.6.min.js"></script>
+		<script type="text/javascript" src="/lib/jquery-3.4.1.min.js"></script>
 		<link rel="stylesheet" href="normalize.css" />
 		<link rel="stylesheet" href="style.css" />
 		<script type="module" src="/app/main.js"></script>
@@ -36,6 +37,37 @@
 
 		<header>
 			<h1>Dark Sky Planner</h1>
+
+			<div id="user-controls">
+				<form class="user-form" id="login-form" action="">
+					<div>
+						<label for="login-username">Username:</label>
+						<input id="login-username" name="username" type="text" required />
+					</div>
+					<div>
+						<label for="login-password">Password:</label>
+						<input id="login-password" name="password" type="password" required />
+					</div>
+					<div>
+						<button type="login-submit">Login</button>
+					</div>
+				</form>
+
+				<form class="user-form" id="register-form" action="">
+					<div>
+						<label for="register-username">Username:</label>
+						<input id="register-username" name="username" type="text" required />
+					</div>
+					<div>
+						<label for="register-password">Password:</label>
+						<input id="register-password" name="password" type="password" required />
+					</div>
+					<div>
+						<button type="register-submit">Register</button>
+					</div>
+				</form>
+			</div>
+
 		</header>
 
 		<main id="content">

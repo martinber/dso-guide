@@ -14,6 +14,41 @@ header
 {
 	background-color: #555555;
 	padding: 0.5em;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+header h1
+{
+	flex: 1;
+}
+
+header #user-controls
+{
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+header #user-controls form
+{
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+header #user-controls form div
+{
+	flex: 1;
+}
+
+header #user-controls form div input
+{
+	width: 100%;
+	min-width: 1em;
 }
 
 footer
