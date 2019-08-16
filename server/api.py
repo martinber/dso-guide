@@ -30,8 +30,14 @@ def page_not_found(e):
 
 @app.route('/api/v1/users', methods=['GET'])
 def api_filter():
+
+    conn = sqlite3.connect('users.db')
+    #devuelve los valores encontrados por el cursor
+    #en forma de diccionarios para mejorar el output de jsonify
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
     #Checkear autenticacion usando esos atributos
-    #request.authorization["username"]
+    # if (request.authorization["username"] AND cur.execute(ENCONTRAR USERNAME)
     #request.authorization["password"]
     query_parameters = request.args
 
@@ -61,10 +67,6 @@ def api_filter():
 
     #Cortar el query borrando el AND y agregar ;
     query = query[:-4] + ';'
-
-    conn = sqlite3.connect('users.db')
-    conn.row_factory = dict_factory
-    cur = conn.cursor()
 
     results = cur.execute(query, to_filter).fetchall()
 
