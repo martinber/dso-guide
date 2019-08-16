@@ -45,8 +45,9 @@ Constraint pueden ser:
 
 Tambien se puede poner seguido a una constraint, AUTO_INCREMENT para que vaya aumentando algun valor
 
-Para hacer vinculo entre tablas se usa :
+Para hacer vinculo entre tablas se usa: Pongo una que supongo que vamos a usar
 
+SELECT watchlist.star_id, watchlist.notes, watchlist.style FROM watchlist INNER JOIN users on users.user_id=watchlist.user_id
 
 Mas info en https://www.w3schools.com/sql/default.asp
 
