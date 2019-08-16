@@ -1,28 +1,73 @@
 import flask
-from flask import jsonify, request
+from flask import request, jsonify
+import sqlite3
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-location = [
-    {'id': 0,
-     'nombre': 'martin',
-     'apellido': 'bernardi',
-     'ubicacion': 'ucacha'},
-    {'id': 1,
-     'nombre': 'augusto',
-     'apellido': 'remedi',
-     'ubicacion': 'rio cuarto'},
-    {'id': 2,
-     'nombre': 'ignacio',
-     'apellido': 'rittano',
-     'ubicacion': 'rio cuarto'},
-]
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
-@app.route('/api/v1/resources/all', methods = ['GET'])
-def get_all_locations():
-    resp = jsonify(location)
-    resp.headers['Access-Control-Allow-Origin'] = '*'
-    return resp
+#Por ahora la dejo, creo q no la voy a implementar
+@app.route('/api/v1/users/all', methods=['GET'])
+def api_all():
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    all_users = cur.execute('SELECT * FROM Usuarios;').fetchall()
+
+    return jsonify(all_users)
+
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return "<h1>404</h1><p>The resource could not be found.</p>", 404
+
+
+@app.route('/api/v1/users', methods=['GET'])
+def api_filter():
+    #Checkear autenticacion usando esos atributos
+    #request.authorization["username"]
+    #request.authorization["password"]
+    query_parameters = request.args
+
+    #Los query deben tener el mismo nombre que la columna a buscar
+    id = query_parameters.get('id')
+    username = query_parameters.get('Usuario')
+    latitude = query_parameters.get('lat')
+    longitude = query_parameters.get('lon')
+
+    query = "SELECT * FROM Usuarios WHERE"
+    to_filter = []
+
+    if id:
+        query += ' id=? AND'
+        to_filter.append(id)
+    if username:
+        query += ' Usuario=? AND'
+        to_filter.append(username)
+    if latitude:
+        query += ' lat=? AND'
+        to_filter.append(latitude)
+    if longitude:
+        query += ' lon=? AND'
+        to_filter.append(longitude)
+    if not (id or latitude or longitude or username):
+        return page_not_found(404)
+
+    #Cortar el query borrando el AND y agregar ;
+    query = query[:-4] + ';'
+
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+
+    results = cur.execute(query, to_filter).fetchall()
+
+    return jsonify(results)
 
 app.run()
