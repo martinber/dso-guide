@@ -48,7 +48,7 @@ star chart
 
     - Hashing, salt
 
-		- Captcha
+    - Captcha
 
 ## Things to copy
 
@@ -61,6 +61,8 @@ star chart
     - Shows images for every object: [example](https://archive.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r=0+24+5.0&d=-72+-5&e=J2000&h=60.0&w=60&f=gif&c=none&fov=NONE&v3=)
 
 - [Catalogs and observation lists](http://www.messier.seds.org/xtra/similar/catalogs.html)
+
+- [Aladin](https://aladin.u-strasbg.fr/AladinLite/doc/)
 
 ## Consigna
 
@@ -130,7 +132,7 @@ Las cosas a implementar serían:
 - Después nos dimos cuenta que lo que hacemos en javascript se llama AJAX.
 
 - Al principio ibamos a usar javascript puro pero cuando llegamos a hacer la
-	  parte de AJAX empezamos a usar jQuery
+    parte de AJAX empezamos a usar jQuery
 
 ### Selección de servidor SQL
 

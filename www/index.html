@@ -23,12 +23,15 @@
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=47BKnLQyQq">
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=47BKnLQyQq">
 
+		<script type="text/javascript" src="/lib/jquery-3.4.1.min.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
 		<script type="text/javascript" src="/lib/celestial.0.6.min.js"></script>
-		<script type="text/javascript" src="/lib/jquery-3.4.1.min.js"></script>
+		<script type='text/javascript' src='https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js' charset='utf-8'></script>
 		<link rel="stylesheet" href="normalize.css" />
 		<link rel="stylesheet" href="style.css" />
+		<link rel='stylesheet' href='https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css' />
+		<link href="https://fonts.googleapis.com/css?family=Saira+Condensed:400,800&display=swap" rel="stylesheet">
 		<script type="module" src="/app/main.js"></script>
 
 	</head>
@@ -41,29 +44,15 @@
 			<div id="user-controls">
 				<form class="user-form" id="login-form" action="">
 					<div>
-						<label for="login-username">Username:</label>
+						<label for="login-username">Username</label>
 						<input id="login-username" name="username" type="text" required />
 					</div>
 					<div>
-						<label for="login-password">Password:</label>
+						<label for="login-password">Password</label>
 						<input id="login-password" name="password" type="password" required />
 					</div>
 					<div>
-						<button type="login-submit">Login</button>
-					</div>
-				</form>
-
-				<form class="user-form" id="register-form" action="">
-					<div>
-						<label for="register-username">Username:</label>
-						<input id="register-username" name="username" type="text" required />
-					</div>
-					<div>
-						<label for="register-password">Password:</label>
-						<input id="register-password" name="password" type="password" required />
-					</div>
-					<div>
-						<button type="register-submit">Register</button>
+						<button id="login-submit">Login</button>
 					</div>
 				</form>
 			</div>
@@ -75,11 +64,13 @@
 			<button id="test-button">Test</button>
 			<p id="test-text"></p>
 
+			<h2>Sky map</h2>
 			<section id="celestial-container"><div id="celestial-map"></div></section>
+			<section id="aladin-container"><div id='aladin-map'></div></section>
 
 			<section id="user-data">
-
-				<p>Observing location. Formated as signed degrees, e.g. -23.235</p>
+				<h2>Observing location</h2>
+				<p>Formatted as signed degrees, e.g. -23.235</p>
 				<form id="location-form" action="">
 					<div>
 						<label for="location-lat">Latitude:</label>
@@ -94,6 +85,7 @@
 					</div>
 				</form>
 
+				<h2>Watchlist</h2>
 				<table id="watch-table">
 					<thead>
 						<tr>

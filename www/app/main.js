@@ -12,10 +12,8 @@ const table_rows = [
     { name: "name", string: "Name" },
     { name: "mag", string: "Mag" },
     { name: "type", string: "Type" },
-    { name: "ra", string: "RA" },
-    { name: "dec", string: "DEC" },
-    { name: "alt", string: "ALT" },
-    { name: "az", string: "AZ" },
+    { name: "ra-dec", string: "RA/DEC" },
+    { name: "alt-az", string: "ALT/AZ" },
     { name: "notes", string: "Notes" },
     { name: "style", string: "Style" },
     { name: "delete", string: "Delete" },
@@ -99,35 +97,31 @@ function create_row(dsos_data, id, notes, style) {
                 );
                 break;
 
-            case "ra":
+            case "ra-dec":
                 tr.append(
-                    $("<td>", {
-                        text: `${data.get_ra(dsos_data, id)}`,
-                    }),
+                    $("<td>").append(
+                        $("<span>", {
+                            text: `${data.get_ra(dsos_data, id)}`,
+                        }),
+                        $("<br>"),
+                        $("<span>", {
+                            text: `${data.get_dec(dsos_data, id)}`,
+                        }),
+                    ),
                 );
                 break;
 
-            case "dec":
+            case "alt-az":
                 tr.append(
-                    $("<td>", {
-                        text: `${data.get_dec(dsos_data, id)}`,
-                    }),
-                );
-                break;
-
-            case "alt":
-                tr.append(
-                    $("<td>", {
-                        text: `${data.get_alt(dsos_data, id)}`,
-                    }),
-                );
-                break;
-
-            case "az":
-                tr.append(
-                    $("<td>", {
-                        text: `${data.get_az(dsos_data, id)}`,
-                    }),
+                    $("<td>").append(
+                        $("<span>", {
+                            text: `${data.get_alt(dsos_data, id)}`,
+                        }),
+                        $("<br>"),
+                        $("<span>", {
+                            text: `${data.get_az(dsos_data, id)}`,
+                        }),
+                    ),
                 );
                 break;
 
@@ -161,7 +155,8 @@ function create_row(dsos_data, id, notes, style) {
 
 $(document).ready(function() {
 
-    // Celestial.display(config);
+    Celestial.display(config);
+    var aladin = A.aladin('#aladin-map', {fov:1, target: 'M81'})
 
     /*
     function button_test() {
