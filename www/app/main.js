@@ -8,15 +8,15 @@ import * as data from "./data.js";
  * the user on the table header
  */
 const table_rows = [
-    { name: "id", string: "ID" },
     { name: "name", string: "Name" },
+    { name: "id", string: "ID" },
     { name: "mag", string: "Mag" },
     { name: "type", string: "Type" },
     { name: "ra-dec", string: "RA/DEC" },
     { name: "alt-az", string: "ALT/AZ" },
-    { name: "notes", string: "Notes" },
     { name: "style", string: "Style" },
     { name: "delete", string: "Delete" },
+    { name: "notes", string: "Notes" },
 ];
 
 /**
@@ -33,7 +33,6 @@ const object_styles = [
  * Create table cell with style dropdown.
  */
 function create_style_cell(style) {
-    var td = $("<tr>");
     var select = $("<select>");
 
     for (var style of object_styles) {
@@ -45,8 +44,7 @@ function create_style_cell(style) {
         );
     }
 
-    td.append(select);
-    return td;
+    return select;
 }
 
 /**
@@ -68,14 +66,23 @@ function create_row(dsos_data, id, notes, style) {
             case "id":
                 tr.append(
                     $("<td>", {
-                        text: `${id}`,
-                    }),
+                        class: "watch-id",
+                    }).append(
+                        $("<span>", {
+                            class: "watch-label",
+                            text: "ID:",
+                        }),
+                        $("<span>", {
+                            text: `${id}`,
+                        }),
+                    ),
                 );
                 break;
 
             case "name":
                 tr.append(
                     $("<td>", {
+                        class: "watch-name",
                         text: `${data.get_name(dsos_data, id)}`,
                     }),
                 );
@@ -84,14 +91,23 @@ function create_row(dsos_data, id, notes, style) {
             case "mag":
                 tr.append(
                     $("<td>", {
-                        text: `${data.get_mag(dsos_data, id)}`,
-                    }),
+                        class: "watch-mag",
+                    }).append(
+                        $("<span>", {
+                            class: "watch-label",
+                            text: "Mag:",
+                        }),
+                        $("<span>", {
+                            text: `${data.get_mag(dsos_data, id)}`,
+                        }),
+                    ),
                 );
                 break;
 
             case "type":
                 tr.append(
                     $("<td>", {
+                        class: "watch-type",
                         text: `${data.get_type(dsos_data, id)}`,
                     }),
                 );
@@ -99,34 +115,62 @@ function create_row(dsos_data, id, notes, style) {
 
             case "ra-dec":
                 tr.append(
-                    $("<td>").append(
-                        $("<span>", {
-                            text: `${data.get_ra(dsos_data, id)}`,
-                        }),
-                        $("<br>"),
-                        $("<span>", {
-                            text: `${data.get_dec(dsos_data, id)}`,
-                        }),
+                    $("<td>", {
+                        class: "watch-ra-dec",
+                    }).append(
+                        $("<span>").append(
+                            $("<span>", {
+                                class: "watch-label",
+                                text: "RA:",
+                            }),
+                            $("<span>", {
+                                text: `${data.get_ra(dsos_data, id)}`,
+                            }),
+                        ),
+                        $("<span>").append(
+                            $("<span>", {
+                                class: "watch-label",
+                                text: "DEC:",
+                            }),
+                            $("<span>", {
+                                text: `${data.get_dec(dsos_data, id)}`,
+                            }),
+                        ),
                     ),
                 );
                 break;
 
             case "alt-az":
                 tr.append(
-                    $("<td>").append(
-                        $("<span>", {
-                            text: `${data.get_alt(dsos_data, id)}`,
-                        }),
-                        $("<br>"),
-                        $("<span>", {
-                            text: `${data.get_az(dsos_data, id)}`,
-                        }),
+                    $("<td>", {
+                        class: "watch-alt-az",
+                    }).append(
+                        $("<span>").append(
+                            $("<span>", {
+                                class: "watch-label",
+                                text: "ALT:",
+                            }),
+                            $("<span>", {
+                                text: `${data.get_alt(dsos_data, id)}`,
+                            }),
+                        ),
+                        $("<span>").append(
+                            $("<span>", {
+                                class: "watch-label",
+                                text: "AZ:",
+                            }),
+                            $("<span>", {
+                                text: `${data.get_az(dsos_data, id)}`,
+                            }),
+                        ),
                     ),
                 );
                 break;
 
             case "notes":
-                tr.append($("<td>").append(
+                tr.append($("<td>", {
+                    class: "watch-notes",
+                }).append(
                     $("<textarea placeholder='Notes....'>", {
                         // TODO: Not working
                         text: "dfhjsdk",
@@ -135,13 +179,17 @@ function create_row(dsos_data, id, notes, style) {
                 break;
 
             case "style":
-                tr.append($("<td>").append(
+                tr.append($("<td>", {
+                    class: "watch-style",
+                }).append(
                     create_style_cell(style)
                 ));
                 break;
 
             case "delete":
-                tr.append($("<td>").append(
+                tr.append($("<td>", {
+                    class: "watch-delete",
+                }).append(
                     $("<button>", {
                         text: "X",
                     })

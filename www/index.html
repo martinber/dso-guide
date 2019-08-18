@@ -39,76 +39,81 @@
 	<body>
 
 		<header>
-			<h1>Dark Sky Planner</h1>
+			<div class="inner">
+				<h1>Dark Sky Planner</h1>
 
-			<div id="user-controls">
-				<form class="user-form" id="login-form" action="">
-					<div>
-						<label for="login-username">Username</label>
-						<input id="login-username" name="username" type="text" required />
-					</div>
-					<div>
-						<label for="login-password">Password</label>
-						<input id="login-password" name="password" type="password" required />
-					</div>
-					<div>
-						<button id="login-submit">Login</button>
-					</div>
-				</form>
+				<div id="user-controls">
+					<form class="user-form" id="login-form" action="">
+						<div>
+							<label for="login-username">Username</label>
+							<input id="login-username" name="username" type="text" required />
+						</div>
+						<div>
+							<label for="login-password">Password</label>
+							<input id="login-password" name="password" type="password" required />
+						</div>
+						<div>
+							<button id="login-submit">Login</button>
+						</div>
+					</form>
+				</div>
 			</div>
-
 		</header>
 
 		<main id="content">
+			<div class="inner">
 
-			<button id="test-button">Test</button>
-			<p id="test-text"></p>
+				<button id="test-button">Test</button>
+				<p id="test-text"></p>
 
-			<h2>Sky map</h2>
-			<section id="celestial-container"><div id="celestial-map"></div></section>
-			<section id="aladin-container"><div id='aladin-map'></div></section>
+				<h2>Sky map</h2>
+				<section id="celestial-container"><div id="celestial-map"></div></section>
+				<section id="aladin-container"><div id='aladin-map'></div></section>
 
-			<section id="user-data">
-				<h2>Observing location</h2>
-				<p>Formatted as signed degrees, e.g. -23.235</p>
-				<form id="location-form" action="">
-					<div>
-						<label for="location-lat">Latitude:</label>
-						<input id="location-lat" name="lat" type="text" required />
-					</div>
-					<div>
-						<label for="location-long">Longitude:</label>
-						<input id="location-long" name="long" type="text" required />
-					</div>
-					<div>
-						<button type="location-submit">Update</button>
-					</div>
-				</form>
+				<section id="user-data">
+					<h2>Observing location</h2>
+					<p>Formatted as signed degrees, e.g. -23.235</p>
+					<form id="location-form" action="">
+						<div>
+							<label for="location-lat">Latitude:</label>
+							<input id="location-lat" name="lat" type="text" required />
+						</div>
+						<div>
+							<label for="location-long">Longitude:</label>
+							<input id="location-long" name="long" type="text" required />
+						</div>
+						<div>
+							<button type="location-submit">Update</button>
+						</div>
+					</form>
 
-				<h2>Watchlist</h2>
-				<table id="watch-table">
-					<thead>
-						<tr>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
+					<h2>Watchlist</h2>
+					<table id="watch-table">
+						<thead>
+							<tr>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
 
-			</section>
+				</section>
 
+			</div>
 		</main>
 
 		<footer>
-			<p><a href="https://github.com/martinber/dark-sky-planner">GitHub</a></p>
-			</p>
-			<p>Using
-				<a href="https://github.com/ofrohn/d3-celestial">D3-Celestial</a>
-				released under
-				<a href="http://opensource.org/licenses/BSD-3-Clause">BSD license</a>.
-				Copyright 2015-17
-				<a href="http://armchairastronautics.blogspot.com/" rel="author">Olaf Frohn</a>.
-			</p>
+			<div class="inner">
+				<p><a href="https://github.com/martinber/dark-sky-planner">GitHub</a></p>
+				</p>
+				<p>Using
+					<a href="https://github.com/ofrohn/d3-celestial">D3-Celestial</a>
+					released under
+					<a href="http://opensource.org/licenses/BSD-3-Clause">BSD license</a>.
+					Copyright 2015-17
+					<a href="http://armchairastronautics.blogspot.com/" rel="author">Olaf Frohn</a>.
+				</p>
+			</div>
 		</footer>
 
 	</body>

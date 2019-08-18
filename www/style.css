@@ -5,6 +5,13 @@ body
 	color: #EEEEEE;
 }
 
+.inner
+{
+	width: 100%;
+	max-width: 70em;
+	margin: 0 auto;
+}
+
 a
 {
 	color: #AAAAFF;
@@ -16,6 +23,34 @@ a
 	box-sizing: border-box;
 }
 
+textarea, input
+{
+	border: none;
+	background-color: #444444;
+	color: #EEEEEE;
+}
+
+textarea:focus, input:focus
+{
+	background-color: #555555;
+}
+
+button
+{
+	border: none;
+	background-color: #333;
+	color: #EEEEEE;
+	box-shadow: 0px 0px 3px #00000055;
+	outline: none;
+	background-color: #444444;
+}
+
+button:active
+{
+	box-shadow: none;
+	background-color: #555555;
+}
+
 /* HEADER ------------------------------------------------------------- */
 
 header
@@ -23,38 +58,32 @@ header
 	background-color: #333333;
 	padding: 0.5em;
 	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
 }
 
 header h1
 {
-	flex: 1;
 	font-size: 50px;
 	margin: 0.1em;
+	display: inline-block;
 }
 
 header #user-controls
 {
-	flex: 1;
 	margin: 0.5em;
-}
-
-header #user-controls form
-{
+	float: right;
 }
 
 header #user-controls form div
 {
 	display: inline-block;
-	width: 8em;
 	margin: 0.2em;
 }
 
 header #user-controls form div input
 {
-	width: 100%;
 	height: 2em;
+	width: 8em;
+	display: block;
 }
 
 #login-submit
@@ -75,7 +104,6 @@ footer
 main#content
 {
 	margin: 0 auto;
-	max-width: 70em;
 	padding: 1em;
 }
 
@@ -152,3 +180,80 @@ main#content h2
   background-color: #333333;
 }
 
+.watch-label
+{
+	color: #555555;
+	display: none;
+}
+
+.watch-ra-dec > span, .watch-alt-az > span
+{
+	display: block;
+}
+
+.watch-ra-dec > span > span, .watch-alt-az > span > span
+{
+	display: inline;
+}
+
+#watch-table td
+{
+	white-space: nowrap;
+	vertical-align: bottom;
+}
+
+#watch-table td.watch-name
+{
+	font-weight: 700;
+
+}
+
+#watch-table td.watch-notes
+{
+	width: 100%; /* Expand notes column until there is no space remaining */
+}
+
+#watch-table td.watch-notes textarea
+{
+	width: 100%;
+	resize: vertical;
+	min-height: 2em;
+}
+
+#watch-table textarea {
+	background-color: transparent;
+	border: 1px solid #555555;
+}
+
+#watch-table textarea:focus {
+	background-color: #444444;
+}
+
+@media screen and (max-width: 750px) {
+
+	#watch-table thead
+	{
+		display: none;
+	}
+
+	.watch-label
+	{
+		display: inherit;
+	}
+
+	#watch-table td
+	{
+		display: inline-block;
+	}
+
+	#watch-table tbody tr:nth-child(even)
+	{
+		background-color: #282828;
+	}
+
+	#watch-table tbody tr:nth-child(odd)
+	{
+		background-color: #333333;
+	}
+
+}
