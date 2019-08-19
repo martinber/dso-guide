@@ -220,7 +220,23 @@ function create_row(dsos_data, id, notes, style) {
  * }
  */
 
-function update_maps(objs) {
+// TODO: Not working, debug doing modifications to celestial.js
+function update_map_datetime(datetime) {
+    Celestial.date(datetime);
+    Celestial.apply();
+    Celestial.display(config);
+    console.log(config.geopos);
+}
+
+// TODO: Not working, debug doing modifications to celestial.js
+function update_map_location(lat, long) {
+    config.geopos = [lat, long];
+    Celestial.apply(config);
+    Celestial.display(config);
+    console.log(config.geopos);
+}
+
+function update_map_markers(objs) {
 
     var pointStyle = {
         stroke: "#f0f",
@@ -298,14 +314,27 @@ function update_maps(objs) {
     catalog.addSources(A.source(105.74242906, -8.34776709));
 
     Celestial.display(config);
-    Celestial.date(new Date()); // Set date to now
-    Celestial.apply();
+    console.log(config.geopos);
 }
 
 $(document).ready(function() {
 
+    // TODO
+    // $('#datetime-date').val(new Date().toDateInputValue());
+    // $('#datetime-time').val(new Date().toDateInputValue());
+
     // Celestial.display(config);
     aladin = A.aladin('#aladin-map', {fov:1, target: 'M32'})
+
+    $("#datetime-submit").click(function(e) {
+        e.preventDefault(); // Disable built-in HTML action
+        update_map_datetime(new Date(0, 0, 0));
+    });
+
+    $("#location-submit").click(function(e) {
+        e.preventDefault(); // Disable built-in HTML action
+        update_map_location(-33, -63);
+    });
 
     /*
     function button_test() {
@@ -428,7 +457,7 @@ $(document).ready(function() {
                 }
             });
         }
-        update_maps(map_objects);
+        update_map_markers(map_objects);
 
         create_row(dsos_data, 1, null, 3).appendTo("#catalog-table tbody");
         create_row(dsos_data, 33, null, 3).appendTo("#catalog-table tbody");

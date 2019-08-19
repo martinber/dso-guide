@@ -67,13 +67,18 @@
 				<p id="test-text"></p>
 
 				<h2>Sky map</h2>
-                <section id="celestial-container"><div id="celestial-map"></div><div id="celestial-form"></div></section>
-				<section id="aladin-container"><div id='aladin-map'></div></section>
+				<section id="celestial-container">
+					<div id="celestial-map"></div>
+					<div id="celestial-form"></div>
+				</section>
+				<section id="aladin-container">
+					<div id='aladin-map'></div>
+				</section>
 
 				<section id="user-data">
 					<h2>Observing location</h2>
 					<p>Formatted as signed degrees, e.g. -23.235</p>
-					<form id="location-form" action="">
+					<form class="observation-form" id="location-form" action="">
 						<div>
 							<label for="location-lat">Latitude:</label>
 							<input id="location-lat" name="lat" type="text" required />
@@ -83,7 +88,21 @@
 							<input id="location-long" name="long" type="text" required />
 						</div>
 						<div>
-							<button type="location-submit">Update</button>
+							<button id="location-submit">Update</button>
+						</div>
+					</form>
+
+					<form class="observation-form" id="datetime-form" action="">
+						<div>
+							<label for="datetime-date">Date:</label>
+							<input id="datetime-date" name="date" type="date" required />
+						</div>
+						<div>
+							<label for="datetime-time">Time:</label>
+							<input id="datetime-time" name="time" type="time" required />
+						</div>
+						<div>
+							<button id="datetime-submit">Update</button>
 						</div>
 					</form>
 

@@ -7,7 +7,7 @@ export var config = {
     projection: "stereographic",
 
     // optional initial geographic position [lat,lon] in degrees
-    geopos: [-33, -63],
+    geopos: [0, 0],
 
     // initial zoom level 0...zoomextend; 0|null = default, 1 = 100%, 0 < x <= zoomextend
     zoomlevel: null,
