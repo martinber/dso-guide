@@ -120,9 +120,9 @@ main#content h2
 	max-width: 100%;
 }
 
-#aladin-container
+#celestial-form
 {
-
+	display: none;
 }
 
 #aladin-map
@@ -153,105 +153,105 @@ main#content h2
 
 /* TABLE -------------------------------------------------------------- */
 
-#watch-table
+.objects-table
 {
 	margin: 1em 0;
 	width: 100%;
 	border-collapse: collapse;
 }
 
-#watch-table th, #watch-table td
+.objects-table th, .objects-table td
 {
 	padding: 0.4em;
 }
 
-#watch-table thead
+.objects-table thead
 {
   background-color: #444444;
 }
 
-#watch-table tbody tr:nth-child(odd)
+.objects-table tbody tr:nth-child(odd)
 {
   background-color: #282828;
 }
 
-#watch-table tbody tr:nth-child(even)
+.objects-table tbody tr:nth-child(even)
 {
   background-color: #333333;
 }
 
-.watch-label
+.objects-label
 {
 	color: #555555;
 	display: none;
 }
 
-.watch-ra-dec > span, .watch-alt-az > span
+.objects-ra-dec > span, .objects-alt-az > span
 {
 	display: block;
 }
 
-.watch-ra-dec > span > span, .watch-alt-az > span > span
+.objects-ra-dec > span > span, .objects-alt-az > span > span
 {
 	display: inline;
 }
 
-#watch-table td
+.objects-table td
 {
 	white-space: nowrap;
 	vertical-align: bottom;
 }
 
-#watch-table td.watch-name
+.objects-table td.objects-name
 {
 	font-weight: 700;
 
 }
 
-#watch-table td.watch-notes
+.objects-table td.objects-notes
 {
 	width: 100%; /* Expand notes column until there is no space remaining */
 }
 
-#watch-table td.watch-notes textarea
+.objects-table td.objects-notes textarea
 {
 	width: 100%;
 	resize: vertical;
 	min-height: 2em;
 }
 
-#watch-table textarea {
+.objects-table textarea {
 	background-color: transparent;
 	border: 1px solid #555555;
 }
 
-#watch-table textarea:focus {
+.objects-table textarea:focus {
 	background-color: #444444;
 }
 
 @media screen and (max-width: 750px) {
 
-	#watch-table thead
+	.objects-table thead
 	{
 		display: none;
 	}
 
-	.watch-label
+	.objects-label
 	{
 		display: inherit;
 	}
 
-	#watch-table td
+	.objects-table td
 	{
 		display: inline-block;
 	}
 
-	#watch-table tbody tr:nth-child(even)
+	.objects-table tbody tr:nth-child(even)
 	{
 		background-color: #282828;
 	}
 
-	#watch-table tbody tr:nth-child(odd)
+	.objects-table tbody tr:nth-child(odd)
 	{
 		background-color: #333333;
 	}

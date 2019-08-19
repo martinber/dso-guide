@@ -7,26 +7,32 @@ export var config = {
     projection: "stereographic",
 
     // optional initial geographic position [lat,lon] in degrees
-    geopos: null,
+    geopos: [-33, -63],
 
     // initial zoom level 0...zoomextend; 0|null = default, 1 = 100%, 0 < x <= zoomextend
     zoomlevel: null,
 
     // maximum zoom level
-    zoomextend: 10,
+    zoomextend: 1, // 1: disabled
 
     // Sizes are increased with higher zoom-levels
     adaptable: true,
 
     // Enable zooming and rotation with mousewheel and dragging
-    // interactive: true,
     interactive: false,
+
+    // Keep orientation angle the same as center[2]
+    orientationfixed: true,
+
+    // On which coordinates to center the map, default: zenith, if location
+    // enabled, otherwise center
+    follow: "zenith",
 
     // Display form for interactive settings
     form: false,
 
     // Display location settings (no center setting on form)
-    location: false,
+    location: true,
 
     // Display zoom controls
     controls: false,
@@ -57,7 +63,7 @@ export var config = {
 
         // Show star designation (Bayer, Flamsteed, Variable star, Gliese,
         // whichever applies first in that order)
-        names: true,
+        names: false,
 
         // Show proper name (if one exists)
         proper: false,
@@ -95,16 +101,16 @@ export var config = {
 
     dsos: {
 
-        show: true,
+        show: false,
 
         // Show only DSOs brighter than limit magnitude
         limit: 6,
 
         // Show DSO names
-        names: true,
+        names: false,
 
         // Show short DSO names
-        desig: true,
+        desig: false,
 
         // Style for DSO names
         namestyle: { fill: "#cccccc", font: "11px Helvetica, Arial, serif",
@@ -186,10 +192,10 @@ export var config = {
         show: true,
 
         // Show constellation names
-        names: true,
+        names: false,
 
         // Show short constellation names (3 letter designations)
-        desig: true,
+        desig: false,
 
         // Style for constellations, with different fonts for different ranked
         // constellation

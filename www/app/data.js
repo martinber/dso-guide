@@ -3,6 +3,20 @@
  */
 
 /**
+ * Find id of object given his data id
+ */
+export function get_id(dsos_data, data_id) {
+    for (var i = 0; i < dsos_data.features.length; i++)
+    {
+        if (dsos_data.features[i].id == data_id)
+        {
+            return i;
+        }
+    }
+    return 0; // TODO
+}
+
+/**
  * Get name of object
  */
 export function get_name(dsos_data, id) {
@@ -23,6 +37,13 @@ export function get_type(dsos_data, id) {
 export function get_mag(dsos_data, id) {
     // TODO
     return dsos_data.features[id].properties.mag;
+}
+
+/**
+ * Get dimensions of object
+ */
+export function get_dim(dsos_data, id) {
+    return dsos_data.features[id].properties.dim;
 }
 
 /**
