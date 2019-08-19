@@ -1,5 +1,5 @@
 import flask
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 import sqlite3
 
 app = flask.Flask(__name__)
@@ -19,24 +19,17 @@ def login(user, password, cursor):
         if password == database_password.fetchone()['password']:
             return user
         else:
-            return page_not_found(404)
+            return invalid_credentials(401)
     else:
-        return page_not_found(404) #en realidad erro el usuario
-#Por ahora la dejo, creo q no la voy a implementar
-@app.route('/api/v1/users/all', methods=['GET'])
-def api_all():
-    conn = sqlite3.connect('deepsky.db')
-    conn.row_factory = dict_factory
-    cur = conn.cursor()
-    all_users = cur.execute('SELECT * FROM users;').fetchall()
-
-    return jsonify(all_users)
-
-
+        return invalid_credentials(401) #en realidad erro el usuario
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "<h1>404</h1><p>The resource could not be found.</p>", 404
+    return 404
+@app.errorhandler(401)
+def invalid_credentials(e):
+    return 401
+
 
 
 @app.route('/api/v1/location', methods=['GET'])
