@@ -39,7 +39,7 @@ def api_location():
     #Checkear autenticacion usando esos atributos
     # if (request.authorization["username"] AND cur.execute(ENCONTRAR USERNAME)
     #request.authorization["password"]
-    query_parameters = request.args
+    query_parameters = request.json
 
     latitude = query_parameters.get('lat')
     longitude = query_parameters.get('lon')
@@ -56,22 +56,98 @@ def api_location():
     else:
         return error('Bad method')
 
-@app.route('/api/v1/watchlist', methods=[])
-def api_wathlist():
+    cur.close()
 
-    if :
-        aa
+    conn.commit()
 
-    elif:
-        asd
+    conn.close()
 
-    elif:
-        password
+@app.route('/api/v1/watchlist', methods=['DELETE', 'PUT', 'POST', 'GET'])
+def api_watchlist():
 
-    elif:
-        asdads
+    conn = sqlite3.connect('deepsky.db')
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    query_parameters = request.json
 
 
+    user = query_parameters.get('username')
+    star_id = query_parameters.get('star_id')
+    notes = query_parameters.get('notes')
+    style = query_parameters.get('style')
+
+    if request.methods == 'GET':
+        results = cur.execute('SELECT watchlist.star_id, watchlist.notes, watchlist.style \
+        FROM watchlist INNER JOIN users on users.?=watchlist.? ;', user, user)
+        return jsonify(results)
+
+    #elif request.methods == 'PUT':
+
+
+    elif request.methods == 'POST':
+        cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', star_id, notes, style, user)
+
+    elif request.methods == 'DELETE':
+        cur.execute('DELETE FROM watchlist where username = ?;', user)
+
+    else:
+        return error('Bad method')
+
+    cur.close()
+
+    conn.commit()
+
+    conn.close()
+
+
+@app.route('/api/v1/password', methods=['PUT'])
+def api_password():
+
+    conn = sqlite3.connect('deepsky.db')
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    query_parameters = request.json
+
+    user = query_parameters.get('username')
+    password = query_parameters.get('password')
+
+    if request.methods == 'PUT':
+        cur.execute('UPDATE users SET password = ? WHERE username = ?', password, user)
+
+    else:
+        return error('Bad method')
+
+    cur.close()
+
+    conn.commit()
+
+    conn.close()
+
+
+@app.route('/api/v1/watchlist/object', methods=['DELETE','PUT'])
+def api_objects():
+
+    conn = sqlite3.connect('deepsky.db')
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    query_parameters = request.json
+
+    user = query_parameters.get('username')
+
+    if request.methods == 'PUT':
+        pass
+
+    elif request.methods == 'DELETE':
+
+
+    else:
+        return error('Bad method')
+
+    cur.close()
+
+    conn.commit()
+
+    conn.close()
 
 
 
