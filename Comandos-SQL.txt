@@ -6,8 +6,8 @@ Lista de comandos que se pueden utilizar en SQL:
 
 - SELECT columna1,... FROM nombre-de-tabla WHERE condición; Selecciona de una tabla, las colunmas que quieras,
 de acuerdo a una condición (ej WHERE Usuario = 'nombre')
-- SELECT columna1, columna2, ... FROM nombre-de-tabla 
-	* WHERE condición1 AND condición2 ...; 
+- SELECT columna1, columna2, ... FROM nombre-de-tabla
+	* WHERE condición1 AND condición2 ...;
 	* WHERE condición1 OR condición2 ...;
 	* WHERE NOT condición;
 	* ORDER BY culumna1, columna2 ... ASC/DESC;
@@ -31,8 +31,8 @@ Para tablas:
 - ALTER TABLE table_name
 	* ADD column_name datatype;
 	* DROP COLUMN column_name;
-	* ALTER COLUMN column_name datatype; 
-	
+	* ALTER COLUMN column_name datatype;
+
 Constraint pueden ser:
 
     * NOT NULL - Ensures that a column cannot have a NULL value
@@ -76,3 +76,8 @@ Consultar todos los registros de la tabla agenda:
     print(registro)
 
 Mas info en https://python-para-impacientes.blogspot.com/2014/02/bases-de-datos-sqlite3.html
+
+try:
+
+except sqlite3.IntegrityError as error:
+    print("Error el usuario {} metio un {}, error:".format(user, values, error))
