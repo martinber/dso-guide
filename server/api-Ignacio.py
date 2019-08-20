@@ -11,11 +11,9 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-
 @app.errorhandler(404)
 def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
-
 
 @app.route('/api/v1/location', methods=['GET','PUT'])
 def api_location():
@@ -46,9 +44,7 @@ def api_location():
         return error('Bad method')
 
     cur.close()
-
     conn.commit()
-
     conn.close()
 
 @app.route('/api/v1/watchlist', methods=['DELETE', 'PUT', 'POST', 'GET'])
@@ -58,7 +54,6 @@ def api_watchlist():
     conn.row_factory = dict_factory
     cur = conn.cursor()
     query_parameters = request.json
-
 
     user = query_parameters.get('username')
     star_id = query_parameters.get('star_id')
@@ -70,9 +65,6 @@ def api_watchlist():
         FROM watchlist INNER JOIN users on users.?=watchlist.? ;', (user, user)
         return jsonify(results)
 
-    #elif request.methods == 'PUT':
-
-
     elif request.methods == 'POST':
         cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
 
@@ -83,11 +75,8 @@ def api_watchlist():
         return error('Bad method')
 
     cur.close()
-
     conn.commit()
-
     conn.close()
-
 
 @app.route('/api/v1/password', methods=['PUT'])
 def api_password():
@@ -107,11 +96,8 @@ def api_password():
         return error('Bad method')
 
     cur.close()
-
     conn.commit()
-
     conn.close()
-
 
 @app.route('/api/v1/watchlist/object', methods=['DELETE','PUT'])
 def api_objects():
@@ -120,22 +106,19 @@ def api_objects():
     conn.row_factory = dict_factory
     cur = conn.cursor()
     query_parameters = request.json
-
     user = query_parameters.get('username')
 
     if request.methods == 'PUT':
         pass
 
     elif request.methods == 'DELETE':
-
+        pass
 
     else:
         return error('Bad method')
 
     cur.close()
-
     conn.commit()
-
     conn.close()
 
 
