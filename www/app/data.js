@@ -1,5 +1,5 @@
 /**
- * Object data related functions
+ * DSO json data related functions
  */
 
 /**
@@ -41,9 +41,24 @@ export function get_mag(dsos_data, id) {
 
 /**
  * Get dimensions of object
+ *
+ * Returns a list of two floats, e.g.: [0.5, 4]
  */
-export function get_dim(dsos_data, id) {
-    return dsos_data.features[id].properties.dim;
+export function get_dimensions(dsos_data, id) {
+    var values = dsos_data.features[id].properties.dim.split("x");
+
+    var result;
+    if (values.length == 2) {
+        var result = [parseFloat(values[0]), parseFloat(values[1])];
+    } else if (values.length == 1) {
+        var result = [parseFloat(values[0]), parseFloat(values[0])];
+    }
+
+    if (isNaN(result[0]) || isNaN(result[1])) {
+        var string = dsos_data.features[id].properties.dim;
+        console.error(`Failed to parse dimensions: ${string}`);
+    }
+    return result;
 }
 
 /**

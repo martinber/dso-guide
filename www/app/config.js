@@ -1,3 +1,7 @@
+/**
+ * Contains the celestial configuration
+ */
+
 export var config = {
 
     // Default width, 0 = full parent element width; height is determined by

@@ -131,7 +131,13 @@ main#content h2
 	width: 80vh;
 	max-width: 100%;
 	height: 50vh;
-	border: none; !important /* Set by aladin stylesheet */
+	border: none !important; /* Set by aladin stylesheet */
+}
+
+/* Override aladin style */
+.aladin-location-text
+{
+	color: #000000;
 }
 
 .observation-form div

@@ -1,204 +1,65 @@
 "use strict";
 
+// TODO: Remove watchlist_rows
+import { watchlist_rows, object_styles } from "./const.js";
 import { config } from "./config.js";
 import * as data from "./data.js";
+import { watchlist_create_row, catalog_create } from "./tables.js";
 
 var aladin;
 
 /**
- * List of rows on a table, including the string that is shown to the user on
- * the table header
- */
-const table_rows = [
-    { name: "name", string: "Name" },
-    { name: "id", string: "ID" },
-    { name: "mag", string: "Mag" },
-    { name: "type", string: "Type" },
-    { name: "ra-dec", string: "RA/DEC" },
-    { name: "alt-az", string: "ALT/AZ" },
-    { name: "style", string: "Style" },
-    { name: "controls", string: "Controls" },
-    { name: "notes", string: "Notes" },
-];
-
-/**
- * Available styles for object highlighting. Each one has an integer ID
- * represented by the index on this table.
- */
-const object_styles = [
-    { name: "circle", string: "Circle" },
-    { name: "square", string: "Square" },
-    { name: "triangle", string: "Triangle" },
-];
-
-/**
- * Create table cell with style dropdown.
- */
-function create_style_cell(style) {
-    var select = $("<select>");
-
-    for (var style of object_styles) {
-        select.append(
-            $("<option>", {
-                value: style.name,
-                text: style.string,
-            })
-        );
-    }
-
-    return select;
-}
-
-/**
- * Create table row from arguments and dsos_data
+ * Delete object from watchlist
  *
- * Args:
- * - dsos_data: JSON of object data
- * - id: Object id
- * - notes: String of user notes, can be null
- * - style: Integer id of object style, can be null
+ * Deletes both on server and on client
  */
-function create_row(dsos_data, id, notes, style) {
-    var tr =  $("<tr>", {
-        id: `objects-obj-${id}`,
+function watchlist_delete(id)
+{
+    $.ajax({
+        type: "DELETE",
+        url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        dataType: "json",
+    }).done(function(dsos_data) {
+
+        $(`#watchlist-obj-${id}`).remove();
+        // TODO
+
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        alert("Error " + id);
+        $(`#watchlist-obj-${id}`).remove();
+        // TODO
+
     });
-
-    for (var row of table_rows) {
-        switch (row.name) {
-            case "id":
-                tr.append(
-                    $("<td>", {
-                        class: "objects-id",
-                    }).append(
-                        $("<span>", {
-                            class: "objects-label",
-                            text: "ID:",
-                        }),
-                        $("<span>", {
-                            text: `${id}`,
-                        }),
-                    ),
-                );
-                break;
-
-            case "name":
-                tr.append(
-                    $("<td>", {
-                        class: "objects-name",
-                        text: `${data.get_name(dsos_data, id)}`,
-                    }),
-                );
-                break;
-
-            case "mag":
-                tr.append(
-                    $("<td>", {
-                        class: "objects-mag",
-                    }).append(
-                        $("<span>", {
-                            class: "objects-label",
-                            text: "Mag:",
-                        }),
-                        $("<span>", {
-                            text: `${data.get_mag(dsos_data, id)}`,
-                        }),
-                    ),
-                );
-                break;
-
-            case "type":
-                tr.append(
-                    $("<td>", {
-                        class: "objects-type",
-                        text: `${data.get_type(dsos_data, id)}`,
-                    }),
-                );
-                break;
-
-            case "ra-dec":
-                tr.append(
-                    $("<td>", {
-                        class: "objects-ra-dec",
-                    }).append(
-                        $("<span>").append(
-                            $("<span>", {
-                                class: "objects-label",
-                                text: "RA:",
-                            }),
-                            $("<span>", {
-                                text: `${data.get_ra(dsos_data, id)}`,
-                            }),
-                        ),
-                        $("<span>").append(
-                            $("<span>", {
-                                class: "objects-label",
-                                text: "DEC:",
-                            }),
-                            $("<span>", {
-                                text: `${data.get_dec(dsos_data, id)}`,
-                            }),
-                        ),
-                    ),
-                );
-                break;
-
-            case "alt-az":
-                tr.append(
-                    $("<td>", {
-                        class: "objects-alt-az",
-                    }).append(
-                        $("<span>").append(
-                            $("<span>", {
-                                class: "objects-label",
-                                text: "ALT:",
-                            }),
-                            $("<span>", {
-                                text: `${data.get_alt(dsos_data, id)}`,
-                            }),
-                        ),
-                        $("<span>").append(
-                            $("<span>", {
-                                class: "objects-label",
-                                text: "AZ:",
-                            }),
-                            $("<span>", {
-                                text: `${data.get_az(dsos_data, id)}`,
-                            }),
-                        ),
-                    ),
-                );
-                break;
-
-            case "notes":
-                tr.append($("<td>", {
-                    class: "objects-notes",
-                }).append(
-                    $("<textarea placeholder='Notes....'>").val(notes)
-                ));
-                break;
-
-            case "style":
-                tr.append($("<td>", {
-                    class: "objects-style",
-                }).append(
-                    create_style_cell(style)
-                ));
-                break;
-
-            case "controls":
-                tr.append($("<td>", {
-                    class: "objects-controls",
-                }).append(
-                    $("<button>", {
-                        text: "X",
-                    })
-                ));
-                break;
-        }
-    }
-
-    return tr;
 }
+
+/**
+ * Save changes on given object id to server
+ */
+function watchlist_save(id)
+{
+    console.log($(`#watchlist-obj-${id} .objects-notes textarea`).val());
+    console.log($(`#watchlist-obj-${id} .objects-style select`).val());
+    $.ajax({
+        type: "PUT",
+        url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+            id: id,
+            notes: $(`#watchlist-obj-${id} .objects-notes textarea`).val(),
+            style: $(`#watchlist-obj-${id} .objects-style select`).val(),
+        }),
+        dataType: "json",
+    }).done(function(dsos_data) {
+
+        // TODO
+
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        alert("Error " + id);
+        // TODO
+
+    });
+}
+
 
 /**
  * Update the objects to show on the maps.
@@ -234,6 +95,18 @@ function update_map_location(lat, long) {
     Celestial.apply(config);
     Celestial.display(config);
     console.log(config.geopos);
+}
+
+/**
+ * Focus object on aladin map
+ *
+ * ra and dec must be given on degrees
+ * fov is the field of view to set (zoom)
+ */
+function map_goto(ra, dec, fov) {
+    aladin.gotoRaDec(ra, dec);
+    aladin.setFov(fov);
+    window.location.hash = "aladin-map" // Scroll page to map
 }
 
 function update_map_markers(objs) {
@@ -324,7 +197,12 @@ $(document).ready(function() {
     // $('#datetime-time').val(new Date().toDateInputValue());
 
     // Celestial.display(config);
-    aladin = A.aladin('#aladin-map', {fov:1, target: 'M32'})
+    aladin = A.aladin('#aladin-map', {
+        fov: 1,
+        target: 'M31',
+        reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
+        showReticle: false,
+    });
 
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
@@ -350,17 +228,6 @@ $(document).ready(function() {
 
     document.getElementById("test-button").addEventListener("click", button_test);
     */
-
-    $("#test-button").click(function() {
-        $.ajax({
-            type: "GET",
-            url: "https://baconipsum.com/api/?type=meat-and-filler",
-            dataType: "json",
-        }).done(function(json) {
-            const test_text = document.getElementById("test-text");
-            test_text.innerHTML = json[1];
-        });
-    });
 
     $("#login-form").submit(function(e) {
         e.preventDefault(); // Disable built-in HTML action
@@ -392,9 +259,10 @@ $(document).ready(function() {
         dataType: "json",
     }).done(function(dsos_data) {
 
-        for (var row of table_rows) {
+        // TODO: Move to tables.js
+        for (var row of watchlist_rows) {
 
-            $(".objects-table thead tr").append(
+            $("#watchlist-table thead tr").append(
                 $("<th>", {
                     text: row.string,
                 })
@@ -439,14 +307,16 @@ $(document).ready(function() {
 
         var map_objects = [];
         for (var obj of watchlist) {
-            create_row(dsos_data, obj.id, obj.notes, obj.style).appendTo("#watch-table tbody");
+            watchlist_create_row(dsos_data, obj.id, obj.notes, obj.style).appendTo("#watchlist-table tbody");
+            var dim = data.get_dimensions(dsos_data, obj.id);
+
             map_objects.push({
                 "type": "Feature",
                 "id": obj.id,
                 "style": obj.style,
                 "properties": {
                     "name": data.get_name(dsos_data, obj.id),
-                    "dim": data.get_dim(dsos_data, obj.id),
+                    "dim": `${dim[0]}x${dim[1]}`,
                 },
                 "geometry":{
                     "type": "Point",
@@ -459,9 +329,20 @@ $(document).ready(function() {
         }
         update_map_markers(map_objects);
 
-        create_row(dsos_data, 1, null, 3).appendTo("#catalog-table tbody");
-        create_row(dsos_data, 33, null, 3).appendTo("#catalog-table tbody");
-        create_row(dsos_data, 545, null, 3).appendTo("#catalog-table tbody");
+        catalog_create(dsos_data, null, [
+            {
+                id: 534,
+                appears_on: ["adfa", "dsfs"],
+            },
+            {
+                id: 33,
+                appears_on: ["adfa", "dsfs"],
+            },
+            {
+                id: 64,
+                appears_on: ["adfa", "dsfs"],
+            },
+        ]);
 
     });
 
