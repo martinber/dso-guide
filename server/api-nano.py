@@ -20,9 +20,9 @@ def login(user, password, cursor):
         if password == database_password.fetchone()['password']:
             return True
         else:
-            return False, "Username does not exist", tinvalid_credentials(401)
+            return False, "Invalid password", invalid_credentials(401)
     else:
-        return False, "Invalid password", invalid_credentials(401)
+        return False, "Username does not exist", tinvalid_credentials(401)
 
 @app.errorhandler(404)
 def page_not_found(e):
