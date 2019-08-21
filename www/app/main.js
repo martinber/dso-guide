@@ -5,7 +5,7 @@ import { config } from "./config.js";
 import * as data from "./data.js";
 import { watchlist_create_header, watchlist_create_row, catalog_create } from "./tables.js";
 
-var aladin;
+let aladin;
 
 /**
  * Delete object from watchlist
@@ -36,8 +36,8 @@ function watchlist_delete(id) {
 function watchlist_add(dsos_data, id) {
     // TODO
 
-    var style = 0;
-    var notes = "";
+    let style = 0;
+    let notes = "";
 
     watchlist_create_row(
         dsos_data,
@@ -82,7 +82,7 @@ function watchlist_save(id) {
  * Show given id on the sky survey map
  */
 function object_goto(dsos_data, id) {
-    var dim = data.get_dimensions(dsos_data, id);
+    let dim = data.get_dimensions(dsos_data, id);
 
     aladin.gotoRaDec(
         data.get_ra(dsos_data, id),
@@ -132,12 +132,12 @@ function update_map_location(lat, long) {
  */
 function update_map_markers(objs) {
 
-    var pointStyle = {
+    let pointStyle = {
         stroke: "#f0f",
         width: 3,
         fill: "rgba(255, 204, 255, 0.4)"
     };
-    var textStyle = {
+    let textStyle = {
         fill:"#f0f",
         font: "bold 15px 'Saira Condensed', sans-serif",
         align: "left",
@@ -151,7 +151,7 @@ function update_map_markers(objs) {
 
             // Load the geoJSON file and transform to correct coordinate
             // system, if necessaryo
-            var data = Celestial.getData({
+            let data = Celestial.getData({
                 "type": "FeatureCollection",
                 "features": objs,
             }, config.transform);
@@ -171,10 +171,10 @@ function update_map_markers(objs) {
                 // If point is visible (this doesn't work automatically for points)
                 if (Celestial.clip(d.geometry.coordinates)) {
                     // get point coordinates
-                    var pt = Celestial.mapProjection(d.geometry.coordinates);
+                    let pt = Celestial.mapProjection(d.geometry.coordinates);
                     // object radius in pixel, could be varable depending on e.g. dimension or magnitude
-                    // var r = Math.pow(100 - d.properties.mag, 0.7); // replace 20 with dimmest magnitude in the data
-                    var r = 10;
+                    // let r = Math.pow(100 - d.properties.mag, 0.7); // replace 20 with dimmest magnitude in the data
+                    let r = 10;
 
                     // draw on canvas
                     //  Set object styles fill color, line color & width etc.
@@ -199,9 +199,9 @@ function update_map_markers(objs) {
         },
     });
 
-    var catalog = A.catalog({ shape: "circle" });
+    let catalog = A.catalog({ shape: "circle" });
     aladin.addCatalog(catalog);
-    for (var obj of objs) {
+    for (let obj of objs) {
         catalog.addSources(A.source(obj.geometry.coordinates[0], obj.geometry.coordinates[1]));
     }
 
@@ -263,7 +263,7 @@ $(document).ready(function() {
         dataType: "json",
     }).done(function(dsos_data) {
 
-        var watchlist = [
+        let watchlist = [
             {
                 "id": 35,
                 "notes": "qwertyuiop",
@@ -298,8 +298,8 @@ $(document).ready(function() {
 
         watchlist_create_header($("#watchlist-table thead tr"));
 
-        var map_objects = [];
-        for (var obj of watchlist) {
+        let map_objects = [];
+        for (let obj of watchlist) {
             watchlist_create_row(
                 dsos_data,
                 obj.id,
@@ -310,7 +310,7 @@ $(document).ready(function() {
                 function(id) { object_goto(dsos_data, id) },
             ).appendTo("#watchlist-table tbody");
 
-            var dim = data.get_dimensions(dsos_data, obj.id);
+            let dim = data.get_dimensions(dsos_data, obj.id);
 
             map_objects.push({
                 "type": "Feature",
