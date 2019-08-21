@@ -129,8 +129,11 @@ def api_watchlist():
                 notes = query_parameters.get('notes')
                 style = query_parameters.get('style')
                 try:
-                    db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
-                    return "Operation Successful \n"
+                    if db.cur.execute('SELECT * FROM watchlist where username = ? and star_id = ?;', (user, star_id)).fetchall():
+                        return "Already exist \n"
+                    else:
+                        db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
+                        return "Operation Successful \n", 200
                 except sqlite3.IntegrityError:
                     return "Could not add to the list", internal_server_error(500)
 
