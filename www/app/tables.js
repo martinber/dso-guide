@@ -158,6 +158,22 @@ function create_style_cell(style) {
 
 
 /**
+ * Create watchlist header
+ *
+ * Give as an argument the already created "table thead tr"
+ */
+export function watchlist_create_header(tr) {
+
+    for (var row of watchlist_rows) {
+        tr.append(
+            $("<th>", {
+                text: row.string,
+            })
+        );
+    };
+}
+
+/**
  * Create table row from arguments and dsos_data
  *
  * Args:
@@ -334,7 +350,6 @@ export function catalog_create(
                 case "controls":
                     var dim = data.get_dimensions(dsos_data, object.id);
 
-                    console.log(object.id);
                     tr.append($("<td>", {
                         class: "objects-controls",
                     }).append(
@@ -351,6 +366,22 @@ export function catalog_create(
                             },
                         }),
                     ));
+                    break;
+
+                case "appears_on":
+                    var td = $("<td>", {
+                        class: "objects-appears-on",
+                    });
+                    var ul = $("<ul>");
+
+                    for (catalog of object.appears_on) {
+                        ul.append(
+                            $("<li>", { text: catalog, })
+                        );
+                    }
+
+                    td.append(ul);
+                    tr.append(td);
                     break;
             }
         }

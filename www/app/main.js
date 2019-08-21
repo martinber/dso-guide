@@ -1,10 +1,9 @@
 "use strict";
 
-// TODO: Remove watchlist_rows
-import { watchlist_rows, object_styles } from "./const.js";
+import { object_styles } from "./const.js";
 import { config } from "./config.js";
 import * as data from "./data.js";
-import { watchlist_create_row, catalog_create } from "./tables.js";
+import { watchlist_create_header, watchlist_create_row, catalog_create } from "./tables.js";
 
 var aladin;
 
@@ -96,6 +95,22 @@ function object_goto(dsos_data, id) {
     window.location.hash = "aladin-map";
 }
 
+// TODO: Not working, debug doing modifications to celestial.js
+function update_map_datetime(datetime) {
+    Celestial.date(datetime);
+    Celestial.apply();
+    Celestial.display(config);
+    console.log(config.geopos);
+}
+
+// TODO: Not working, debug doing modifications to celestial.js
+function update_map_location(lat, long) {
+    config.geopos = [lat, long];
+    Celestial.apply(config);
+    Celestial.display(config);
+    console.log(config.geopos);
+}
+
 /**
  * Update the objects to show on the maps.
  *
@@ -115,23 +130,6 @@ function object_goto(dsos_data, id) {
  *     }
  * }
  */
-
-// TODO: Not working, debug doing modifications to celestial.js
-function update_map_datetime(datetime) {
-    Celestial.date(datetime);
-    Celestial.apply();
-    Celestial.display(config);
-    console.log(config.geopos);
-}
-
-// TODO: Not working, debug doing modifications to celestial.js
-function update_map_location(lat, long) {
-    config.geopos = [lat, long];
-    Celestial.apply(config);
-    Celestial.display(config);
-    console.log(config.geopos);
-}
-
 function update_map_markers(objs) {
 
     var pointStyle = {
@@ -213,10 +211,6 @@ function update_map_markers(objs) {
 
 $(document).ready(function() {
 
-    // TODO
-    // $('#datetime-date').val(new Date().toDateInputValue());
-    // $('#datetime-time').val(new Date().toDateInputValue());
-
     // Celestial.display(config);
     aladin = A.aladin('#aladin-map', {
         fov: 1,
@@ -224,6 +218,10 @@ $(document).ready(function() {
         reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
         showReticle: false,
     });
+
+    // TODO
+    // $('#datetime-date').val(new Date().toDateInputValue());
+    // $('#datetime-time').val(new Date().toDateInputValue());
 
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
@@ -265,19 +263,6 @@ $(document).ready(function() {
         dataType: "json",
     }).done(function(dsos_data) {
 
-        // TODO: Move to tables.js
-        for (var row of watchlist_rows) {
-
-            $("#watchlist-table thead tr").append(
-                $("<th>", {
-                    text: row.string,
-                })
-            );
-        };
-
-        var ngc104 = data.get_id(dsos_data, "NGC104");
-        var m32 = data.get_id(dsos_data, "M32");
-
         var watchlist = [
             {
                 "id": 35,
@@ -285,12 +270,12 @@ $(document).ready(function() {
                 "style": 3,
             },
             {
-                "id": ngc104,
+                "id": data.get_id(dsos_data, "NGC104"),
                 "notes": null,
                 "style": 4,
             },
             {
-                "id": m32,
+                "id": data.get_id(dsos_data, "M31"),
                 "notes": null,
                 "style": 2,
             },
@@ -310,6 +295,8 @@ $(document).ready(function() {
                 "style": 2,
             },
         ]
+
+        watchlist_create_header($("#watchlist-table thead tr"));
 
         var map_objects = [];
         for (var obj of watchlist) {

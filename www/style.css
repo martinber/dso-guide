@@ -43,6 +43,8 @@ button
 	box-shadow: 0px 0px 3px #00000055;
 	outline: none;
 	background-color: #444444;
+    padding: 0.4em;
+    margin: 0.2em;
 }
 
 button:active
@@ -224,15 +226,25 @@ main#content h2
 	width: 100%;
 	resize: vertical;
 	min-height: 2em;
-}
-
-.objects-table textarea {
 	background-color: transparent;
 	border: 1px solid #555555;
 }
 
-.objects-table textarea:focus {
+.objects-table td.objects-notes textarea:focus {
 	background-color: #444444;
+}
+
+.objects-table td.objects-appears-on ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.objects-table td.objects-appears-on li {
+    display: inline-block;
+    margin: 0 0.2em;
+    padding: 0.2em;
+    border: 1px solid #555555;
 }
 
 @media screen and (max-width: 750px) {
