@@ -13,8 +13,7 @@ var aladin;
  *
  * Deletes both on server and on client
  */
-function watchlist_delete(id)
-{
+function watchlist_delete(id) {
     $.ajax({
         type: "DELETE",
         url: "/api/v1/watchlist/object" + $.param({ "id": id }),
@@ -33,10 +32,29 @@ function watchlist_delete(id)
 }
 
 /**
+ * Add object to watchlist, both on client and on server
+ */
+function watchlist_add(dsos_data, id) {
+    // TODO
+
+    var style = 0;
+    var notes = "";
+
+    watchlist_create_row(
+        dsos_data,
+        id,
+        notes,
+        style,
+        watchlist_delete,
+        watchlist_save,
+        function(id) { object_goto(dsos_data, id) },
+    ).appendTo("#watchlist-table tbody");
+}
+
+/**
  * Save changes on given object id to server
  */
-function watchlist_save(id)
-{
+function watchlist_save(id) {
     console.log($(`#watchlist-obj-${id} .objects-notes textarea`).val());
     console.log($(`#watchlist-obj-${id} .objects-style select`).val());
     $.ajax({
@@ -64,15 +82,19 @@ function watchlist_save(id)
 /**
  * Show given id on the sky survey map
  */
-function watchlist_goto(id)
-{
-    map_goto(
+function object_goto(dsos_data, id) {
+    var dim = data.get_dimensions(dsos_data, id);
+
+    aladin.gotoRaDec(
         data.get_ra(dsos_data, id),
         data.get_dec(dsos_data, id),
-        // Set FOV to the biggest of width,height of
-        // object
-        Math.max(dim[0], dim[1]),
     );
+    // Set FOV to the biggest of width,height of object
+    aladin.setFov(Math.max(dim[0], dim[1]));
+
+    // Scroll page to map
+    window.location.hash = "aladin-map";
+}
 
 /**
  * Update the objects to show on the maps.
@@ -108,18 +130,6 @@ function update_map_location(lat, long) {
     Celestial.apply(config);
     Celestial.display(config);
     console.log(config.geopos);
-}
-
-/**
- * Focus object on aladin map
- *
- * ra and dec must be given on degrees
- * fov is the field of view to set (zoom)
- */
-function map_goto(ra, dec, fov) {
-    aladin.gotoRaDec(ra, dec);
-    aladin.setFov(fov);
-    window.location.hash = "aladin-map" // Scroll page to map
 }
 
 function update_map_markers(objs) {
@@ -196,8 +206,6 @@ function update_map_markers(objs) {
     for (var obj of objs) {
         catalog.addSources(A.source(obj.geometry.coordinates[0], obj.geometry.coordinates[1]));
     }
-    catalog.addSources(A.source(105.70779763, -8.31350997));
-    catalog.addSources(A.source(105.74242906, -8.34776709));
 
     Celestial.display(config);
     console.log(config.geopos);
@@ -226,21 +234,6 @@ $(document).ready(function() {
         e.preventDefault(); // Disable built-in HTML action
         update_map_location(-33, -63);
     });
-
-    /*
-    function button_test() {
-        const userAction = async () => {
-            const response = await fetch("http://127.0.0.1:5000/api/v1/resources/all");
-            const myJson = await response.json();
-
-            const test_text = document.getElementById("test-text");
-            test_text.innerHTML = myJson[1].apellido;
-        }
-        userAction();
-    }
-
-    document.getElementById("test-button").addEventListener("click", button_test);
-    */
 
     $("#login-form").submit(function(e) {
         e.preventDefault(); // Disable built-in HTML action
@@ -327,7 +320,7 @@ $(document).ready(function() {
                 obj.style,
                 watchlist_delete,
                 watchlist_save,
-                watchlist_goto,
+                function(id) { object_goto(dsos_data, id) },
             ).appendTo("#watchlist-table tbody");
 
             var dim = data.get_dimensions(dsos_data, obj.id);
@@ -351,20 +344,30 @@ $(document).ready(function() {
         }
         update_map_markers(map_objects);
 
-        catalog_create(dsos_data, null, [
-            {
-                id: 534,
-                appears_on: ["adfa", "dsfs"],
-            },
-            {
-                id: 33,
-                appears_on: ["adfa", "dsfs"],
-            },
-            {
-                id: 64,
-                appears_on: ["adfa", "dsfs"],
-            },
-        ]);
+        catalog_create(
+            dsos_data,
+            null,
+            [
+                {
+                    id: 534,
+                    appears_on: ["adfa", "dsfs"],
+                },
+                {
+                    id: 33,
+                    appears_on: ["adfa", "dsfs"],
+                },
+                {
+                    id: 64,
+                    appears_on: ["adfa", "dsfs"],
+                },
+                {
+                    id: 649,
+                    appears_on: ["adfa", "dsfs"],
+                },
+            ],
+            function(id) { watchlist_add(dsos_data, id) },
+            function(id) { object_goto(dsos_data, id) },
+        );
 
     });
 

@@ -178,6 +178,8 @@ export function watchlist_create_row(
     notes,
     style,
     delete_callback,
+    save_callback,
+    goto_callback,
 ) {
     var tr =  $("<tr>", {
         id: `watchlist-obj-${id}`,
@@ -238,13 +240,7 @@ export function watchlist_create_row(
                     $("<button>", {
                         text: "GoTo",
                         click: function() {
-                            map_goto(
-                                data.get_ra(dsos_data, id),
-                                data.get_dec(dsos_data, id),
-                                // Set FOV to the biggest of width,height of
-                                // object
-                                Math.max(dim[0], dim[1]),
-                            );
+                            goto_callback(id);
                         },
                     }),
                 ));
@@ -262,6 +258,10 @@ export function watchlist_create_row(
  * - dsos_data: JSON of object data
  * - table: Table where to create the catalog
  * - catalog: Catalog array
+ * - ass_callback(id): Called when user clicks the add button, gives object id
+ *   as argument
+ * - goto_callback(id): Called when user clicks the goto button, gives object
+ *   id as argument
  *
  * Catalog array:
  *
@@ -281,7 +281,13 @@ export function watchlist_create_row(
  *     },
  * ]
  */
-export function catalog_create(dsos_data, table, catalog) {
+export function catalog_create(
+    dsos_data,
+    table,
+    catalog,
+    add_callback,
+    goto_callback
+) {
 
     // TODO: Stop hardconding #catalog-table
     for (var row of catalog_rows) {
@@ -328,25 +334,20 @@ export function catalog_create(dsos_data, table, catalog) {
                 case "controls":
                     var dim = data.get_dimensions(dsos_data, object.id);
 
+                    console.log(object.id);
                     tr.append($("<td>", {
                         class: "objects-controls",
                     }).append(
                         $("<button>", {
                             text: "Add",
-                            click: function() {
-                                console.log(object.id);
+                            click: () => {
+                                add_callback(object.id);
                             }
                         }),
                         $("<button>", {
                             text: "GoTo",
-                            click: function() {
-                                map_goto(
-                                    data.get_ra(dsos_data, object.id),
-                                    data.get_dec(dsos_data, object.id),
-                                    // Set FOV to the biggest of width,height of
-                                    // object
-                                    Math.max(dim[0], dim[1]),
-                                );
+                            click: () => {
+                                goto_callback(object.id);
                             },
                         }),
                     ));
