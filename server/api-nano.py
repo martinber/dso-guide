@@ -20,9 +20,9 @@ def login(user, password, cursor):
         if password == database_password.fetchone()['password']:
             return True
         else:
-            return False, invalid_credentials(401)
+            return False, "Username does not exist", tinvalid_credentials(401)
     else:
-        return False, invalid_credentials(401)
+        return False, "Invalid password", invalid_credentials(401)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -73,13 +73,15 @@ def api_location():
             elif request.method == 'PUT':
                 latitude = query_parameters.get('lat')
                 longitude = query_parameters.get('lon')
-                #asd = db.cur.execute("SELECT typeof(?);", (latitude,)).fetchone()
+
                 try:
                     db.cur.execute("UPDATE users SET lat=?, lon=? WHERE username=?;", (latitude, longitude, user))
                     return "Operation Successful \n", 200
 
-                except:
-                    return internal_server_error(500)
+                except sqlite3.IntegrityError:
+                    #return
+                    #print(err.args[0])
+                    return "Wrong constraints \n ", internal_server_error(500)
             else:
                 return method_not_allowed(405)
         else:
@@ -100,20 +102,22 @@ def api_addusers():
             #salt = TODO
             try:
                 db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, password, lat, lon, salt))
-            except:
-                return internal_server_error(500)
+            except sqlite3.IntegrityError:
+                return "User already exist \n ", internal_server_error(500)
         else:
             return method_not_allowed(405)
 
-@app.route('/api/v1/watchlist', methods=['DELETE', 'PUT', 'POST', 'GET'])
+@app.route('/api/v1/watchlist', methods=['DELETE', 'POST', 'GET'])
 def api_watchlist():
 
     query_parameters = request.json
-    user = login(request.authorization["username"], request.authorization["password"], cur)
+
 
     with Database() as db:
+        user = request.authorization["username"]
+        password = request.authorization["password"]
 
-        if login(user, password, cur):
+        if login(user, password, db.cur):
 
             if request.method == 'GET':
                 results = db.cur.execute('SELECT watchlist.star_id, watchlist.notes, watchlist.style \
@@ -126,12 +130,13 @@ def api_watchlist():
                 style = query_parameters.get('style')
                 try:
                     db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
-                except:
-                    return internal_server_error(500)
+                    return "Operation Successful \n"
+                except sqlite3.IntegrityError:
+                    return "Could not add to the list", internal_server_error(500)
 
             elif request.method == 'DELETE':
                 db.cur.execute('DELETE FROM watchlist where username = ?;', (user,))
-
+                return "Operation Successful \n", 200
             else:
                 return method_not_allowed(405)
 
@@ -143,17 +148,19 @@ def api_password():
 
     query_parameters = request.json
 
-    user = login(request.authorization["username"], request.authorization["password"], cur)
-    password = query_parameters.get('password')
     with Database() as db:
 
-        if login(user, password, cur):
+        user = request.authorization["username"]
+        password = request.authorization["password"]
+        if login(user, password, db.cur):
             if request.method == 'PUT':
 
                 try:
                     db.cur.execute('UPDATE users SET password = ? WHERE username = ?', (password, user))
-                except:
-                    return internal_server_error(500)
+                    return "Operation Successful \n", 200
+
+                except sqlite3.IntegrityError:
+                    return "Wrong data \n", internal_server_error(500)
             else:
                 return method_not_allowed(405)
         else:
@@ -163,11 +170,12 @@ def api_password():
 def api_objects():
 
     query_parameters = request.json
-    user = login(request.authorization["username"], request.authorization["password"], cur)
 
     with Database() as db:
+        user = request.authorization["username"]
+        password = request.authorization["password"]
 
-        if login(user, password, cur):
+        if login(user, password, db.cur):
             if request.method == 'PUT':
                 star_id = query_parameters.get('star_id')
                 notes = query_parameters.get('notes')
@@ -175,18 +183,18 @@ def api_objects():
 
                 try:
                     db.cur.execute('UPDATE watchlist ')
-
-                except:
-                    return internal_server_error(500)
+                    return "Operation Successful \n", 200
+                except sqlite3.IntegrityError:
+                    return "asdasddas", internal_server_error(500)
 
             elif request.method == 'DELETE':
                 star_id = query_parameters.get('star_id')
 
                 try:
                     db.cur.execute('DELETE from watchlist WHERE username = ? and star_id = ?;', user, star_id)
-
-                except:
-                    return internal_server_error(500)
+                    return "Operation Successful \n", 200
+                except sqlite3.IntegrityError:
+                    return "Could not delete the object \n", internal_server_error(500)
             else:
                 return method_not_allowed(405)
         else:
