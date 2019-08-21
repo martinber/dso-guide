@@ -336,20 +336,108 @@ $(document).ready(function() {
             null,
             [
                 {
-                    id: 534,
-                    appears_on: ["adfa", "dsfs"],
+                    id: 6217,
+                    appears_on: ["Binosky"],
                 },
                 {
-                    id: 33,
-                    appears_on: ["adfa", "dsfs"],
+                    id: 37,
+                    appears_on: ["Binosky"],
                 },
                 {
-                    id: 64,
-                    appears_on: ["adfa", "dsfs"],
+                    id: 4935,
+                    appears_on: ["Binosky"],
                 },
                 {
-                    id: 649,
-                    appears_on: ["adfa", "dsfs"],
+                    id: 6055,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 4615,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 4613,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 4618,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 3131,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 4309,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 1692,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5343,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5368,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 861,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 1809,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 6654,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 881,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 908,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 936,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 1957,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 2218,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5572,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5643,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5666,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5917,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 5923,
+                    appears_on: ["Binosky"],
+                },
+                {
+                    id: 2570,
+                    appears_on: ["Binosky"],
                 },
             ],
             function(id) { watchlist_add(dsos_data, id) },
