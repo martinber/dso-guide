@@ -165,8 +165,20 @@ function create_style_cell(style) {
  * - id: Object id
  * - notes: String of user notes, can be null
  * - style: Integer id of object style, can be null
+ * - delete_callback(id): Called when user clicks the delete button, gives
+ *   object id as argument
+ * - save_callback(id): Called when user clicks the save button, gives object id
+ *   as argument
+ * - goto_callback(id): Called when user clicks the goto button, gives object
+ *   id as argument
  */
-export function watchlist_create_row(dsos_data, id, notes, style) {
+export function watchlist_create_row(
+    dsos_data,
+    id,
+    notes,
+    style,
+    delete_callback,
+) {
     var tr =  $("<tr>", {
         id: `watchlist-obj-${id}`,
     });
@@ -214,13 +226,13 @@ export function watchlist_create_row(dsos_data, id, notes, style) {
                     $("<button>", {
                         text: "X",
                         click: function() {
-                            watchlist_delete(id);
+                            delete_callback(id);
                         }
                     }),
                     $("<button>", {
                         text: "Save",
                         click: function() {
-                            watchlist_save(id);
+                            save_callback(id);
                         }
                     }),
                     $("<button>", {

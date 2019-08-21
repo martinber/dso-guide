@@ -62,6 +62,19 @@ function watchlist_save(id)
 
 
 /**
+ * Show given id on the sky survey map
+ */
+function watchlist_goto(id)
+{
+    map_goto(
+        data.get_ra(dsos_data, id),
+        data.get_dec(dsos_data, id),
+        // Set FOV to the biggest of width,height of
+        // object
+        Math.max(dim[0], dim[1]),
+    );
+
+/**
  * Update the objects to show on the maps.
  *
  * Provide a list of objects to show. Most properties are taken directly from
@@ -307,7 +320,16 @@ $(document).ready(function() {
 
         var map_objects = [];
         for (var obj of watchlist) {
-            watchlist_create_row(dsos_data, obj.id, obj.notes, obj.style).appendTo("#watchlist-table tbody");
+            watchlist_create_row(
+                dsos_data,
+                obj.id,
+                obj.notes,
+                obj.style,
+                watchlist_delete,
+                watchlist_save,
+                watchlist_goto,
+            ).appendTo("#watchlist-table tbody");
+
             var dim = data.get_dimensions(dsos_data, obj.id);
 
             map_objects.push({
