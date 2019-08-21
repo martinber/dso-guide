@@ -81,3 +81,7 @@ try:
 
 except sqlite3.IntegrityError as error:
     print("Error el usuario {} metio un {}, error:".format(user, values, error))
+
+comando curl:
+curl -u 'tincho:ucacha' --header "Content-Type: application/json" --request \
+PUT --data '{"lat":-91, "lon":-67.2}' http://127.0.0.1:5000/api/v1/location
