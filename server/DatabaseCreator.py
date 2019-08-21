@@ -14,10 +14,10 @@ lon float CHECK(typeof(lon) == \"real\" or typeof(lat) == "integer" and lon >= -
 salt text CHECK(typeof(salt) == \"text\"));')
 
 cur.execute('CREATE TABLE watchlist \
-(star_id int CHECK(typeof(star_id) == \"integer\" and star_id >= 1), \
+(star_id int NOT NULL CHECK(typeof(star_id) == \"integer\" and star_id >= 1), \
 notes text CHECK(typeof(notes) == \"text\"),\
 style int CHECK(typeof(style) == \"integer\"), \
-username text CHECK(typeof(username) == \"text\"));')
+username text NOT NULL CHECK(typeof(username) == \"text\"));')
 
 cur.execute('INSERT INTO users values (\'nano\', \'tuli\', -33.3, -62.4, \'asd123\');')
 cur.execute('INSERT INTO users values (\'tincho\', \'ucacha\', -33.54, -62.321, \'asdasd\');')

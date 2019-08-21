@@ -20,9 +20,9 @@ def login(user, password, cursor):
         if password == database_password.fetchone()['password']:
             return True
         else:
-            return False
+            return False, invalid_credentials(401)
     else:
-        return False
+        return False, invalid_credentials(401)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -30,6 +30,12 @@ def page_not_found(e):
 @app.errorhandler(401)
 def invalid_credentials(e):
     return 401
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return 405
+@app.errorhandler(500)
+def internal_server_error(e):
+    return 500
 
 class Database:
 
@@ -68,11 +74,14 @@ def api_location():
                 latitude = query_parameters.get('lat')
                 longitude = query_parameters.get('lon')
                 #asd = db.cur.execute("SELECT typeof(?);", (latitude,)).fetchone()
-                db.cur.execute("UPDATE users SET lat=?, lon=? WHERE username=?;", (latitude, longitude, user))
-                return "Operation Successful \n", 200
+                try:
+                    db.cur.execute("UPDATE users SET lat=?, lon=? WHERE username=?;", (latitude, longitude, user))
+                    return "Operation Successful \n", 200
 
+                except:
+                    return internal_server_error(500)
             else:
-                return error('Bad method')
+                return method_not_allowed(405)
         else:
             return invalid_credentials(401)
 
@@ -88,10 +97,13 @@ def api_addusers():
             password = query_parameters.get('password')
             lat = 0
             lon = 0
-            db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, password, lat, lon, salt))
-
+            #salt = TODO
+            try:
+                db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, password, lat, lon, salt))
+            except:
+                return internal_server_error(500)
         else:
-            return error('Bad method')
+            return method_not_allowed(405)
 
 @app.route('/api/v1/watchlist', methods=['DELETE', 'PUT', 'POST', 'GET'])
 def api_watchlist():
@@ -104,7 +116,7 @@ def api_watchlist():
         if login(user, password, cur):
 
             if request.method == 'GET':
-                results = cur.execute('SELECT watchlist.star_id, watchlist.notes, watchlist.style \
+                results = db.cur.execute('SELECT watchlist.star_id, watchlist.notes, watchlist.style \
                 FROM watchlist INNER JOIN users on users.?=watchlist.? ;', (user, user))
                 return jsonify(results)
 
@@ -112,12 +124,16 @@ def api_watchlist():
                 star_id = query_parameters.get('star_id')
                 notes = query_parameters.get('notes')
                 style = query_parameters.get('style')
-                cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
+                try:
+                    db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
+                except:
+                    return internal_server_error(500)
 
             elif request.method == 'DELETE':
-                cur.execute('DELETE FROM watchlist where username = ?;', (user,))
+                db.cur.execute('DELETE FROM watchlist where username = ?;', (user,))
+
             else:
-                return error('Bad method')
+                return method_not_allowed(405)
 
         else:
             return invalid_credentials(401)
@@ -133,10 +149,13 @@ def api_password():
 
         if login(user, password, cur):
             if request.method == 'PUT':
-                cur.execute('UPDATE users SET password = ? WHERE username = ?', (password, user))
 
+                try:
+                    db.cur.execute('UPDATE users SET password = ? WHERE username = ?', (password, user))
+                except:
+                    return internal_server_error(500)
             else:
-                return error('Bad method')
+                return method_not_allowed(405)
         else:
             return invalid_credentials(401)
 
@@ -150,13 +169,26 @@ def api_objects():
 
         if login(user, password, cur):
             if request.method == 'PUT':
-                pass
+                star_id = query_parameters.get('star_id')
+                notes = query_parameters.get('notes')
+                style = query_parameters.get('style')
+
+                try:
+                    db.cur.execute('UPDATE watchlist ')
+
+                except:
+                    return internal_server_error(500)
 
             elif request.method == 'DELETE':
-                pass
+                star_id = query_parameters.get('star_id')
 
+                try:
+                    db.cur.execute('DELETE from watchlist WHERE username = ? and star_id = ?;', user, star_id)
+
+                except:
+                    return internal_server_error(500)
             else:
-                return error('Bad method')
+                return method_not_allowed(405)
         else:
             return invalid_credentials(401)
 
