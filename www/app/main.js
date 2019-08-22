@@ -116,51 +116,69 @@ function update_map_location(lat, long) {
  *
  * Provide a list of objects to show. Most properties are taken directly from
  * the json database.
- * {
- *     "type": "Feature",
- *     "id": 43,
- *     "style": 2,
- *     "properties": {
- *         "name": "NGC 54",
- *         "dim": "1.5x3" // Size in arcminutes
+ *
+ * The class must be an integer, 0 means that the object is from the catalog,
+ * positive numbers represent styles from const.js:object_styles
+ *
+ * Example of obj argument:
+ * [
+ *     {
+ *         "type": "Feature",
+ *         "id": 43,
+ *         "style": 2,
+ *         "properties": {
+ *             "name": "NGC 54",
+ *             "dim": "1.5x3" // Size in arcminutes
+ *         },
+ *         "geometry":{
+ *             "type": "Point",
+ *             "coordinates": [-80.7653, 38.7837]
+ *         }
  *     },
- *     "geometry":{
- *         "type": "Point",
- *         "coordinates": [-80.7653, 38.7837]
- *     }
- * }
+ *     ...
+ *  ]
+ *
  */
-function update_map_markers(objs) {
+function update_map_markers(objs, cls) {
 
-    let pointStyle = {
-        stroke: "#f0f",
+    let point_style = {
+        stroke: "#ff00ff",
         width: 3,
         fill: "rgba(255, 204, 255, 0.4)"
     };
-    let textStyle = {
-        fill:"#f0f",
+    let text_style = {
+        fill: "#f0f",
         font: "bold 15px 'Saira Condensed', sans-serif",
         align: "left",
         baseline: "bottom"
     };
+
+    // Translate the given integer class to a string to use with Celestial
+    let class_string = "catalog";
+    if (cls > 0)
+    {
+        let class_string = `watclist-${cls}`;
+    }
 
     Celestial.add({
         type: "line",
         callback: function(error, json) {
             if (error) return console.warn(error);
 
-            // Load the geoJSON file and transform to correct coordinate
-            // system, if necessaryo
+            // Load the given geoJSON objects and transform to correct
+            // coordinate system, if necessary
             let data = Celestial.getData({
                 "type": "FeatureCollection",
                 "features": objs,
             }, config.transform);
 
-            // Add to celestial objects container in d3
+            // Add to celestial objects container from d3 library
+            // I guess that ".asterisms" is used by convention because it works
+            // with any string
             Celestial.container.selectAll(".asterisms")
                 .data(data.features)
                 .enter().append("path")
-                .attr("class", "watchlist");
+                .attr("class", class_string);
             // Trigger redraw to display changes
             Celestial.redraw();
         },
@@ -178,7 +196,7 @@ function update_map_markers(objs) {
 
                     // draw on canvas
                     //  Set object styles fill color, line color & width etc.
-                    Celestial.setStyle(pointStyle);
+                    Celestial.setStyle(point_style);
                     // Start the drawing path
                     Celestial.context.beginPath();
                     // Thats a circle in html5 canvas
@@ -191,7 +209,7 @@ function update_map_markers(objs) {
                     Celestial.context.fill();
 
                     // Set text styles
-                    Celestial.setTextStyle(textStyle);
+                    Celestial.setTextStyle(text_style);
                     // and draw text on canvas
                     Celestial.context.fillText(d.properties.name, pt[0] + r - 1, pt[1] - r + 1);
                 }
