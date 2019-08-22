@@ -265,34 +265,64 @@ $(document).ready(function() {
 
         let watchlist = [
             {
-                "id": 35,
-                "notes": "qwertyuiop",
-                "style": 3,
-            },
-            {
                 "id": data.get_id(dsos_data, "NGC104"),
                 "notes": null,
                 "style": 4,
             },
             {
                 "id": data.get_id(dsos_data, "M31"),
-                "notes": null,
+                "notes": "Also known as Andromeda",
                 "style": 2,
             },
             {
-                "id": 435,
+                id: 4613,
                 "notes": null,
-                "style": 2,
+                "style": 1,
             },
             {
-                "id": 4035,
+                id: 3131,
                 "notes": null,
-                "style": 2,
+                "style": 1,
             },
             {
-                "id": 534,
+                id: 1692,
                 "notes": null,
-                "style": 2,
+                "style": 1,
+            },
+            {
+                id: 5368,
+                "notes": null,
+                "style": 1,
+            },
+            {
+                id: 1809,
+                "notes": null,
+                "style": 1,
+            },
+            {
+                id: 881,
+                "notes": null,
+                "style": 1,
+            },
+            {
+                id: 936,
+                "notes": null,
+                "style": 1,
+            },
+            {
+                id: 2218,
+                "notes": null,
+                "style": 1,
+            },
+            {
+                id: 5643,
+                "notes": null,
+                "style": 1,
+            },
+            {
+                id: 5917,
+                "notes": null,
+                "style": 1,
             },
         ]
 
