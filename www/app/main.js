@@ -112,13 +112,94 @@ function update_map_location(lat, long) {
 }
 
 /**
+ * Set celestial redraw function
+ *
+ * Determines how the narkers will look on the celestial map
+ */
+function celestial_redraw() {
+    let text_style = {
+        fill: "#f0f",
+        font: "bold 15px 'Saira Condensed', sans-serif",
+        align: "left",
+        baseline: "bottom"
+    };
+    let point_style = {
+        stroke: "#ff00ff",
+        width: 3,
+        fill: "rgba(255, 204, 255, 0.4)"
+    };
+
+    Celestial.container.selectAll(`.watchlist-0`).each(function(d) {
+
+        // If point is visible
+        if (Celestial.clip(d.geometry.coordinates)) {
+
+            // Get point coordinates
+            let pt = Celestial.mapProjection(d.geometry.coordinates);
+
+            let radius = 10;
+
+            Celestial.setStyle(point_style);
+
+            // Draw a circle
+            Celestial.context.beginPath();
+            Celestial.context.arc(pt[0], pt[1], radius, 0, 2 * Math.PI);
+            Celestial.context.closePath();
+
+            Celestial.context.stroke();
+            Celestial.context.fill();
+
+            // Draw text
+            Celestial.setTextStyle(text_style);
+            Celestial.context.fillText(
+                d.properties.name, // Text
+                pt[0] + radius - 1, // X
+                pt[1] - radius + 1 // Y
+            );
+        }
+    });
+    Celestial.container.selectAll(`.watchlist-1`).each(function(d) {
+
+        // If point is visible
+        if (Celestial.clip(d.geometry.coordinates)) {
+
+            // Get point coordinates
+            let pt = Celestial.mapProjection(d.geometry.coordinates);
+
+            let size = 10;
+
+            Celestial.setStyle(point_style);
+
+            // Draw a circle
+            Celestial.context.beginPath();
+
+            let hsize = size/2;
+            Celestial.context.moveTo(pt[0] - hsize, pt[1] - hsize);
+            Celestial.context.lineTo(pt[0] + hsize, pt[1] + hsize);
+            Celestial.context.stroke();
+            Celestial.context.moveTo(pt[0] - hsize, pt[1] + hsize);
+            Celestial.context.lineTo(pt[0] + hsize, pt[1] - hsize);
+            Celestial.context.stroke();
+
+            // Draw text
+            Celestial.setTextStyle(text_style);
+            Celestial.context.fillText(
+                d.properties.name, // Text
+                pt[0] + size - 1, // X
+                pt[1] - size + 1 // Y
+            );
+        }
+    });
+}
+
+/**
  * Update the objects to show on the maps.
  *
  * Provide a list of objects to show. Most properties are taken directly from
  * the json database.
  *
- * The class must be an integer, 0 means that the object is from the catalog,
- * positive numbers represent styles from const.js:object_styles
+ * The class must be an integer, -1 means that the object is from the catalog,
+ * numbers from 0 represent styles from const.js:object_styles
  *
  * Example of obj argument:
  * [
@@ -139,25 +220,34 @@ function update_map_location(lat, long) {
  *  ]
  *
  */
-function update_map_markers(objs, cls) {
-
-    let point_style = {
-        stroke: "#ff00ff",
-        width: 3,
-        fill: "rgba(255, 204, 255, 0.4)"
-    };
-    let text_style = {
-        fill: "#f0f",
-        font: "bold 15px 'Saira Condensed', sans-serif",
-        align: "left",
-        baseline: "bottom"
-    };
+function add_map_markers(objs, cls) {
 
     // Translate the given integer class to a string to use with Celestial
     let class_string = "catalog";
-    if (cls > 0)
+    if (cls >= 0)
     {
-        let class_string = `watclist-${cls}`;
+        class_string = `watchlist-${cls}`;
+    }
+
+    // Separate objs given on different lists depending on the style used
+    // Each element of this array is a list of objects that share the same style
+    // So you get something like
+    // objs_by_style = [
+    //     [{obj}, {obj}, ...], // Objects that share style 0
+    //     [{obj}, {obj}, ...], // Objects that share style 1
+    //     undefined,           // No objects share style 2
+    //     [{obj}, {obj}, ...], // Objects that share style 3
+    // ]
+    let objs_by_style = []
+
+    for (let obj of objs) {
+
+        // If this is the first object with this style, create the list
+        if (typeof objs_by_style[obj.style] == "undefined") {
+            objs_by_style[obj.style] = [];
+        }
+
+        objs_by_style[obj.style].push(obj);
     }
 
     Celestial.add({
@@ -182,39 +272,7 @@ function update_map_markers(objs, cls) {
             // Trigger redraw to display changes
             Celestial.redraw();
         },
-        redraw: function() {
-            // Select the added objects by class name as given previously
-            Celestial.container.selectAll(".watchlist").each(function(d) {
-
-                // If point is visible (this doesn't work automatically for points)
-                if (Celestial.clip(d.geometry.coordinates)) {
-                    // get point coordinates
-                    let pt = Celestial.mapProjection(d.geometry.coordinates);
-                    // object radius in pixel, could be varable depending on e.g. dimension or magnitude
-                    // let r = Math.pow(100 - d.properties.mag, 0.7); // replace 20 with dimmest magnitude in the data
-                    let r = 10;
-
-                    // draw on canvas
-                    //  Set object styles fill color, line color & width etc.
-                    Celestial.setStyle(point_style);
-                    // Start the drawing path
-                    Celestial.context.beginPath();
-                    // Thats a circle in html5 canvas
-                    Celestial.context.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
-                    // Finish the drawing path
-                    Celestial.context.closePath();
-                    // Draw a line along the path with the prevoiusly set stroke color and line width
-                    Celestial.context.stroke();
-                    // Fill the object path with the prevoiusly set fill color
-                    Celestial.context.fill();
-
-                    // Set text styles
-                    Celestial.setTextStyle(text_style);
-                    // and draw text on canvas
-                    Celestial.context.fillText(d.properties.name, pt[0] + r - 1, pt[1] - r + 1);
-                }
-            });
-        },
+        redraw: celestial_redraw,
     });
 
     let catalog = A.catalog({ shape: "circle" });
@@ -285,12 +343,12 @@ $(document).ready(function() {
             {
                 "id": data.get_id(dsos_data, "NGC104"),
                 "notes": null,
-                "style": 4,
+                "style": 1,
             },
             {
                 "id": data.get_id(dsos_data, "M31"),
                 "notes": "Also known as Andromeda",
-                "style": 2,
+                "style": 0,
             },
             {
                 id: 4613,
@@ -300,7 +358,7 @@ $(document).ready(function() {
             {
                 id: 3131,
                 "notes": null,
-                "style": 1,
+                "style": 0,
             },
             {
                 id: 1692,
@@ -315,7 +373,7 @@ $(document).ready(function() {
             {
                 id: 1809,
                 "notes": null,
-                "style": 1,
+                "style": 0,
             },
             {
                 id: 881,
@@ -325,7 +383,7 @@ $(document).ready(function() {
             {
                 id: 936,
                 "notes": null,
-                "style": 1,
+                "style": 0,
             },
             {
                 id: 2218,
@@ -335,7 +393,7 @@ $(document).ready(function() {
             {
                 id: 5643,
                 "notes": null,
-                "style": 1,
+                "style": 0,
             },
             {
                 id: 5917,
@@ -377,7 +435,7 @@ $(document).ready(function() {
                 }
             });
         }
-        update_map_markers(map_objects);
+        add_map_markers(map_objects, 1);
 
         catalog_create(
             dsos_data,
