@@ -18,6 +18,10 @@ star chart
 
 - Javascript
 
+- https://swagger.io/specification/
+
+- https://www.getpostman.com/products
+
 ## Tutorials
 
 - https://realpython.com/handling-email-confirmation-in-flask/
