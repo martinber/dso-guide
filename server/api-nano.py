@@ -1,6 +1,7 @@
 import flask
 from flask import request, jsonify, render_template
 import sqlite3
+import hashlib
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -16,8 +17,8 @@ def dict_factory(cursor, row):
 def login(user, password, cursor):
     """ Devuelve true o false """
     if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)):
-        database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,))
-        if password == database_password.fetchone()['password']:
+        database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
+        if password == database_password['password']:
             return True
         else:
             return False, "Invalid password", invalid_credentials(401)
@@ -26,16 +27,16 @@ def login(user, password, cursor):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return 404
+    return "404"
 @app.errorhandler(401)
 def invalid_credentials(e):
-    return 401
+    return "401 \n"
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return 405
+    return "405"
 @app.errorhandler(500)
 def internal_server_error(e):
-    return 500
+    return "500"
 
 class Database:
 
@@ -64,7 +65,10 @@ def api_location():
         user = request.authorization["username"]
         password = request.authorization["password"]
 
-        if login(user, password, db.cur):
+        #hash_object = hashlib.sha256(password.encode())
+        #print(hash_object.hexdigest())
+
+        if login(user, password, db.cur)[0]:
 
             if request.method == 'GET':
                 results = db.cur.execute(("SELECT lat, lon FROM users WHERE username=?;"), (user,)).fetchone()
@@ -85,7 +89,7 @@ def api_location():
             else:
                 return method_not_allowed(405)
         else:
-            return invalid_credentials(401)
+            return "Unauthorized \n", invalid_credentials(401)
 
 @app.route('/api/v1/users', methods=['POST'])
 def api_addusers():
