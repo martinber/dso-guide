@@ -136,13 +136,13 @@ function create_notes_cell(notes) {
  * Create table cell with style dropdown
  */
 function create_style_cell(style) {
-    var td = $("<td>", {
+    let td = $("<td>", {
         class: "objects-style",
     });
 
-    var select = $("<select>");
+    let select = $("<select>");
 
-    for (var style of object_styles) {
+    for (let style of object_styles) {
         select.append(
             $("<option>", {
                 value: style.name,
@@ -164,7 +164,7 @@ function create_style_cell(style) {
  */
 export function watchlist_create_header(tr) {
 
-    for (var row of watchlist_rows) {
+    for (let row of watchlist_rows) {
         tr.append(
             $("<th>", {
                 text: row.string,
@@ -197,11 +197,11 @@ export function watchlist_create_row(
     save_callback,
     goto_callback,
 ) {
-    var tr =  $("<tr>", {
+    let tr =  $("<tr>", {
         id: `watchlist-obj-${id}`,
     });
 
-    for (var row of watchlist_rows) {
+    for (let row of watchlist_rows) {
         switch (row.name) {
             case "id":
                 tr.append(create_id_cell(id));
@@ -236,7 +236,7 @@ export function watchlist_create_row(
                 break;
 
             case "controls":
-                var dim = data.get_dimensions(dsos_data, id);
+                let dim = data.get_dimensions(dsos_data, id);
 
                 tr.append($("<td>", {
                     class: "objects-controls",
@@ -306,7 +306,7 @@ export function catalog_create(
 ) {
 
     // TODO: Stop hardconding #catalog-table
-    for (var row of catalog_rows) {
+    for (let row of catalog_rows) {
 
         $("#catalog-table thead tr").append(
             $("<th>", {
@@ -315,13 +315,13 @@ export function catalog_create(
         );
     };
 
-    for (var object of catalog) {
+    for (let object of catalog) {
 
-        var tr =  $("<tr>", {
+        let tr =  $("<tr>", {
             id: `watchlist-obj-${object.id}`,
         });
 
-        for (var row of catalog_rows) {
+        for (let row of catalog_rows) {
             switch (row.name) {
                 case "id":
                     tr.append(create_id_cell(object.id));
@@ -348,13 +348,14 @@ export function catalog_create(
                     break;
 
                 case "controls":
-                    var dim = data.get_dimensions(dsos_data, object.id);
+                    let dim = data.get_dimensions(dsos_data, object.id);
 
+                    console.log(object.id);
                     tr.append($("<td>", {
                         class: "objects-controls",
                     }).append(
                         $("<button>", {
-                            text: "Add",
+                            text: `Add`,
                             click: () => {
                                 add_callback(object.id);
                             }
@@ -369,12 +370,12 @@ export function catalog_create(
                     break;
 
                 case "appears_on":
-                    var td = $("<td>", {
+                    let td = $("<td>", {
                         class: "objects-appears-on",
                     });
-                    var ul = $("<ul>");
+                    let ul = $("<ul>");
 
-                    for (catalog of object.appears_on) {
+                    for (let catalog of object.appears_on) {
                         ul.append(
                             $("<li>", { text: catalog, })
                         );

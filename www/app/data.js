@@ -6,7 +6,7 @@
  * Find id of object given his data id
  */
 export function get_id(dsos_data, data_id) {
-    for (var i = 0; i < dsos_data.features.length; i++)
+    for (let i = 0; i < dsos_data.features.length; i++)
     {
         if (dsos_data.features[i].id == data_id)
         {
@@ -45,17 +45,17 @@ export function get_mag(dsos_data, id) {
  * Returns a list of two floats, e.g.: [0.5, 4]
  */
 export function get_dimensions(dsos_data, id) {
-    var values = dsos_data.features[id].properties.dim.split("x");
+    let values = dsos_data.features[id].properties.dim.split("x");
 
-    var result;
+    let result;
     if (values.length == 2) {
-        var result = [parseFloat(values[0]), parseFloat(values[1])];
+        result = [parseFloat(values[0]), parseFloat(values[1])];
     } else if (values.length == 1) {
-        var result = [parseFloat(values[0]), parseFloat(values[0])];
+        result = [parseFloat(values[0]), parseFloat(values[0])];
     }
 
     if (isNaN(result[0]) || isNaN(result[1])) {
-        var string = dsos_data.features[id].properties.dim;
+        let string = dsos_data.features[id].properties.dim;
         console.error(`Failed to parse dimensions: ${string}`);
     }
     return result;

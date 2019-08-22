@@ -76,31 +76,6 @@ Response:
 ]
 ```
 
-Replace watchlist
------------------
-
-```
-PUT /api/v1/watchlist
-
-[
-    {
-        "id": 35,
-        "notes": "qwertyuiop",
-        "style": 3,
-    },
-    {
-        "id": 12,
-        "notes": "asdfghjkl",
-        "style": 4,
-    },
-    {
-        "id": 45,
-        "notes": "zxcvbnm",
-        "style": 2,
-    },
-]
-```
-
 Add to watchlist
 ----------------
 
@@ -119,4 +94,17 @@ Delete object on watchlist
 
 ```
 DELETE /api/v1/watchlist/object?id=34
+```
+
+Update object on watchlist
+--------------------------
+
+```
+PUT /api/v1/watchlist/object?id=34
+
+{
+    "id": 35,
+    "notes": "qwertyuiop",
+    "style": 3,
+}
 ```
