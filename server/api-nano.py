@@ -1,7 +1,7 @@
 import flask
 from flask import request, jsonify, render_template
 import sqlite3
-import hashlib
+import hashlib, os, binascii
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -18,12 +18,18 @@ def login(user, password, cursor):
     """ Devuelve true o false """
     if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)):
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
+        #salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
+        #hashpw =  hashlib.sha256(password.encode())
+        #hash_object = hashlib.sha256(password.encode())
+        #print(hash_object.hexdigest())
+        #salt = os.urandom(8) #.hexdigest().encode('ascii')
+        print(salt)
         if password == database_password['password']:
             return True
         else:
-            return False, "Invalid password", invalid_credentials(401)
+            return False
     else:
-        return False, "Username does not exist", tinvalid_credentials(401)
+        return False
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -65,14 +71,11 @@ def api_location():
         user = request.authorization["username"]
         password = request.authorization["password"]
 
-        #hash_object = hashlib.sha256(password.encode())
-        #print(hash_object.hexdigest())
-
-        if login(user, password, db.cur)[0]:
+        if login(user, password, db.cur):
 
             if request.method == 'GET':
                 results = db.cur.execute(("SELECT lat, lon FROM users WHERE username=?;"), (user,)).fetchone()
-                return jsonify(results)
+                return jsonify(results), 200
 
             elif request.method == 'PUT':
                 latitude = query_parameters.get('lat')
@@ -83,13 +86,11 @@ def api_location():
                     return "Operation Successful \n", 200
 
                 except sqlite3.IntegrityError:
-                    #return
-                    #print(err.args[0])
-                    return "Wrong constraints \n ", internal_server_error(500)
+                    return "Wrong constraints \n ", 500
             else:
-                return method_not_allowed(405)
+                return "Method not allowed \n", 405
         else:
-            return "Unauthorized \n", invalid_credentials(401)
+            return "Unauthorized \n", 401
 
 @app.route('/api/v1/users', methods=['POST'])
 def api_addusers():
@@ -101,15 +102,17 @@ def api_addusers():
         if request.method == 'POST':
             user = query_parameters.get('username')
             password = query_parameters.get('password')
+            #salt = os.urandom(8)
+
             lat = 0
             lon = 0
-            #salt = TODO
             try:
                 db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, password, lat, lon, salt))
+                return "Operation Successful \n", 200
             except sqlite3.IntegrityError:
-                return "User already exist \n ", internal_server_error(500)
+                return "User already exist \n ", 500
         else:
-            return method_not_allowed(405)
+            return "Method not allowed \n", 405
 
 @app.route('/api/v1/watchlist', methods=['DELETE', 'POST', 'GET'])
 def api_watchlist():
@@ -134,18 +137,18 @@ def api_watchlist():
                 style = query_parameters.get('style')
                 try:
                     if db.cur.execute('SELECT * FROM watchlist where username = ? and star_id = ?;', (user, star_id)).fetchall():
-                        return "Already exist \n"
+                        return "Already exist \n", 200 #fijarse si es 200
                     else:
                         db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
                         return "Operation Successful \n", 200
                 except sqlite3.IntegrityError:
-                    return "Could not add to the list", internal_server_error(500)
+                    return "Could not add to the list", 500
 
             elif request.method == 'DELETE':
                 db.cur.execute('DELETE FROM watchlist where username = ?;', (user,))
                 return "Operation Successful \n", 200
             else:
-                return method_not_allowed(405)
+                return "Method not allowed \n", 405
 
         else:
             return invalid_credentials(401)
@@ -159,6 +162,7 @@ def api_password():
 
         user = request.authorization["username"]
         password = request.authorization["password"]
+
         if login(user, password, db.cur):
             if request.method == 'PUT':
 
@@ -167,9 +171,9 @@ def api_password():
                     return "Operation Successful \n", 200
 
                 except sqlite3.IntegrityError:
-                    return "Wrong data \n", internal_server_error(500)
+                    return "Wrong data \n", 500
             else:
-                return method_not_allowed(405)
+                return "Method not allowed \n", 405
         else:
             return invalid_credentials(401)
 
@@ -192,7 +196,7 @@ def api_objects():
                     db.cur.execute('UPDATE watchlist ')
                     return "Operation Successful \n", 200
                 except sqlite3.IntegrityError:
-                    return "asdasddas", internal_server_error(500)
+                    return "Wrong constraint", 500
 
             elif request.method == 'DELETE':
                 star_id = query_parameters.get('star_id')
@@ -201,10 +205,12 @@ def api_objects():
                     db.cur.execute('DELETE from watchlist WHERE username = ? and star_id = ?;', user, star_id)
                     return "Operation Successful \n", 200
                 except sqlite3.IntegrityError:
-                    return "Could not delete the object \n", internal_server_error(500)
+                    return "Could not delete the object \n", 500
             else:
-                return method_not_allowed(405)
+                return "Method not allowed \n", 405
         else:
-            return invalid_credentials(401)
+            return 401
 
-app.run()
+if __name__ == "__main__":
+
+    app.run(host="localhost", port=5000)
