@@ -19,11 +19,11 @@ def login(user, password, cursor):
     if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)):
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
         if password == database_password['password']:
-            return True
+            return True, "200"
         else:
             return False, "Invalid password", invalid_credentials(401)
     else:
-        return False, "Username does not exist", tinvalid_credentials(401)
+        return False, "Username does not exist", invalid_credentials(401)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -207,4 +207,6 @@ def api_objects():
         else:
             return invalid_credentials(401)
 
-app.run()
+if __name__ == "__main__":
+
+    app.run(host="0.0.0.0", port=80)
