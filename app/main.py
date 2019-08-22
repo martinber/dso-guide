@@ -25,15 +25,11 @@ def login(user, password, cursor):
         #salt = os.urandom(8) #.hexdigest().encode('ascii')
         print(salt)
         if password == database_password['password']:
-            return True, "200"
+            return True
         else:
             return False
     else:
-<<<<<<< HEAD
-        return False, "Username does not exist", invalid_credentials(401)
-=======
         return False
->>>>>>> 5d49df93689efe59ed061079fb3b54109988bb3a
 
 @app.errorhandler(404)
 def page_not_found(e):
