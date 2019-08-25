@@ -1,12 +1,71 @@
 "use strict";
 
-import { object_styles } from "./const.js";
+import { object_styles, catalog } from "./const.js";
 import { config } from "./config.js";
 import * as data from "./data.js";
 import { watchlist_create_header, watchlist_create_row, catalog_create } from "./tables.js";
 
+
+// Define global variables
 let aladin;
 let aladin_catalogs = {};
+let watchlist = [
+    {
+        id: 37,
+        "notes": null,
+        "style": 2,
+    },
+    {
+        id: 4613,
+        "notes": null,
+        "style": 1,
+    },
+    {
+        id: 3131,
+        "notes": null,
+        "style": 0,
+    },
+    {
+        id: 1692,
+        "notes": null,
+        "style": 1,
+    },
+    {
+        id: 5368,
+        "notes": null,
+        "style": 1,
+    },
+    {
+        id: 1809,
+        "notes": null,
+        "style": 0,
+    },
+    {
+        id: 881,
+        "notes": null,
+        "style": 1,
+    },
+    {
+        id: 936,
+        "notes": null,
+        "style": 0,
+    },
+    {
+        id: 2218,
+        "notes": null,
+        "style": 1,
+    },
+    {
+        id: 5643,
+        "notes": null,
+        "style": 0,
+    },
+    {
+        id: 5917,
+        "notes": null,
+        "style": 1,
+    },
+];
 
 // Objects in "catalog"
 aladin_catalogs[get_class_string(-1)] = A.catalog({ shape: "circle", color: "#555555" });
@@ -20,7 +79,113 @@ for (let i = 0; i < object_styles.length; i++) {
     });
 }
 
-console.log(aladin_catalogs);
+// Load document and JSON data of objects, then start on the main() function
+$(document).ready(function() {
+
+    $.ajax({
+        type: "GET",
+        url: "/data/dsos.14.json",
+        dataType: "json",
+    }).done(function(dsos_data) {
+
+        main(dsos_data);
+
+    });
+
+});
+
+function main(dsos_data) {
+
+    // Celestial.display(config);
+    aladin = A.aladin('#aladin-map', {
+        fov: 1,
+        target: 'M31',
+        reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
+        showReticle: false,
+    });
+
+    // TODO
+    // $('#datetime-date').val(new Date().toDateInputValue());
+    // $('#datetime-time').val(new Date().toDateInputValue());
+
+    $("#datetime-submit").click(function(e) {
+        e.preventDefault(); // Disable built-in HTML action
+        update_map_datetime(new Date(0, 0, 0));
+    });
+
+    $("#location-submit").click(function(e) {
+        e.preventDefault(); // Disable built-in HTML action
+        update_map_location(-33, -63);
+    });
+
+    $("#login-form").submit(function(e) {
+        e.preventDefault(); // Disable built-in HTML action
+        $.ajax({
+            type: "POST",
+            url: "/api/v1/login",
+            data: $(this).serialize(),
+            dataType: "json",
+        }).done(function(json) {
+            test_text.innerHTML = "intentado_loguearse";
+        });
+    });
+
+    $("#register-form").submit(function(e) {
+        e.preventDefault(); // Disable built-in HTML action
+        $.ajax({
+            type: "POST",
+            url: "/api/v1/login",
+            data: $(this).serialize(),
+            dataType: "json",
+        }).done(function(json) {
+            test_text.innerHTML = "intentado_registrarse";
+        });
+    });
+
+    watchlist_create_header($("#watchlist-table thead tr"));
+
+    let map_objects = [];
+    for (let obj of watchlist) {
+        watchlist_create_row(
+            dsos_data,
+            obj.id,
+            obj.notes,
+            obj.style,
+            watchlist_delete,
+            watchlist_save,
+            function(id) { object_goto(dsos_data, id) },
+        ).appendTo("#watchlist-table tbody");
+
+        let dim = data.get_dimensions(dsos_data, obj.id);
+
+        map_objects.push({
+            "type": "Feature",
+            "id": obj.id,
+            "style": obj.style,
+            "properties": {
+                "name": data.get_name(dsos_data, obj.id),
+                "dim": `${dim[0]}x${dim[1]}`,
+            },
+            "geometry":{
+                "type": "Point",
+                "coordinates": [
+                    data.get_ra(dsos_data, obj.id),
+                    data.get_dec(dsos_data, obj.id),
+                ],
+            }
+        });
+    }
+    add_map_markers(map_objects);
+
+    catalog_create(
+        dsos_data,
+        null,
+        catalog,
+        function(id) { watchlist_add(dsos_data, id) },
+        function(id) { object_goto(dsos_data, id) },
+    );
+
+}
 
 /**
  * Delete object from watchlist
@@ -101,7 +266,7 @@ function object_goto(dsos_data, id) {
         data.get_ra(dsos_data, id),
         data.get_dec(dsos_data, id),
     );
-    console.log(dim);
+
     // Set FOV to the biggest of width,height of object, convert dimensions from
     // arcminutes to degrees
     aladin.setFov(Math.max(dim[0], dim[1]) / 60);
@@ -258,6 +423,14 @@ function celestial_redraw() {
  */
 function add_map_markers(objs) {
 
+    Celestial.clear()
+
+    aladin.removeLayers();
+    for (let catalog in aladin_catalogs) {
+        aladin.addCatalog(aladin_catalogs[catalog]);
+    }
+
+
     // Separate objs given on different lists depending on the style used
     // Each element of this object is a list of objects that share the same
     // style So you get something like
@@ -329,278 +502,4 @@ function add_map_markers(objs) {
             );
         }
     }
-
 }
-
-$(document).ready(function() {
-
-    // Celestial.display(config);
-    aladin = A.aladin('#aladin-map', {
-        fov: 1,
-        target: 'M31',
-        reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
-        showReticle: false,
-    });
-
-    for (let catalog in aladin_catalogs) {
-        aladin.addCatalog(aladin_catalogs[catalog]);
-    }
-
-    // TODO
-    // $('#datetime-date').val(new Date().toDateInputValue());
-    // $('#datetime-time').val(new Date().toDateInputValue());
-
-    $("#datetime-submit").click(function(e) {
-        e.preventDefault(); // Disable built-in HTML action
-        update_map_datetime(new Date(0, 0, 0));
-    });
-
-    $("#location-submit").click(function(e) {
-        e.preventDefault(); // Disable built-in HTML action
-        update_map_location(-33, -63);
-    });
-
-    $("#login-form").submit(function(e) {
-        e.preventDefault(); // Disable built-in HTML action
-        $.ajax({
-            type: "POST",
-            url: "/api/v1/login",
-            data: $(this).serialize(),
-            dataType: "json",
-        }).done(function(json) {
-            test_text.innerHTML = "intentado_loguearse";
-        });
-    });
-
-    $("#register-form").submit(function(e) {
-        e.preventDefault(); // Disable built-in HTML action
-        $.ajax({
-            type: "POST",
-            url: "/api/v1/login",
-            data: $(this).serialize(),
-            dataType: "json",
-        }).done(function(json) {
-            test_text.innerHTML = "intentado_registrarse";
-        });
-    });
-
-    $.ajax({
-        type: "GET",
-        url: "/data/dsos.14.json",
-        dataType: "json",
-    }).done(function(dsos_data) {
-
-        let watchlist = [
-            {
-                "id": data.get_id(dsos_data, "NGC104"),
-                "notes": null,
-                "style": 1,
-            },
-            {
-                "id": data.get_id(dsos_data, "M31"),
-                "notes": "Also known as Andromeda",
-                "style": 0,
-            },
-            {
-                id: 4613,
-                "notes": null,
-                "style": 1,
-            },
-            {
-                id: 3131,
-                "notes": null,
-                "style": 0,
-            },
-            {
-                id: 1692,
-                "notes": null,
-                "style": 1,
-            },
-            {
-                id: 5368,
-                "notes": null,
-                "style": 1,
-            },
-            {
-                id: 1809,
-                "notes": null,
-                "style": 0,
-            },
-            {
-                id: 881,
-                "notes": null,
-                "style": 1,
-            },
-            {
-                id: 936,
-                "notes": null,
-                "style": 0,
-            },
-            {
-                id: 2218,
-                "notes": null,
-                "style": 1,
-            },
-            {
-                id: 5643,
-                "notes": null,
-                "style": 0,
-            },
-            {
-                id: 5917,
-                "notes": null,
-                "style": 1,
-            },
-        ]
-
-        watchlist_create_header($("#watchlist-table thead tr"));
-
-        let map_objects = [];
-        for (let obj of watchlist) {
-            watchlist_create_row(
-                dsos_data,
-                obj.id,
-                obj.notes,
-                obj.style,
-                watchlist_delete,
-                watchlist_save,
-                function(id) { object_goto(dsos_data, id) },
-            ).appendTo("#watchlist-table tbody");
-
-            let dim = data.get_dimensions(dsos_data, obj.id);
-
-            map_objects.push({
-                "type": "Feature",
-                "id": obj.id,
-                "style": obj.style,
-                "properties": {
-                    "name": data.get_name(dsos_data, obj.id),
-                    "dim": `${dim[0]}x${dim[1]}`,
-                },
-                "geometry":{
-                    "type": "Point",
-                    "coordinates": [
-                        data.get_ra(dsos_data, obj.id),
-                        data.get_dec(dsos_data, obj.id),
-                    ],
-                }
-            });
-        }
-        add_map_markers(map_objects, 1);
-
-        catalog_create(
-            dsos_data,
-            null,
-            [
-                {
-                    id: 6217,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 37,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 4935,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 6055,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 4615,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 4613,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 4618,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 3131,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 4309,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 1692,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5343,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5368,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 861,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 1809,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 6654,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 881,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 908,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 936,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 1957,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 2218,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5572,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5643,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5666,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5917,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 5923,
-                    appears_on: ["Binosky"],
-                },
-                {
-                    id: 2570,
-                    appears_on: ["Binosky"],
-                },
-            ],
-            function(id) { watchlist_add(dsos_data, id) },
-            function(id) { object_goto(dsos_data, id) },
-        );
-
-    });
-
-});
