@@ -40,7 +40,7 @@ export function get_mag(dsos_data, id) {
 }
 
 /**
- * Get dimensions of object
+ * Get dimensions of object in arcminutes
  *
  * Returns a list of two floats, e.g.: [0.5, 4]
  */

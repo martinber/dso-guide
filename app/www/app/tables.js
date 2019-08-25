@@ -350,7 +350,6 @@ export function catalog_create(
                 case "controls":
                     let dim = data.get_dimensions(dsos_data, object.id);
 
-                    console.log(object.id);
                     tr.append($("<td>", {
                         class: "objects-controls",
                     }).append(

@@ -38,8 +38,33 @@ export const catalog_rows = [
  * represented by the index on this table.
  */
 export const object_styles = [
-    { name: "circle", string: "Circle" },
-    { name: "square", string: "Square" },
-    { name: "triangle", string: "Triangle" },
+    {
+        name: "circle",
+        string: "Circle",
+        aladin_shape: "circle",
+        aladin_name: "Watchlist-circle",
+        color: "#FF0000"
+    },
+    {
+        name: "cross",
+        string: "Cross",
+        aladin_shape: "cross",
+        aladin_name: "Watchlist-cross",
+        color: "#00FF00"
+    },
+    {
+        name: "square",
+        string: "Square",
+        aladin_shape: "square",
+        aladin_name: "Watchlist-square",
+        color: "#0000FF"
+    },
+    {
+        name: "dot",
+        string: "Dot",
+        aladin_shape: "circle",
+        aladin_name: "Watchlist-dot",
+        color: "#555555"
+    },
 ];
 

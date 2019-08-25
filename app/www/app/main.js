@@ -6,6 +6,21 @@ import * as data from "./data.js";
 import { watchlist_create_header, watchlist_create_row, catalog_create } from "./tables.js";
 
 let aladin;
+let aladin_catalogs = {};
+
+// Objects in "catalog"
+aladin_catalogs[get_class_string(-1)] = A.catalog({ shape: "circle", color: "#555555" });
+
+// Objects in "watchlist-{i}"
+for (let i = 0; i < object_styles.length; i++) {
+    aladin_catalogs[get_class_string(i)] = A.catalog({
+        name: object_styles[i].aladin_name,
+        shape: object_styles[i].aladin_shape,
+        color: object_styles[i].color,
+    });
+}
+
+console.log(aladin_catalogs);
 
 /**
  * Delete object from watchlist
@@ -54,8 +69,6 @@ function watchlist_add(dsos_data, id) {
  * Save changes on given object id to server
  */
 function watchlist_save(id) {
-    console.log($(`#watchlist-obj-${id} .objects-notes textarea`).val());
-    console.log($(`#watchlist-obj-${id} .objects-style select`).val());
     $.ajax({
         type: "PUT",
         url: "/api/v1/watchlist/object" + $.param({ "id": id }),
@@ -88,8 +101,10 @@ function object_goto(dsos_data, id) {
         data.get_ra(dsos_data, id),
         data.get_dec(dsos_data, id),
     );
-    // Set FOV to the biggest of width,height of object
-    aladin.setFov(Math.max(dim[0], dim[1]));
+    console.log(dim);
+    // Set FOV to the biggest of width,height of object, convert dimensions from
+    // arcminutes to degrees
+    aladin.setFov(Math.max(dim[0], dim[1]) / 60);
 
     // Scroll page to map
     window.location.hash = "aladin-map";
@@ -100,7 +115,6 @@ function update_map_datetime(datetime) {
     Celestial.date(datetime);
     Celestial.apply();
     Celestial.display(config);
-    console.log(config.geopos);
 }
 
 // TODO: Not working, debug doing modifications to celestial.js
@@ -108,7 +122,29 @@ function update_map_location(lat, long) {
     config.geopos = [lat, long];
     Celestial.apply(config);
     Celestial.display(config);
-    console.log(config.geopos);
+}
+
+/**
+ * Translate the given integer to a class string
+ *
+ * Mapping:
+ *
+ * - -1: "catalog"
+ * - 0: "watchlist-0"
+ * - 1: "watchlist-1"
+ * - 2: "watchlist-2"
+ * - ...
+ *
+ * Used to indicate the style of an object. I use it to work with Celestial or
+ * Aladin
+ */
+function get_class_string(style) {
+    let class_string = "catalog";
+    if (style >= 0)
+    {
+        class_string = `watchlist-${style}`;
+    }
+    return class_string;
 }
 
 /**
@@ -166,7 +202,7 @@ function celestial_redraw() {
             // Get point coordinates
             let pt = Celestial.mapProjection(d.geometry.coordinates);
 
-            let size = 10;
+            let size = 15;
 
             Celestial.setStyle(point_style);
 
@@ -198,7 +234,7 @@ function celestial_redraw() {
  * Provide a list of objects to show. Most properties are taken directly from
  * the json database.
  *
- * The class must be an integer, -1 means that the object is from the catalog,
+ * The style must be an integer, -1 means that the object is from the catalog,
  * numbers from 0 represent styles from const.js:object_styles
  *
  * Example of obj argument:
@@ -220,34 +256,30 @@ function celestial_redraw() {
  *  ]
  *
  */
-function add_map_markers(objs, cls) {
-
-    // Translate the given integer class to a string to use with Celestial
-    let class_string = "catalog";
-    if (cls >= 0)
-    {
-        class_string = `watchlist-${cls}`;
-    }
+function add_map_markers(objs) {
 
     // Separate objs given on different lists depending on the style used
-    // Each element of this array is a list of objects that share the same style
-    // So you get something like
-    // objs_by_style = [
-    //     [{obj}, {obj}, ...], // Objects that share style 0
-    //     [{obj}, {obj}, ...], // Objects that share style 1
-    //     undefined,           // No objects share style 2
-    //     [{obj}, {obj}, ...], // Objects that share style 3
+    // Each element of this object is a list of objects that share the same
+    // style So you get something like
+    // objs_by_class = {
+    //     "catalog": [{obj}, {obj}, ...],    // Objects on catalog
+    //     "wishlist-0": [{obj}, {obj}, ...], // Objects that share style 0
+    //     "wishlist-1": [{obj}, {obj}, ...], // Objects that share style 1
+    //     "wishlist-2": undefined,           // No objects share style 2
+    //     "wishlist-3": [{obj}, {obj}, ...], // Objects that share style 3
     // ]
-    let objs_by_style = []
+    let objs_by_class = {}
 
     for (let obj of objs) {
 
-        // If this is the first object with this style, create the list
-        if (typeof objs_by_style[obj.style] == "undefined") {
-            objs_by_style[obj.style] = [];
+        let class_string = get_class_string(obj.style);
+
+        // If this is the first object with this class, create the list
+        if (typeof objs_by_class[class_string] == "undefined") {
+            objs_by_class[class_string] = [];
         }
 
-        objs_by_style[obj.style].push(obj);
+        objs_by_class[class_string].push(obj);
     }
 
     Celestial.add({
@@ -255,34 +287,49 @@ function add_map_markers(objs, cls) {
         callback: function(error, json) {
             if (error) return console.warn(error);
 
-            // Load the given geoJSON objects and transform to correct
-            // coordinate system, if necessary
-            let data = Celestial.getData({
-                "type": "FeatureCollection",
-                "features": objs,
-            }, config.transform);
+            // For each group, each one with a style/class
+            for (let class_string in objs_by_class) {
 
-            // Add to celestial objects container from d3 library
-            // I guess that ".asterisms" is used by convention because it works
-            // with any string
-            Celestial.container.selectAll(".asterisms")
-                .data(data.features)
-                .enter().append("path")
-                .attr("class", class_string);
+                // Load the given geoJSON objects and transform to correct
+                // coordinate system, if necessary
+                let data = Celestial.getData({
+                    "type": "FeatureCollection",
+                    "features": objs_by_class[class_string],
+                }, config.transform);
+
+                // Add to celestial objects container from d3 library
+                // I guess that ".asterisms" is used by convention because it works
+                // with any string
+                Celestial.container.selectAll(".asterisms")
+                    .data(data.features)
+                    .enter().append("path")
+                    .attr("class", class_string);
+            }
+
             // Trigger redraw to display changes
             Celestial.redraw();
         },
         redraw: celestial_redraw,
     });
 
-    let catalog = A.catalog({ shape: "circle" });
-    aladin.addCatalog(catalog);
-    for (let obj of objs) {
-        catalog.addSources(A.source(obj.geometry.coordinates[0], obj.geometry.coordinates[1]));
+    Celestial.display(config);
+
+    // Adding objects to aladin
+
+    // For each group, each one with a style/class
+    for (let class_string in objs_by_class) {
+
+        // For each object in the group
+        for (let obj of objs_by_class[class_string]) {
+
+            aladin_catalogs[class_string].addSources(
+                A.source(
+                    obj.geometry.coordinates[0],
+                    obj.geometry.coordinates[1])
+            );
+        }
     }
 
-    Celestial.display(config);
-    console.log(config.geopos);
 }
 
 $(document).ready(function() {
@@ -294,6 +341,10 @@ $(document).ready(function() {
         reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
         showReticle: false,
     });
+
+    for (let catalog in aladin_catalogs) {
+        aladin.addCatalog(aladin_catalogs[catalog]);
+    }
 
     // TODO
     // $('#datetime-date').val(new Date().toDateInputValue());
