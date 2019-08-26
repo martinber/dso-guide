@@ -23,7 +23,7 @@ Request:
 curl -u {username:password} --request GET http://URL/api/v1/location
 ```
 Response:
-```
+
 
 TODO(ponerla bien)
 
@@ -34,6 +34,7 @@ curl -u {username:password} --header "Content-Type: application/json" \
     --data '{"lat":"32","password":"64"}' \
     http://localhost:5000/api/v1/location
 ```
+
 | Name | Type | Description |
 | --- |:---:| ---:|
 | lat      | integer | New latitude |
