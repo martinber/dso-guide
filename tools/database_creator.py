@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3 import Error
 
 
-db = sqlite3.connect('deepsky.db')
+db = sqlite3.connect('prueba.db')
 
 cur = db.cursor()
 

@@ -17,14 +17,16 @@ def dict_factory(cursor, row):
 def login(user, password, cursor):
     """ Devuelve true o false """
     if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)):
+
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
-        #salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
-        #hashpw =  hashlib.sha256(password.encode())
-        #hash_object = hashlib.sha256(password.encode())
-        #print(hash_object.hexdigest())
-        #salt = os.urandom(8) #.hexdigest().encode('ascii')
-        print(salt)
-        if password == database_password['password']:
+        salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
+        salt = salt['salt']
+        salt = salt.encode('utf-8')
+        pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+        pwdhash = binascii.hexlify(pwdhash)
+        pwdhash = pwdhash.decode('utf-8')
+
+        if pwdhash == database_password['password']:
             return True
         else:
             return False
@@ -100,14 +102,18 @@ def api_addusers():
         query_parameters = request.json
 
         if request.method == 'POST':
-            user = query_parameters.get('username')
+            user = query_parameters.get('user')
             password = query_parameters.get('password')
-            #salt = os.urandom(8)
-
+            salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
+            pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+            pwdhash = binascii.hexlify(pwdhash)
+            pwdhash = pwdhash.decode('utf-8')
+            salt = salt.decode('utf-8')
             lat = 0
             lon = 0
+
             try:
-                db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, password, lat, lon, salt))
+                db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, pwdhash, lat, lon, salt))
                 return "Operation Successful \n", 200
             except sqlite3.IntegrityError:
                 return "User already exist \n ", 500
@@ -127,8 +133,9 @@ def api_watchlist():
         if login(user, password, db.cur):
 
             if request.method == 'GET':
-                results = db.cur.execute('SELECT watchlist.star_id, watchlist.notes, watchlist.style \
-                FROM watchlist INNER JOIN users on users.?=watchlist.? ;', (user, user))
+                results = db.cur.execute('SELECT watchlist.star_id, watchlist.notes,\
+                 watchlist.style FROM watchlist INNER JOIN users on \
+                 users.username=watchlist.username where users.username = ?;', (user,)).fetchall()
                 return jsonify(results)
 
             elif request.method == 'POST':
@@ -165,9 +172,9 @@ def api_password():
 
         if login(user, password, db.cur):
             if request.method == 'PUT':
-
+                new_password = query_parameters.get('password')
                 try:
-                    db.cur.execute('UPDATE users SET password = ? WHERE username = ?', (password, user))
+                    db.cur.execute('UPDATE users SET password = ? WHERE username = ?', (new_password, user))
                     return "Operation Successful \n", 200
 
                 except sqlite3.IntegrityError:
@@ -213,4 +220,4 @@ def api_objects():
 
 if __name__ == "__main__":
 
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="localhost", port=5000)

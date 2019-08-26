@@ -47,7 +47,8 @@ Tambien se puede poner seguido a una constraint, AUTO_INCREMENT para que vaya au
 
 Para hacer vinculo entre tablas se usa: Pongo una que supongo que vamos a usar
 
-SELECT watchlist.star_id, watchlist.notes, watchlist.style FROM watchlist INNER JOIN users on users.user_id=watchlist.user_id
+SELECT watchlist.star_id, watchlist.notes, watchlist.style FROM watchlist INNER JOIN \
+users on users.username=watchlist.username where users.username = "carlo";
 
 Mas info en https://www.w3schools.com/sql/default.asp
 
@@ -82,6 +83,21 @@ try:
 except sqlite3.IntegrityError as error:
     print("Error el usuario {} metio un {}, error:".format(user, values, error))
 
-comando curl:
+PRUEBAS CURL
+Cambiar lat o lon:
 curl -u 'tincho:ucacha' --header "Content-Type: application/json" --request \
 PUT --data '{"lat":-91, "lon":-67.2}' http://127.0.0.1:5000/api/v1/location
+
+Agregar a la watchlist:
+curl -u "carlo:teve" --header "Content-Type: application/json" --request POST \
+--data '{"star_id":12, "notes":"asdasdads", "style":1}' http://127.0.0.1:5000/api/v1/watchlist
+
+Obtener la lista de fav:
+curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/watchlist
+
+ Obtener coordenadas:
+ curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/location
+
+Agregar usuarios:
+curl --header "Content-Type: application/json" --request POST --data \
+'{"user":"carlo", "password":"teve"}' http://127.0.0.1:5000/api/v1/users
