@@ -104,18 +104,35 @@ function main(dsos_data) {
         showReticle: false,
     });
 
-    // TODO
-    // $('#datetime-date').val(new Date().toDateInputValue());
-    // $('#datetime-time').val(new Date().toDateInputValue());
+    // Set current time and date of forms
+
+    let now = new Date();
+    var day = now.getDate();
+    var month = now.getMonth() + 1; // Otherwise returns from 0 to 11
+    var year = now.getFullYear();
+    var hour = now.getHours();
+    var min  = now.getMinutes();
+
+    // Add leading zeroes so each one always has two digits
+    month = (month < 10 ? "0" : "") + month;
+    day = (day < 10 ? "0" : "") + day;
+    hour = (hour < 10 ? "0" : "") + hour;
+    min = (min < 10 ? "0" : "") + min;
+
+    $('#datetime-date').val(`${year}-${month}-${day}`);
+    $('#datetime-time').val(`${hour}:${min}`);
 
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
-        update_map_datetime(new Date(0, 0, 0));
+        let [year, month, day] = $('#datetime-date').val().split("-");
+        let [hour, min] = $('#datetime-time').val().split(":");
+        let date = new Date(year, month, day, hour, min);
+        update_map_datetime(date);
     });
 
     $("#location-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
-        update_map_location(-33, -63);
+        update_map_location($("#location-lat").val(), $("#location-long").val());
     });
 
     $("#login-form").submit(function(e) {
@@ -275,18 +292,14 @@ function object_goto(dsos_data, id) {
     window.location.hash = "aladin-map";
 }
 
-// TODO: Not working, debug doing modifications to celestial.js
 function update_map_datetime(datetime) {
     Celestial.date(datetime);
-    Celestial.apply();
-    Celestial.display(config);
+    Celestial._go();
 }
 
-// TODO: Not working, debug doing modifications to celestial.js
 function update_map_location(lat, long) {
-    config.geopos = [lat, long];
-    Celestial.apply(config);
-    Celestial.display(config);
+    Celestial._location(lat, long);
+    Celestial._go();
 }
 
 /**
