@@ -6,10 +6,19 @@ import * as data from "./data.js";
 import { watchlist_create_header, watchlist_create_row, catalog_create } from "./tables.js";
 
 
-// Define global variables
-let aladin;
-let aladin_catalogs = {};
-let watchlist = [
+// Define global variables inside the "context" object
+
+let ctx = {};
+
+// Store username and password in plaintext, these are sent on every API request
+// If username is null the user is logged out, so the changes made will not
+// be sent to the server, something like an "offline" mode.
+ctx.username = null;
+ctx.password = null;
+
+ctx.aladin = null;
+ctx.aladin_catalogs = {};
+ctx.watchlist = [
     {
         id: 37,
         "notes": null,
@@ -67,12 +76,16 @@ let watchlist = [
     },
 ];
 
-// Objects in "catalog"
-aladin_catalogs[get_class_string(-1)] = A.catalog({ shape: "circle", color: "#555555" });
+// Create aladin catalog for objects in the catalog
+ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
+    shape: "circle",
+    color: "#555555"
+});
 
-// Objects in "watchlist-{i}"
+// Create aladin catalog for objects in "watchlist-{i}", one for each available
+// style
 for (let i = 0; i < object_styles.length; i++) {
-    aladin_catalogs[get_class_string(i)] = A.catalog({
+    ctx.aladin_catalogs[get_class_string(i)] = A.catalog({
         name: object_styles[i].aladin_name,
         shape: object_styles[i].aladin_shape,
         color: object_styles[i].color,
@@ -87,17 +100,16 @@ $(document).ready(function() {
         url: "/data/dsos.14.json",
         dataType: "json",
     }).done(function(dsos_data) {
-
         main(dsos_data);
-
+    }).fail(function(xhr, status, error) {
+        console.error("get dsos_data failed", xhr, status, error);
     });
-
 });
 
 function main(dsos_data) {
 
     // Celestial.display(config);
-    aladin = A.aladin('#aladin-map', {
+    ctx.aladin = A.aladin('#aladin-map', {
         fov: 1,
         target: 'M31',
         reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
@@ -137,13 +149,28 @@ function main(dsos_data) {
 
     $("#login-form").submit(function(e) {
         e.preventDefault(); // Disable built-in HTML action
+
+        let username = $("#login-username").val();
+        let password = $("#login-password").val();
+
         $.ajax({
             type: "POST",
             url: "/api/v1/login",
-            data: $(this).serialize(),
+            headers: {
+                "Authorization": "Basic " + btoa(username + ":" + password)
+            },
+            // data: $(this).serialize(),
             dataType: "json",
         }).done(function(json) {
-            test_text.innerHTML = "intentado_loguearse";
+            // TODO: Chequear si es correcto
+            ctx.username = username;
+            ctx.password = password;
+            watchlist_get_all();
+        }).fail(function(xhr, status, error) {
+            console.error("login form submit failed", xhr, status, error);
+            ctx.username = username;
+            ctx.password = password;
+            watchlist_get_all();
         });
     });
 
@@ -155,14 +182,17 @@ function main(dsos_data) {
             data: $(this).serialize(),
             dataType: "json",
         }).done(function(json) {
-            test_text.innerHTML = "intentado_registrarse";
+            console.log("intentado_registrarse");
+            // TODO
+        }).fail(function(xhr, status, error) {
+            console.error("register form sumbit failed", xhr, status, error);
         });
     });
 
     watchlist_create_header($("#watchlist-table thead tr"));
 
     let map_objects = [];
-    for (let obj of watchlist) {
+    for (let obj of ctx.watchlist) {
         watchlist_create_row(
             dsos_data,
             obj.id,
@@ -219,11 +249,8 @@ function watchlist_delete(id) {
         $(`#watchlist-obj-${id}`).remove();
         // TODO
 
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        alert("Error " + id);
-        $(`#watchlist-obj-${id}`).remove();
-        // TODO
-
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_delete() failed", xhr, status, error);
     });
 }
 
@@ -265,13 +292,30 @@ function watchlist_save(id) {
 
         // TODO
 
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        alert("Error " + id);
-        // TODO
-
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_save() failed", xhr, status, error);
     });
 }
 
+/**
+ * Replace client watchlist with watchlist from server
+ */
+function watchlist_get_all() {
+    $.ajax({
+        type: "POST",
+        url: "/api/v1/watchlist",
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
+        dataType: "json",
+    }).done(function(json) {
+        console.log(json);
+        // TODO
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_get_all() failed", xhr, status, error);
+    });
+
+}
 
 /**
  * Show given id on the sky survey map
@@ -279,14 +323,14 @@ function watchlist_save(id) {
 function object_goto(dsos_data, id) {
     let dim = data.get_dimensions(dsos_data, id);
 
-    aladin.gotoRaDec(
+    ctx.aladin.gotoRaDec(
         data.get_ra(dsos_data, id),
         data.get_dec(dsos_data, id),
     );
 
     // Set FOV to the biggest of width,height of object, convert dimensions from
     // arcminutes to degrees
-    aladin.setFov(Math.max(dim[0], dim[1]) / 60);
+    ctx.aladin.setFov(Math.max(dim[0], dim[1]) / 60);
 
     // Scroll page to map
     window.location.hash = "aladin-map";
@@ -438,9 +482,9 @@ function add_map_markers(objs) {
 
     Celestial.clear()
 
-    aladin.removeLayers();
-    for (let catalog in aladin_catalogs) {
-        aladin.addCatalog(aladin_catalogs[catalog]);
+    ctx.aladin.removeLayers();
+    for (let catalog in ctx.aladin_catalogs) {
+        ctx.aladin.addCatalog(ctx.aladin_catalogs[catalog]);
     }
 
 
@@ -508,7 +552,7 @@ function add_map_markers(objs) {
         // For each object in the group
         for (let obj of objs_by_class[class_string]) {
 
-            aladin_catalogs[class_string].addSources(
+            ctx.aladin_catalogs[class_string].addSources(
                 A.source(
                     obj.geometry.coordinates[0],
                     obj.geometry.coordinates[1])
