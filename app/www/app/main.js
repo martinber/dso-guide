@@ -5,110 +5,116 @@ import { config } from "./config.js";
 import * as data from "./data.js";
 import { watchlist_create_header, watchlist_create_row, catalog_create } from "./tables.js";
 
-
-// Define global variables inside the "context" object
-
-let ctx = {};
-
-// Store username and password in plaintext, these are sent on every API request
-// If username is null the user is logged out, so the changes made will not
-// be sent to the server, something like an "offline" mode.
-ctx.username = null;
-ctx.password = null;
-
-ctx.aladin = null;
-ctx.aladin_catalogs = {};
-ctx.watchlist = [
-    {
-        id: 37,
-        "notes": null,
-        "style": 2,
-    },
-    {
-        id: 4613,
-        "notes": null,
-        "style": 1,
-    },
-    {
-        id: 3131,
-        "notes": null,
-        "style": 0,
-    },
-    {
-        id: 1692,
-        "notes": null,
-        "style": 1,
-    },
-    {
-        id: 5368,
-        "notes": null,
-        "style": 1,
-    },
-    {
-        id: 1809,
-        "notes": null,
-        "style": 0,
-    },
-    {
-        id: 881,
-        "notes": null,
-        "style": 1,
-    },
-    {
-        id: 936,
-        "notes": null,
-        "style": 0,
-    },
-    {
-        id: 2218,
-        "notes": null,
-        "style": 1,
-    },
-    {
-        id: 5643,
-        "notes": null,
-        "style": 0,
-    },
-    {
-        id: 5917,
-        "notes": null,
-        "style": 1,
-    },
-];
-
-// Create aladin catalog for objects in the catalog
-ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
-    shape: "circle",
-    color: "#555555"
-});
-
-// Create aladin catalog for objects in "watchlist-{i}", one for each available
-// style
-for (let i = 0; i < object_styles.length; i++) {
-    ctx.aladin_catalogs[get_class_string(i)] = A.catalog({
-        name: object_styles[i].aladin_name,
-        shape: object_styles[i].aladin_shape,
-        color: object_styles[i].color,
-    });
-}
-
-// Load document and JSON data of objects, then start on the main() function
 $(document).ready(function() {
+
+    // Define global variables inside the "context" object
+
+    let ctx = {};
+
+    // Store username and password in plaintext, these are sent on every API request
+    // If username is null the user is logged out, so the changes made will not
+    // be sent to the server, something like an "offline" mode.
+    ctx.username = null;
+    ctx.password = null;
+
+    // Reference to the aladin window/applet/library
+    ctx.aladin = null;
+
+    // List of aladin catalogs (categories of markers, each one with a different
+    // shape and color)
+    ctx.aladin_catalogs = {};
+
+    // Watchlist of the user
+    ctx.watchlist = [
+        {
+            id: 37,
+            "notes": null,
+            "style": 2,
+        },
+        {
+            id: 4613,
+            "notes": null,
+            "style": 1,
+        },
+        {
+            id: 3131,
+            "notes": null,
+            "style": 0,
+        },
+        {
+            id: 1692,
+            "notes": null,
+            "style": 1,
+        },
+        {
+            id: 5368,
+            "notes": null,
+            "style": 1,
+        },
+        {
+            id: 1809,
+            "notes": null,
+            "style": 0,
+        },
+        {
+            id: 881,
+            "notes": null,
+            "style": 1,
+        },
+        {
+            id: 936,
+            "notes": null,
+            "style": 0,
+        },
+        {
+            id: 2218,
+            "notes": null,
+            "style": 1,
+        },
+        {
+            id: 5643,
+            "notes": null,
+            "style": 0,
+        },
+        {
+            id: 5917,
+            "notes": null,
+            "style": 1,
+        },
+    ];
+
+    // Create aladin catalog for objects in the object catalog
+    ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
+        shape: "circle",
+        color: "#555555"
+    });
+
+    // Create aladin catalog for objects in "watchlist-{i}", one for each
+    // available style
+    for (let i = 0; i < object_styles.length; i++) {
+        ctx.aladin_catalogs[get_class_string(i)] = A.catalog({
+            name: object_styles[i].aladin_name,
+            shape: object_styles[i].aladin_shape,
+            color: object_styles[i].color,
+        });
+    }
+
+    // Load JSON data of objects, then start on the main() function
 
     $.ajax({
         type: "GET",
         url: "/data/dsos.14.json",
         dataType: "json",
     }).done(function(dsos_data) {
-        main(dsos_data);
+        main(ctx, dsos_data);
     }).fail(function(xhr, status, error) {
         console.error("get dsos_data failed", xhr, status, error);
     });
 });
 
-function main(dsos_data) {
+function main(ctx, dsos_data) {
 
-    // Celestial.display(config);
+    Celestial.display(config);
     ctx.aladin = A.aladin('#aladin-map', {
         fov: 1,
         target: 'M31',
@@ -165,12 +171,12 @@ function main(dsos_data) {
             // TODO: Chequear si es correcto
             ctx.username = username;
             ctx.password = password;
-            watchlist_get_all();
+            watchlist_get_all(ctx);
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
             ctx.username = username;
             ctx.password = password;
-            watchlist_get_all();
+            watchlist_get_all(ctx);
         });
     });
 
@@ -200,7 +206,7 @@ function main(dsos_data) {
             obj.style,
             watchlist_delete,
             watchlist_save,
-            function(id) { object_goto(dsos_data, id) },
+            function(id) { object_goto(ctx, dsos_data, id) },
         ).appendTo("#watchlist-table tbody");
 
         let dim = data.get_dimensions(dsos_data, obj.id);
@@ -222,14 +228,14 @@ function main(dsos_data) {
             }
         });
     }
-    add_map_markers(map_objects);
+    add_map_markers(ctx, map_objects);
 
     catalog_create(
         dsos_data,
         null,
         catalog,
-        function(id) { watchlist_add(dsos_data, id) },
-        function(id) { object_goto(dsos_data, id) },
+        function(id) { watchlist_add(ctx, dsos_data, id) },
+        function(id) { object_goto(ctx, dsos_data, id) },
     );
 
 }
@@ -257,7 +263,7 @@ function watchlist_delete(id) {
 /**
  * Add object to watchlist, both on client and on server
  */
-function watchlist_add(dsos_data, id) {
+function watchlist_add(ctx, dsos_data, id) {
     // TODO
 
     let style = 0;
@@ -270,7 +276,7 @@ function watchlist_add(dsos_data, id) {
         style,
         watchlist_delete,
         watchlist_save,
-        function(id) { object_goto(dsos_data, id) },
+        function(id) { object_goto(ctx, dsos_data, id) },
     ).appendTo("#watchlist-table tbody");
 }
 
@@ -300,7 +306,7 @@ function watchlist_save(id) {
 /**
  * Replace client watchlist with watchlist from server
  */
-function watchlist_get_all() {
+function watchlist_get_all(ctx) {
     $.ajax({
         type: "POST",
         url: "/api/v1/watchlist",
@@ -310,7 +316,7 @@ function watchlist_get_all() {
         dataType: "json",
     }).done(function(json) {
         console.log(json);
-        // TODO
+        ctx.watchlist = json;
     }).fail(function(xhr, status, error) {
         console.error("watchlist_get_all() failed", xhr, status, error);
     });
@@ -320,7 +326,7 @@ function watchlist_get_all() {
 /**
  * Show given id on the sky survey map
  */
-function object_goto(dsos_data, id) {
+function object_goto(ctx, dsos_data, id) {
     let dim = data.get_dimensions(dsos_data, id);
 
     ctx.aladin.gotoRaDec(
@@ -478,8 +484,9 @@ function celestial_redraw() {
  *  ]
  *
  */
-function add_map_markers(objs) {
+function add_map_markers(ctx, objs) {
 
+    // Clean previous markers
     Celestial.clear()
 
     ctx.aladin.removeLayers();
@@ -542,7 +549,12 @@ function add_map_markers(objs) {
         redraw: celestial_redraw,
     });
 
-    Celestial.display(config);
+    // TODO
+    Celestial.apply(config);
+    Celestial.redraw();
+    Celestial.reload(config);
+    // Celestial.reproject(config);  // Not working
+    // Celestial.display(config);
 
     // Adding objects to aladin
 
