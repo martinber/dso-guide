@@ -188,7 +188,7 @@ def api_password():
 
         if login(user, password, db.cur):
             if request.method == 'PUT':
-                new_password = query_parameters.get('password')
+                new_password = query_parameters.get('new_password')
                 try:
                     db.cur.execute('UPDATE users SET password = ? WHERE username = ?', (new_password, user))
                     return "Operation Successful \n", 200
