@@ -840,6 +840,15 @@ Celestial.display = function(config) {
     if (index && index < animations.length) current = index;
     animate(); 
   };
+  this._load_data = function() {
+    // load();
+    if (Celestial.data.length > 0) { 
+      Celestial.data.forEach( function(d) {
+        if (has(d, "file")) d3.json(d.file, d.callback);
+        else setTimeout(d.callback, 0);
+      }, this);
+    }
+  }
   if (!has(this, "date"))
     this.date = function() { console.log("Celestial.date() needs config.location = true to work." ); };
   

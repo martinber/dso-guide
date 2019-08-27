@@ -469,6 +469,7 @@ function add_map_markers(ctx, objs) {
                     .enter().append("path")
                     .attr("class", class_string);
             }
+            console.log("ASDASDAS");
 
             // Trigger redraw to display changes
             Celestial.redraw();
@@ -477,11 +478,12 @@ function add_map_markers(ctx, objs) {
     });
 
     // TODO
-    Celestial.apply(config);
-    Celestial.redraw();
-    Celestial.reload(config);
+    // Celestial.apply(config);
+    // Celestial.redraw();
+    // Celestial.reload(config);
     // Celestial.reproject(config);  // Not working
     // Celestial.display(config);
+    Celestial._load_data();
 
     // Adding objects to aladin
 

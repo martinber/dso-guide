@@ -148,4 +148,3 @@ Las cosas a implementar serían:
 
 - MySQL:
 
-
