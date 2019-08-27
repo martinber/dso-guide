@@ -16,7 +16,7 @@ def dict_factory(cursor, row):
 
 def login(user, password, cursor):
     """ Devuelve true o false """
-    if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)):
+    if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)).fetchone():
 
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
         salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
@@ -35,7 +35,7 @@ def login(user, password, cursor):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "404"
+    return "404", 404
 @app.errorhandler(401)
 def invalid_credentials(e):
     return "401 \n"
@@ -62,6 +62,22 @@ class Database:
         self.cur.close()
         self.conn.commit()
         self.conn.close()
+
+@app.route('/api/v1/login', methods=['GET'])
+def api_login():
+    with Database() as db:
+
+        query_parameters = request.json
+
+        if method == 'GET':
+            user = request.authorization["username"]
+            password = request.authorization["password"]
+            if login(user, password, db.cur):
+                return "200", 200
+            else:
+                return "Unauthorized", 401
+        else:
+            return "Method not allowed \n", 405
 
 @app.route('/api/v1/location', methods=['GET', 'PUT'])
 def api_location():
@@ -102,7 +118,7 @@ def api_addusers():
         query_parameters = request.json
 
         if request.method == 'POST':
-            user = query_parameters.get('user')
+            user = query_parameters.get('username')
             password = query_parameters.get('password')
             salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
             pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
@@ -216,7 +232,7 @@ def api_objects():
             else:
                 return "Method not allowed \n", 405
         else:
-            return 401
+            return "Unauthorized", 401
 
 if __name__ == "__main__":
 

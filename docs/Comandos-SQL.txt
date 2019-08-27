@@ -86,7 +86,7 @@ except sqlite3.IntegrityError as error:
 PRUEBAS CURL
 Cambiar lat o lon:
 curl -u 'tincho:ucacha' --header "Content-Type: application/json" --request \
-PUT --data '{"lat":-91, "lon":-67.2}' http://127.0.0.1:5000/api/v1/location
+PUT --data '{"lat":-31, "lon":-67.2}' http://127.0.0.1:5000/api/v1/location
 
 Agregar a la watchlist:
 curl -u "carlo:teve" --header "Content-Type: application/json" --request POST \
@@ -100,4 +100,4 @@ curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/watchlist
 
 Agregar usuarios:
 curl --header "Content-Type: application/json" --request POST --data \
-'{"user":"carlo", "password":"teve"}' http://127.0.0.1:5000/api/v1/users
+'{"username":"tincho", "password":"ucacha"}' http://127.0.0.1:5000/api/v1/users
