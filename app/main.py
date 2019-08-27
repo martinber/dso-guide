@@ -16,7 +16,7 @@ def dict_factory(cursor, row):
 
 def login(user, password, cursor):
     """ Devuelve true o false """
-    if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)):
+    if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)).fetchone():
 
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
         salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
@@ -35,7 +35,7 @@ def login(user, password, cursor):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "404"
+    return "404", 404
 @app.errorhandler(401)
 def invalid_credentials(e):
     return "401 \n"
