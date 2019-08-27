@@ -1,13 +1,12 @@
-API
-===
+# API
 
-Schema
-------
+## Schema
+
 All API resources must be accessed through this URL https://dsp.mbernardi.com.ar: . Data must be sent and will
 be received in JSON format.
 
-Authentication
---------------
+## Authentication
+
 Done via HTTP header Basic Authentication.
 Example via curl:
  `curl -u {username:password}`
@@ -15,12 +14,12 @@ This is obligatory for ANY API resource that is trying to be accessed,
 and it MUST be sent on each request, except to create a new user,
 for this refer to Users.
 
-Location
----------
+## Location
+
 Allowed methods: 'GET'; 'PUT'
 
-GET
-~~~
+### GET
+
 Obtain user's location.
 Request:
 ```
@@ -30,8 +29,8 @@ Response:
 
 TODO
 
-PUT
-~~~
+### PUT
+
 Modify user's location.
 Request:
 ```
@@ -51,12 +50,12 @@ Response:
 
 TODO
 
-Password
-------------
+## Password
+
 Allowed method: 'PUT'
 
-PUT
-~~~
+### PUT
+
 Change your password.
 
 Request:
@@ -74,12 +73,12 @@ Response:
 
 TODO
 
-Watchlist
------------
+## Watchlist
+
 Allowed methods: 'GET'; 'POST'; 'DELETE'
 
-GET
-~~~
+### GET
+
 Obtain user's watchlist.
 
 Request:
@@ -90,8 +89,8 @@ Response:
 
 TODO
 
-POST
-~~~~
+### POST
+
 Add a new star to the watchlist
 
 Request:
@@ -111,8 +110,8 @@ Response:
 
 TODO
 
-DELETE
-~~~~~~
+### DELETE
+
 Clears the watchlist
 
 Request:
