@@ -6,6 +6,8 @@ import * as data from "./data.js";
 import {
     watchlist_create_header,
     watchlist_create_row,
+    watchlist_delete_row,
+    watchlist_delete_row_all,
     catalog_create
 } from "./tables.js";
 
@@ -175,12 +177,12 @@ function main(ctx, dsos_data) {
             // TODO: Chequear si es correcto
             ctx.username = username;
             ctx.password = password;
-            watchlist_get_all(ctx);
+            watchlist_get_all(ctx, dsos_data);
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
             ctx.username = username;
             ctx.password = password;
-            watchlist_get_all(ctx);
+            watchlist_get_all(ctx, dsos_data);
         });
     });
 
@@ -200,19 +202,6 @@ function main(ctx, dsos_data) {
     });
 
     watchlist_create_header($("#watchlist-table thead tr"));
-
-    for (let obj of ctx.watchlist) {
-        watchlist_create_row(
-            dsos_data,
-            obj.id,
-            obj.notes,
-            obj.style,
-            watchlist_delete,
-            watchlist_save,
-            function(id) { object_goto(ctx, dsos_data, id) },
-        ).appendTo("#watchlist-table tbody");
-    }
-    update_map_markers(ctx, dsos_data, ctx.watchlist);
 
     catalog_create(
         dsos_data,
@@ -271,7 +260,8 @@ export function watchlist_delete(ctx, dsos_data, id) {
         // dataType: "json",
     // }).done(function(dsos_data) {
 
-        $(`#watchlist-obj-${id}`).remove();
+        watchlist_delete_row(id);
+
         let index = ctx.watchlist.findIndex((obj) => {
             return obj.id == id;
         });
@@ -294,28 +284,35 @@ export function watchlist_delete(ctx, dsos_data, id) {
  */
 export function watchlist_add(ctx, dsos_data, id) {
     // TODO make api call
-    // TODO check if element already exists
 
-    let style = 0;
-    let notes = "";
-
-    watchlist_create_row(
-        dsos_data,
-        id,
-        notes,
-        style,
-        function(id) { watchlist_delete(ctx, dsos_data, id) },
-        watchlist_save,
-        function(id) { object_goto(ctx, dsos_data, id) },
-    ).appendTo("#watchlist-table tbody");
-
-    ctx.watchlist.push({
-        id: id,
-        notes: notes,
-        style: style
+    // Check if the object already exists
+    let index = ctx.watchlist.findIndex((obj) => {
+        return obj.id == id;
     });
+    if (index > -1) {
+        console.error("Element already exists id:", id);
+    } else {
+        let style = 0;
+        let notes = "";
 
-    update_map_markers(ctx, dsos_data, ctx.watchlist);
+        watchlist_create_row(
+            dsos_data,
+            id,
+            notes,
+            style,
+            function(id) { watchlist_delete(ctx, dsos_data, id) },
+            watchlist_save,
+            function(id) { object_goto(ctx, dsos_data, id) },
+        ).appendTo("#watchlist-table tbody");
+
+        ctx.watchlist.push({
+            id: id,
+            notes: notes,
+            style: style
+        });
+
+        update_map_markers(ctx, dsos_data, ctx.watchlist);
+    }
 }
 
 /**
@@ -344,7 +341,7 @@ export function watchlist_save(id) {
 /**
  * Replace client watchlist with watchlist from server
  */
-export function watchlist_get_all(ctx) {
+export function watchlist_get_all(ctx, dsos_data) {
     $.ajax({
         type: "GET",
         url: "/api/v1/watchlist",
@@ -354,6 +351,20 @@ export function watchlist_get_all(ctx) {
         dataType: "json",
     }).done(function(json) {
         ctx.watchlist = json;
+        watchlist_delete_row_all();
+
+        for (let obj of ctx.watchlist) {
+            watchlist_create_row(
+                dsos_data,
+                obj.id,
+                obj.notes,
+                obj.style,
+                watchlist_delete,
+                watchlist_save,
+                function(id) { object_goto(ctx, dsos_data, id) },
+            ).appendTo("#watchlist-table tbody");
+        }
+        update_map_markers(ctx, dsos_data, ctx.watchlist);
 
     }).fail(function(xhr, status, error) {
         console.error("watchlist_get_all() failed", xhr, status, error);

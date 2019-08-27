@@ -174,6 +174,20 @@ export function watchlist_create_header(tr) {
 }
 
 /**
+ * Delete every row
+ */
+export function watchlist_delete_row_all() {
+    $("#watchlist-table tbody").empty();
+}
+
+/**
+ * Delete table row from id
+ */
+export function watchlist_delete_row(id) {
+    $(`#watchlist-obj-${id}`).remove();
+}
+
+/**
  * Create table row from arguments and dsos_data
  *
  * Args:
