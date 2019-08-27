@@ -118,7 +118,7 @@ def api_addusers():
         query_parameters = request.json
 
         if request.method == 'POST':
-            user = query_parameters.get('user')
+            user = query_parameters.get('username')
             password = query_parameters.get('password')
             salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
             pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
