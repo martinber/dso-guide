@@ -264,26 +264,37 @@ function update_map_location(lat, long) {
  *
  * Deletes both on server and on client
  */
-export function watchlist_delete(id) {
-    $.ajax({
-        type: "DELETE",
-        url: "/api/v1/watchlist/object" + $.param({ "id": id }),
-        dataType: "json",
-    }).done(function(dsos_data) {
+export function watchlist_delete(ctx, dsos_data, id) {
+    // $.ajax({
+        // type: "DELETE",
+        // url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        // dataType: "json",
+    // }).done(function(dsos_data) {
 
         $(`#watchlist-obj-${id}`).remove();
-        // TODO
+        let index = ctx.watchlist.findIndex((obj) => {
+            return obj.id == id;
+        });
+        if (index > -1) {
+            // Remove the element
+            ctx.watchlist.splice(index, 1);
+        } else {
+            console.error(`Tried to delete unexistent watchlist object id ${id}`);
+        }
+        update_map_markers(ctx, dsos_data, ctx.watchlist);
+        // TODO make api call
 
-    }).fail(function(xhr, status, error) {
-        console.error("watchlist_delete() failed", xhr, status, error);
-    });
+    // }).fail(function(xhr, status, error) {
+        // console.error("watchlist_delete() failed", xhr, status, error);
+    // });
 }
 
 /**
  * Add object to watchlist, both on client and on server
  */
 export function watchlist_add(ctx, dsos_data, id) {
-    // TODO
+    // TODO make api call
+    // TODO check if element already exists
 
     let style = 0;
     let notes = "";
@@ -293,7 +304,7 @@ export function watchlist_add(ctx, dsos_data, id) {
         id,
         notes,
         style,
-        watchlist_delete,
+        function(id) { watchlist_delete(ctx, dsos_data, id) },
         watchlist_save,
         function(id) { object_goto(ctx, dsos_data, id) },
     ).appendTo("#watchlist-table tbody");
@@ -509,6 +520,11 @@ function update_map_markers(ctx, dsos_data, watchlist) {
 
     // Clean previous markers
     Celestial.clear()
+    // TODO: Add issue to celestial, I would expect that these items would be
+    // removed by clear()
+    for (let i = 0; i < object_styles.length; i++) {
+        Celestial.container.selectAll(`.${get_class_string(i)}`).remove();
+    }
 
     ctx.aladin.removeLayers();
     for (let catalog in ctx.aladin_catalogs) {
@@ -569,7 +585,7 @@ function update_map_markers(ctx, dsos_data, watchlist) {
         redraw: celestial_redraw,
     });
 
-    // TODO
+    // TODO: Add issue to celestial
     // Celestial.apply(config);
     // Celestial.redraw();
     // Celestial.reload(config);
