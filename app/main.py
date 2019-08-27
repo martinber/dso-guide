@@ -63,6 +63,22 @@ class Database:
         self.conn.commit()
         self.conn.close()
 
+@app.route('/api/v1/login', methods=['GET'])
+def api_login():
+    with Database() as db:
+
+        query_parameters = request.json
+
+        if method == 'GET':
+            user = request.authorization["username"]
+            password = request.authorization["password"]
+            if login(user, password, db.cur):
+                return "200", 200
+            else:
+                return "Unauthorized", 401
+        else:
+            return "Method not allowed \n", 405
+
 @app.route('/api/v1/location', methods=['GET', 'PUT'])
 def api_location():
 
@@ -216,7 +232,7 @@ def api_objects():
             else:
                 return "Method not allowed \n", 405
         else:
-            return 401
+            return "Unauthorized", 401
 
 if __name__ == "__main__":
 
