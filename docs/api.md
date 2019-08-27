@@ -3,117 +3,125 @@ API
 
 Schema
 ------
-All API resources must be accessed through this URL: . Data must be sent and will
-be received in json format.
+All API resources must be accessed through this URL https://dsp.mbernardi.com.ar: . Data must be sent and will
+be received in JSON format.
 
 Authentication
 --------------
-Done via curl command.
+Done via HTTP header Basic Authentication.
+Example via curl:
  `curl -u {username:password}`
-This is obligatory for ANY API resource that is trying to be accessed, and it
-MUST be sent on each curl request.
+This is obligatory for ANY API resource that is trying to be accessed,
+and it MUST be sent on each request, except to create a new user,
+for this refer to Users.
 
 Location
 ---------
 Allowed methods: 'GET'; 'PUT'
 
+GET
+~~~
 Obtain user's location.
 Request:
 ```
-curl -u {username:password} --request GET http://URL/api/v1/location
+curl -u {username:password} --request GET https://dsp.mbernardi.com.ar/api/v1/location
 ```
 Response:
 
+TODO
 
-TODO(ponerla bien)
-
+PUT
+~~~
+Modify user's location.
 Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
-    --data '{"lat":"32","password":"64"}' \
-    http://localhost:5000/api/v1/location
+    --data '{"lat":32,"lon":64}' \
+    https://dsp.mbernardi.com.ar/api/v1/location
 ```
 
 | Name | Type | Description |
 | --- |:---:| ---:|
-| lat      | integer | New latitude |
-| lon      | integer     |   New longitude |
+| lat | real | New latitude |
+| lon | real | New longitude |
 
 
 Response:
 
-```
-{
-    "lat": 12.345,
-    "long": 23.435,
-}
-```
+TODO
 
 Password
 ------------
 Allowed method: 'PUT'
 
-Change your password
+PUT
+~~~
+Change your password.
 
 Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
     --data '{"password":"new_password"}' \
-    http://localhost:5000/api/v1/password
+    https://dsp.mbernardi.com.ar/api/v1/password
 ```
+
+| Name | Type | Description |
+| --- |:---:| ---:|
+| password      | string | New password |
 Response:
+
 TODO
 
 Watchlist
 -----------
 Allowed methods: 'GET'; 'POST'; 'DELETE'
 
-Lets you access, add an entry or delete your watchlist.
+GET
+~~~
+Obtain user's watchlist.
 
 Request:
 ```
-curl -u {username:password} --request GET http://URL/api/v1/watchlist
+curl -u {username:password} --request GET https://mbernardi.com.ar/api/v1/watchlist
 ```
 Response:
+
 TODO
+
+POST
+~~~~
+Add a new star to the watchlist
 
 Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request POST \
-    --data '{"star_id":"INTEGER","notes":"STRING","style":"INTEGER"}' \
-    http://localhost:5000/api/v1/watchlist
+    --data '{"star_id":3,"notes":"It's awesome - Rittano 2019","style":"1"}' \
+    https://dsp.mbernardi.com.ar/api/v1/watchlist
 ```
 | Name | Type | Description |
 | --- |:---:| ---:|
-| star_id     | integer | id object identifying the star |
+| star_id     | real | id object identifying the star |
 | notes      | string     | comment about the star |
-| style      | integer     |   TODO |
+| style      | real     |   TODO |
 
 Response:
+
 TODO
+
+DELETE
+~~~~~~
+Clears the watchlist
 
 Request:
 ```
-curl -u {username:password} --request DELETE http://URL/api/v1/watchlist
+curl -u {username:password} --request DELETE https://dsp.mbernardi.com.ar/api/v1/watchlist
 ```
 
 Response:
+
 TODO
 
-Watchlist Objects
------------
-Allowed methods: 'PUT'; 'DELETE'
-
-Lets you delete a single entry of your watchlist or change "notes" and "style".
-
-Request:
-```
-curl -u {username:password} --header "Content-Type: application/json" \
-    --request PUT \
-    --data '{"star_id":"INTEGER","notes":"STRING","style":"INTEGER"}' \
-    http://localhost:5000/api/v1/watchlist/object?id=INTEGER
-```
-QUIZAS MODIFIQUEMOS ESTA PARTE PORQUE NO SE SI HACE FALTA EL SIGNO DE PREGUNTA
+FALTA VER COMO DOCUMENTAR LO DE /watchlist/X

@@ -116,7 +116,7 @@ def api_addusers():
                 db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, pwdhash, lat, lon, salt))
                 return "Operation Successful \n", 200
             except sqlite3.IntegrityError:
-                return "User already exist \n ", 500
+                return "User already exists \n ", 500
         else:
             return "Method not allowed \n", 405
 
@@ -144,12 +144,12 @@ def api_watchlist():
                 style = query_parameters.get('style')
                 try:
                     if db.cur.execute('SELECT * FROM watchlist where username = ? and star_id = ?;', (user, star_id)).fetchall():
-                        return "Already exist \n", 200 #fijarse si es 200
+                        return "Already exists \n", 200 #fijarse si es 200
                     else:
                         db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
                         return "Operation Successful \n", 200
                 except sqlite3.IntegrityError:
-                    return "Could not add to the list", 500
+                    return "Wrong constraints", 500
 
             elif request.method == 'DELETE':
                 db.cur.execute('DELETE FROM watchlist where username = ?;', (user,))
