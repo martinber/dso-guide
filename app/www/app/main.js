@@ -8,12 +8,6 @@ import {
     watchlist_create_row,
     catalog_create
 } from "./tables.js";
-import {
-    watchlist_add,
-    watchlist_delete,
-    watchlist_save,
-    watchlist_get_all
-} from "./watchlist.js";
 
 $(document).ready(function() {
 
@@ -36,61 +30,61 @@ $(document).ready(function() {
 
     // Watchlist of the user
     ctx.watchlist = [
-        {
-            id: 37,
-            "notes": null,
-            "style": 2,
-        },
-        {
-            id: 4613,
-            "notes": null,
-            "style": 1,
-        },
-        {
-            id: 3131,
-            "notes": null,
-            "style": 0,
-        },
-        {
-            id: 1692,
-            "notes": null,
-            "style": 1,
-        },
-        {
-            id: 5368,
-            "notes": null,
-            "style": 1,
-        },
-        {
-            id: 1809,
-            "notes": null,
-            "style": 0,
-        },
-        {
-            id: 881,
-            "notes": null,
-            "style": 1,
-        },
-        {
-            id: 936,
-            "notes": null,
-            "style": 0,
-        },
-        {
-            id: 2218,
-            "notes": null,
-            "style": 1,
-        },
-        {
-            id: 5643,
-            "notes": null,
-            "style": 0,
-        },
-        {
-            id: 5917,
-            "notes": null,
-            "style": 1,
-        },
+        // {
+            // id: 37,
+            // "notes": null,
+            // "style": 2,
+        // },
+        // {
+            // id: 4613,
+            // "notes": null,
+            // "style": 1,
+        // },
+        // {
+            // id: 3131,
+            // "notes": null,
+            // "style": 0,
+        // },
+        // {
+            // id: 1692,
+            // "notes": null,
+            // "style": 1,
+        // },
+        // {
+            // id: 5368,
+            // "notes": null,
+            // "style": 1,
+        // },
+        // {
+            // id: 1809,
+            // "notes": null,
+            // "style": 0,
+        // },
+        // {
+            // id: 881,
+            // "notes": null,
+            // "style": 1,
+        // },
+        // {
+            // id: 936,
+            // "notes": null,
+            // "style": 0,
+        // },
+        // {
+            // id: 2218,
+            // "notes": null,
+            // "style": 1,
+        // },
+        // {
+            // id: 5643,
+            // "notes": null,
+            // "style": 0,
+        // },
+        // {
+            // id: 5917,
+            // "notes": null,
+            // "style": 1,
+        // },
     ];
 
     // Create aladin catalog for objects in the object catalog
@@ -207,7 +201,6 @@ function main(ctx, dsos_data) {
 
     watchlist_create_header($("#watchlist-table thead tr"));
 
-    let map_objects = [];
     for (let obj of ctx.watchlist) {
         watchlist_create_row(
             dsos_data,
@@ -218,27 +211,8 @@ function main(ctx, dsos_data) {
             watchlist_save,
             function(id) { object_goto(ctx, dsos_data, id) },
         ).appendTo("#watchlist-table tbody");
-
-        let dim = data.get_dimensions(dsos_data, obj.id);
-
-        map_objects.push({
-            "type": "Feature",
-            "id": obj.id,
-            "style": obj.style,
-            "properties": {
-                "name": data.get_name(dsos_data, obj.id),
-                "dim": `${dim[0]}x${dim[1]}`,
-            },
-            "geometry":{
-                "type": "Point",
-                "coordinates": [
-                    data.get_ra(dsos_data, obj.id),
-                    data.get_dec(dsos_data, obj.id),
-                ],
-            }
-        });
     }
-    add_map_markers(ctx, map_objects);
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
 
     catalog_create(
         dsos_data,
@@ -269,15 +243,112 @@ function object_goto(ctx, dsos_data, id) {
     window.location.hash = "aladin-map";
 }
 
+/**
+ * Set the observing time for the Celestial map
+ */
 function update_map_datetime(datetime) {
     Celestial.date(datetime);
     Celestial._go();
 }
 
+/**
+ * Set the observing location for the Celestial map
+ */
 function update_map_location(lat, long) {
     Celestial._location(lat, long);
     Celestial._go();
 }
+
+/**
+ * Delete object from watchlist
+ *
+ * Deletes both on server and on client
+ */
+export function watchlist_delete(id) {
+    $.ajax({
+        type: "DELETE",
+        url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        dataType: "json",
+    }).done(function(dsos_data) {
+
+        $(`#watchlist-obj-${id}`).remove();
+        // TODO
+
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_delete() failed", xhr, status, error);
+    });
+}
+
+/**
+ * Add object to watchlist, both on client and on server
+ */
+export function watchlist_add(ctx, dsos_data, id) {
+    // TODO
+
+    let style = 0;
+    let notes = "";
+
+    watchlist_create_row(
+        dsos_data,
+        id,
+        notes,
+        style,
+        watchlist_delete,
+        watchlist_save,
+        function(id) { object_goto(ctx, dsos_data, id) },
+    ).appendTo("#watchlist-table tbody");
+
+    ctx.watchlist.push({
+        id: id,
+        notes: notes,
+        style: style
+    });
+
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
+}
+
+/**
+ * Save changes on given object id to server
+ */
+export function watchlist_save(id) {
+    $.ajax({
+        type: "PUT",
+        url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+            id: id,
+            notes: $(`#watchlist-obj-${id} .objects-notes textarea`).val(),
+            style: $(`#watchlist-obj-${id} .objects-style select`).val(),
+        }),
+        dataType: "json",
+    }).done(function(dsos_data) {
+
+        // TODO
+
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_save() failed", xhr, status, error);
+    });
+}
+
+/**
+ * Replace client watchlist with watchlist from server
+ */
+export function watchlist_get_all(ctx) {
+    $.ajax({
+        type: "GET",
+        url: "/api/v1/watchlist",
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
+        dataType: "json",
+    }).done(function(json) {
+        ctx.watchlist = json;
+
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_get_all() failed", xhr, status, error);
+    });
+}
+
 
 /**
  * Translate the given integer to a class string
@@ -411,7 +482,30 @@ function celestial_redraw() {
  *  ]
  *
  */
-function add_map_markers(ctx, objs) {
+function update_map_markers(ctx, dsos_data, watchlist) {
+
+    // Format the array elemts to what Celestial expects
+    let objs = [];
+    for (let obj of watchlist) {
+        let dim = data.get_dimensions(dsos_data, obj.id);
+
+        objs.push({
+            "type": "Feature",
+            "id": obj.id,
+            "style": obj.style,
+            "properties": {
+                "name": data.get_name(dsos_data, obj.id),
+                "dim": `${dim[0]}x${dim[1]}`,
+            },
+            "geometry":{
+                "type": "Point",
+                "coordinates": [
+                    data.get_ra(dsos_data, obj.id),
+                    data.get_dec(dsos_data, obj.id),
+                ],
+            }
+        });
+    }
 
     // Clean previous markers
     Celestial.clear()
@@ -420,7 +514,6 @@ function add_map_markers(ctx, objs) {
     for (let catalog in ctx.aladin_catalogs) {
         ctx.aladin.addCatalog(ctx.aladin_catalogs[catalog]);
     }
-
 
     // Separate objs given on different lists depending on the style used
     // Each element of this object is a list of objects that share the same
@@ -469,7 +562,6 @@ function add_map_markers(ctx, objs) {
                     .enter().append("path")
                     .attr("class", class_string);
             }
-            console.log("ASDASDAS");
 
             // Trigger redraw to display changes
             Celestial.redraw();
