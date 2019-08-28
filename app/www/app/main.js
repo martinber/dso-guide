@@ -32,21 +32,21 @@ $(document).ready(function() {
 
     // Watchlist of the user
     ctx.watchlist = [
-        {
-            id: 37,
-            "notes": null,
-            "style": 2,
-        },
-        {
-            id: 4613,
-            "notes": null,
-            "style": 1,
-        },
-        {
-            id: 3131,
-            "notes": null,
-            "style": 0,
-        },
+        // {
+            // id: 37,
+            // "notes": null,
+            // "style": 2,
+        // },
+        // {
+            // id: 4613,
+            // "notes": null,
+            // "style": 1,
+        // },
+        // {
+            // id: 3131,
+            // "notes": null,
+            // "style": 0,
+        // },
         // {
             // id: 1692,
             // "notes": null,
@@ -166,7 +166,7 @@ function main(ctx, dsos_data) {
         let password = $("#login-password").val();
 
         $.ajax({
-            type: "POST",
+            type: "GET",
             url: "/api/v1/login",
             headers: {
                 "Authorization": "Basic " + btoa(username + ":" + password)
@@ -188,6 +188,7 @@ function main(ctx, dsos_data) {
 
     $("#register-form").submit(function(e) {
         e.preventDefault(); // Disable built-in HTML action
+        // TODO
         $.ajax({
             type: "POST",
             url: "/api/v1/login",
@@ -350,7 +351,14 @@ export function watchlist_get_all(ctx, dsos_data) {
         },
         dataType: "json",
     }).done(function(json) {
+
+        // Check the API, the field is named star_id instead of just id
+        for (let obj of json) {
+            obj.id = obj.star_id;
+            obj.star_id = undefined;
+        }
         ctx.watchlist = json;
+
         watchlist_delete_row_all();
 
         for (let obj of ctx.watchlist) {
