@@ -14,7 +14,7 @@ function create_name_cell(dsos_data, id) {
     }).append(
         $("<span>", {
             text: `${data.get_name(dsos_data, id)}`,
-        }),
+        })
     );
 }
 
@@ -31,7 +31,7 @@ function create_id_cell(id) {
         }),
         $("<span>", {
             text: `${id}`,
-        }),
+        })
     );
 }
 
@@ -48,7 +48,7 @@ function create_mag_cell(dsos_data, id) {
         }),
         $("<span>", {
             text: `${data.get_mag(dsos_data, id)}`,
-        }),
+        })
     );
 }
 
@@ -77,7 +77,7 @@ function create_ra_dec_cell(dsos_data, id) {
             }),
             $("<span>", {
                 text: `${data.get_ra(dsos_data, id)}`,
-            }),
+            })
         ),
         $("<span>").append(
             $("<span>", {
@@ -86,8 +86,8 @@ function create_ra_dec_cell(dsos_data, id) {
             }),
             $("<span>", {
                 text: `${data.get_dec(dsos_data, id)}`,
-            }),
-        ),
+            })
+        )
     );
 }
 
@@ -106,7 +106,7 @@ function create_alt_az_cell(dsos_data, id) {
             }),
             $("<span>", {
                 text: `${data.get_alt(dsos_data, id)}`,
-            }),
+            })
         ),
         $("<span>").append(
             $("<span>", {
@@ -115,8 +115,8 @@ function create_alt_az_cell(dsos_data, id) {
             }),
             $("<span>", {
                 text: `${data.get_az(dsos_data, id)}`,
-            }),
-        ),
+            })
+        )
     );
 }
 
@@ -135,20 +135,31 @@ function create_notes_cell(notes) {
 /**
  * Create table cell with style dropdown
  */
-function create_style_cell(style) {
+function create_style_cell(selected_style) {
     let td = $("<td>", {
         class: "objects-style",
     });
 
     let select = $("<select>");
 
-    for (let style of object_styles) {
-        select.append(
-            $("<option>", {
-                value: style.name,
-                text: style.string,
-            })
-        );
+    for (let i = 0; i < object_styles.length; i++) {
+
+        if (i == selected_style) {
+            select.append(
+                $("<option>", {
+                    value: object_styles[i].name,
+                    text: object_styles[i].string,
+                    selected: true,
+                })
+            );
+        } else {
+            select.append(
+                $("<option>", {
+                    value: object_styles[i].name,
+                    text: object_styles[i].string,
+                })
+            );
+        }
     }
 
     td.append(select);
@@ -170,7 +181,7 @@ export function watchlist_create_header(tr) {
                 text: row.string,
             })
         );
-    };
+    }
 }
 
 /**
@@ -209,7 +220,7 @@ export function watchlist_create_row(
     style,
     delete_callback,
     save_callback,
-    goto_callback,
+    goto_callback
 ) {
     let tr =  $("<tr>", {
         id: `watchlist-obj-${id}`,
@@ -223,7 +234,7 @@ export function watchlist_create_row(
 
             case "name":
                 tr.append(create_name_cell(dsos_data, id));
-                break
+                break;
 
             case "mag":
                 tr.append(create_mag_cell(dsos_data, id));
@@ -272,7 +283,7 @@ export function watchlist_create_row(
                         click: function() {
                             goto_callback(id);
                         },
-                    }),
+                    })
                 ));
                 break;
         }
@@ -378,7 +389,7 @@ export function catalog_create(
                             click: () => {
                                 goto_callback(object.id);
                             },
-                        }),
+                        })
                     ));
                     break;
 

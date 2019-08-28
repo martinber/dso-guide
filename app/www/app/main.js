@@ -17,9 +17,9 @@ $(document).ready(function() {
 
     let ctx = {};
 
-    // Store username and password in plaintext, these are sent on every API request
-    // If username is null the user is logged out, so the changes made will not
-    // be sent to the server, something like an "offline" mode.
+    // Store username and password in plaintext, these are sent on every API
+    // request. If username is null the user is logged out, so the changes made
+    // will not be sent to the server, something like an "offline" mode.
     ctx.username = null;
     ctx.password = null;
 
@@ -32,21 +32,21 @@ $(document).ready(function() {
 
     // Watchlist of the user
     ctx.watchlist = [
-        // {
-            // id: 37,
-            // "notes": null,
-            // "style": 2,
-        // },
-        // {
-            // id: 4613,
-            // "notes": null,
-            // "style": 1,
-        // },
-        // {
-            // id: 3131,
-            // "notes": null,
-            // "style": 0,
-        // },
+        {
+            id: 37,
+            "notes": null,
+            "style": 2,
+        },
+        {
+            id: 4613,
+            "notes": null,
+            "style": 1,
+        },
+        {
+            id: 3131,
+            "notes": null,
+            "style": 0,
+        },
         // {
             // id: 1692,
             // "notes": null,
@@ -121,9 +121,9 @@ $(document).ready(function() {
 function main(ctx, dsos_data) {
 
     Celestial.display(config);
-    ctx.aladin = A.aladin('#aladin-map', {
+    ctx.aladin = A.aladin("#aladin-map", {
         fov: 1,
-        target: 'M31',
+        target: "M31",
         reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
         showReticle: false,
     });
@@ -143,13 +143,13 @@ function main(ctx, dsos_data) {
     hour = (hour < 10 ? "0" : "") + hour;
     min = (min < 10 ? "0" : "") + min;
 
-    $('#datetime-date').val(`${year}-${month}-${day}`);
-    $('#datetime-time').val(`${hour}:${min}`);
+    $("#datetime-date").val(`${year}-${month}-${day}`);
+    $("#datetime-time").val(`${hour}:${min}`);
 
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
-        let [year, month, day] = $('#datetime-date').val().split("-");
-        let [hour, min] = $('#datetime-time').val().split(":");
+        let [year, month, day] = $("#datetime-date").val().split("-");
+        let [hour, min] = $("#datetime-time").val().split(":");
         let date = new Date(year, month, day, hour, min);
         update_map_datetime(date);
     });
@@ -207,8 +207,8 @@ function main(ctx, dsos_data) {
         dsos_data,
         null,
         catalog,
-        function(id) { watchlist_add(ctx, dsos_data, id) },
-        function(id) { object_goto(ctx, dsos_data, id) },
+        function(id) { watchlist_add(ctx, dsos_data, id); },
+        function(id) { object_goto(ctx, dsos_data, id); }
     );
 
 }
@@ -221,7 +221,7 @@ function object_goto(ctx, dsos_data, id) {
 
     ctx.aladin.gotoRaDec(
         data.get_ra(dsos_data, id),
-        data.get_dec(dsos_data, id),
+        data.get_dec(dsos_data, id)
     );
 
     // Set FOV to the biggest of width,height of object, convert dimensions from
@@ -300,9 +300,9 @@ export function watchlist_add(ctx, dsos_data, id) {
             id,
             notes,
             style,
-            function(id) { watchlist_delete(ctx, dsos_data, id) },
+            function(id) { watchlist_delete(ctx, dsos_data, id); },
             watchlist_save,
-            function(id) { object_goto(ctx, dsos_data, id) },
+            function(id) { object_goto(ctx, dsos_data, id); }
         ).appendTo("#watchlist-table tbody");
 
         ctx.watchlist.push({
@@ -361,7 +361,7 @@ export function watchlist_get_all(ctx, dsos_data) {
                 obj.style,
                 watchlist_delete,
                 watchlist_save,
-                function(id) { object_goto(ctx, dsos_data, id) },
+                function(id) { object_goto(ctx, dsos_data, id); }
             ).appendTo("#watchlist-table tbody");
         }
         update_map_markers(ctx, dsos_data, ctx.watchlist);
@@ -530,7 +530,7 @@ function update_map_markers(ctx, dsos_data, watchlist) {
     }
 
     // Clean previous markers
-    Celestial.clear()
+    Celestial.clear();
     // TODO: Add issue to celestial, I would expect that these items would be
     // removed by clear()
     for (let i = 0; i < object_styles.length; i++) {
@@ -552,7 +552,7 @@ function update_map_markers(ctx, dsos_data, watchlist) {
     //     "wishlist-2": undefined,           // No objects share style 2
     //     "wishlist-3": [{obj}, {obj}, ...], // Objects that share style 3
     // ]
-    let objs_by_class = {}
+    let objs_by_class = {};
 
     for (let obj of objs) {
 
@@ -568,7 +568,7 @@ function update_map_markers(ctx, dsos_data, watchlist) {
 
     Celestial.add({
         type: "line",
-        callback: function(error, json) {
+        callback: function(error, _json) {
             if (error) return console.warn(error);
 
             // For each group, each one with a style/class
@@ -582,8 +582,8 @@ function update_map_markers(ctx, dsos_data, watchlist) {
                 }, config.transform);
 
                 // Add to celestial objects container from d3 library
-                // I guess that ".asterisms" is used by convention because it works
-                // with any string
+                // I guess that ".asterisms" is used by convention because it
+                // works with any string
                 Celestial.container.selectAll(".asterisms")
                     .data(data.features)
                     .enter().append("path")

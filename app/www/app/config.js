@@ -13,7 +13,8 @@ export let config = {
     // optional initial geographic position [lat,lon] in degrees
     geopos: [0, 0],
 
-    // initial zoom level 0...zoomextend; 0|null = default, 1 = 100%, 0 < x <= zoomextend
+    // initial zoom level 0...zoomextend; 0|null = default, 1 = 100%,
+    // 0 < x <= zoomextend
     zoomlevel: null,
 
     // maximum zoom level
@@ -100,7 +101,7 @@ export let config = {
         exponent: -0.28,
 
         // Data source for stellar data, number indicates limit magnitude
-        data: 'stars.6.json'
+        data: "stars.6.json"
     },
 
     dsos: {
@@ -130,7 +131,7 @@ export let config = {
         exponent: 1.4,
 
         // Data source for DSOs, opt. number indicates limit magnitude
-        data: 'dsos.bright.json',
+        data: "dsos.bright.json",
 
         //DSO symbol styles, 'stroke'-parameter present = outline
         symbols: {
@@ -170,8 +171,12 @@ export let config = {
         which: ["sol", "mer", "ven", "ter", "lun", "mar", "jup", "sat", "ura", "nep"],
 
         // Font styles for planetary symbols
-        style: { fill: "#00ccff", font: "bold 17px 'Lucida Sans Unicode', Consolas, sans-serif",
-            align: "center", baseline: "middle" },
+        style: {
+            fill: "#00ccff",
+            font: "bold 17px 'Lucida Sans Unicode', Consolas, sans-serif",
+            align: "center",
+            baseline: "middle"
+        },
 
         // Character and color for each symbol in 'which', simple circle \u25cf
         symbols: {
