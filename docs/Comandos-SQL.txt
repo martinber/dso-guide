@@ -84,9 +84,17 @@ except sqlite3.IntegrityError as error:
     print("Error el usuario {} metio un {}, error:".format(user, values, error))
 
 PRUEBAS CURL
+
+Obtener coordenadas:
+curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/location
+
 Cambiar lat o lon:
 curl -u 'tincho:ucacha' --header "Content-Type: application/json" --request \
-PUT --data '{"lat":-91, "lon":-67.2}' http://127.0.0.1:5000/api/v1/location
+PUT --data '{"lat":-31, "lon":-67.2}' http://127.0.0.1:5000/api/v1/location
+
+Agregar usuarios:
+curl --header "Content-Type: application/json" --request POST --data \
+'{"username":"tincho", "password":"ucacha"}' http://127.0.0.1:5000/api/v1/users
 
 Agregar a la watchlist:
 curl -u "carlo:teve" --header "Content-Type: application/json" --request POST \
@@ -95,9 +103,9 @@ curl -u "carlo:teve" --header "Content-Type: application/json" --request POST \
 Obtener la lista de fav:
 curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/watchlist
 
- Obtener coordenadas:
- curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/location
+Borrar todos los favoritos:
+curl -u 'carlo:teve'  --request DELETE http://127.0.0.1:5000/api/v1/watchlist
 
-Agregar usuarios:
-curl --header "Content-Type: application/json" --request POST --data \
-'{"user":"carlo", "password":"teve"}' http://127.0.0.1:5000/api/v1/users
+Cambiar contraseña:
+curl -u "nano:elbajo" --header "Content-Type: application/json" --request PUT \
+--data '{"new_password":"enano"}' http://127.0.0.1:5000/api/v1/password
