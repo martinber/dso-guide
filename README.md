@@ -79,6 +79,10 @@ star chart
   AttributeError: 'NoneType' object has no attribute 'get'
   ```
 
+- Parecería que a veces tenemos que mandar el header
+  "Content-Type: application/json" al hacer PUT, habría que hacer que no haga
+  falta?
+
 ## Tools
 
 - Flask

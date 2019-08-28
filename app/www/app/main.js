@@ -174,15 +174,18 @@ function main(ctx, dsos_data) {
             // data: $(this).serialize(),
             dataType: "json",
         }).done(function(json) {
-            // TODO: Chequear si es correcto
+            // TODO: Chequear si es correcto, capaz que al recibir 405 se entre
+            // acá
             ctx.username = username;
             ctx.password = password;
             watchlist_get_all(ctx, dsos_data);
+            location_get(ctx);
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
             ctx.username = username;
             ctx.password = password;
             watchlist_get_all(ctx, dsos_data);
+            location_get(ctx);
         });
     });
 
@@ -250,11 +253,35 @@ function update_map_location(lat, long) {
 }
 
 /**
+ * Get location from server and update the map and location form
+ */
+function location_get(ctx) {
+    $.ajax({
+        type: "GET",
+        url: "/api/v1/location",
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
+        dataType: "json",
+    }).done(function(json) {
+
+        $("#location-lat").val(`${json.lat}`);
+        $("#location-long").val(`${json.lon}`);
+        update_map_location(json.lat, json.lon);
+
+    }).fail(function(xhr, status, error) {
+        console.error("location_get() failed", xhr, status, error);
+    });
+
+}
+
+
+/**
  * Delete object from watchlist
  *
  * Deletes both on server and on client
  */
-export function watchlist_delete(ctx, dsos_data, id) {
+function watchlist_delete(ctx, dsos_data, id) {
     // $.ajax({
         // type: "DELETE",
         // url: "/api/v1/watchlist/object" + $.param({ "id": id }),
@@ -283,7 +310,7 @@ export function watchlist_delete(ctx, dsos_data, id) {
 /**
  * Add object to watchlist, both on client and on server
  */
-export function watchlist_add(ctx, dsos_data, id) {
+function watchlist_add(ctx, dsos_data, id) {
     // TODO make api call
 
     // Check if the object already exists
@@ -319,7 +346,7 @@ export function watchlist_add(ctx, dsos_data, id) {
 /**
  * Save changes on given object id to server
  */
-export function watchlist_save(id) {
+function watchlist_save(id) {
     $.ajax({
         type: "PUT",
         url: "/api/v1/watchlist/object" + $.param({ "id": id }),
@@ -342,7 +369,7 @@ export function watchlist_save(id) {
 /**
  * Replace client watchlist with watchlist from server
  */
-export function watchlist_get_all(ctx, dsos_data) {
+function watchlist_get_all(ctx, dsos_data) {
     $.ajax({
         type: "GET",
         url: "/api/v1/watchlist",
