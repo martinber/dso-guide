@@ -136,6 +136,9 @@ curl -u {username:password} --header "Content-Type: application/json" \
     --data '{"star_id":12, "notes":"asda", "style":1}' \
     https://dsp.mbernardi.com.ar/api/v1/location
 ```
+Response:
+
+TODO
 
 ### DELETE
 
@@ -146,3 +149,6 @@ curl -u {username:password} \
     --request PUT \
     https://dsp.mbernardi.com.ar/api/v1/location
 ```
+Response:
+
+TODO
