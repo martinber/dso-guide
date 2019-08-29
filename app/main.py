@@ -160,7 +160,7 @@ def api_watchlist():
                 style = query_parameters.get('style')
                 try:
                     if db.cur.execute('SELECT * FROM watchlist where username = ? and star_id = ?;', (user, star_id)).fetchall():
-                        return "Already exists \n", 200 #fijarse si es 200
+                        return "Already exists \n", 200 
                     else:
                         db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
                         return "Operation Successful \n", 200
