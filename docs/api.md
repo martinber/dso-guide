@@ -26,17 +26,25 @@ Request:
 curl -u {username:password} --request GET https://dsp.mbernardi.com.ar/api/v1/location
 ```
 Response:
-
-TODO
+```
+{
+  "lat": value, 
+  "lon": value
+}
+```
 
 ### PUT
 
-Modify user's location.
+Modify user's location. Values MUST be:
+
+- latitude: -90<lat<90
+- longitude: -180<lon<180
+
 Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
-    --data '{"lat":32,"lon":64}' \
+    --data '{"lat":value,"lon":value}' \
     https://dsp.mbernardi.com.ar/api/v1/location
 ```
 
@@ -48,7 +56,7 @@ curl -u {username:password} --header "Content-Type: application/json" \
 
 Response:
 
-TODO
+`Operation Successful`
 
 ## Password
 
@@ -72,7 +80,7 @@ curl -u {username:password} --header "Content-Type: application/json" \
 
 Response:
 
-TODO
+`Operation Successful`
 
 ## Watchlist
 
@@ -87,8 +95,20 @@ Request:
 curl -u {username:password} --request GET https://mbernardi.com.ar/api/v1/watchlist
 ```
 Response:
-
-TODO
+```
+[
+  {
+    "notes": "asdasdads", 
+    "star_id": 12, 
+    "style": 1
+  }, 
+  {
+    "notes": "asdasdads", 
+    "star_id": 11, 
+    "style": 1
+  }
+]
+```
 
 ### POST
 
@@ -122,14 +142,33 @@ curl -u {username:password} --request DELETE https://dsp.mbernardi.com.ar/api/v1
 
 Response:
 
-## Watchlist/<star_id>
+## Watchlist/<int:star_id>
 
 Allowed methods: 'PUT'; 'DELETE'
 
 ### PUT
 
 Change the notes or the style from a star on the watchlist.
+Request:
+```
+curl -u {username:password} --header "Content-Type: application/json" \
+    --request PUT \
+    --data '{"star_id":12, "notes":"asda", "style":1}' \
+    https://dsp.mbernardi.com.ar/api/v1/location
+```
+Response:
+
+TODO
 
 ### DELETE
 
 Delete a single object from the watchlist.
+Request:
+```
+curl -u {username:password} \
+    --request PUT \
+    https://dsp.mbernardi.com.ar/api/v1/location
+```
+Response:
+
+TODO
