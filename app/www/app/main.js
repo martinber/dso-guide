@@ -158,8 +158,8 @@ function main(ctx, dsos_data) {
         e.preventDefault(); // Disable built-in HTML action
 
         let data = {
-            lat: $("#location-lat").val(),
-            lon: $("#location-long").val()
+            lat: parseFloat($("#location-lat").val()),
+            lon: parseFloat($("#location-long").val())
         }
 
         $.ajax({
@@ -170,7 +170,6 @@ function main(ctx, dsos_data) {
             },
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
-            dataType: "json",
         }).done(function(json) {
             console.log("location submitted to server");
         }).fail(function(xhr, status, error) {
@@ -218,7 +217,6 @@ function main(ctx, dsos_data) {
             url: "/api/v1/login",
             data: $(this).serialize(),
             contentType: "application/json",
-            dataType: "json",
         }).done(function(json) {
             console.log("intentado_registrarse");
             // TODO
@@ -304,11 +302,13 @@ function location_get(ctx) {
  * Deletes both on server and on client
  */
 function watchlist_delete(ctx, dsos_data, id) {
-    // $.ajax({
-        // type: "DELETE",
-        // url: "/api/v1/watchlist/object" + $.param({ "id": id }),
-        // dataType: "json",
-    // }).done(function(dsos_data) {
+    $.ajax({
+        type: "DELETE",
+        url: `/api/v1/watchlist/${id}`),
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
+    }).done(function(dsos_data) {
 
         watchlist_delete_row(id);
 
@@ -322,11 +322,10 @@ function watchlist_delete(ctx, dsos_data, id) {
             console.error(`Tried to delete unexistent watchlist object id ${id}`);
         }
         update_map_markers(ctx, dsos_data, ctx.watchlist);
-        // TODO make api call
 
-    // }).fail(function(xhr, status, error) {
-        // console.error("watchlist_delete() failed", xhr, status, error);
-    // });
+    }).fail(function(xhr, status, error) {
+        console.error("watchlist_delete() failed", xhr, status, error);
+    });
 }
 
 /**
@@ -351,7 +350,7 @@ function watchlist_add(ctx, dsos_data, id) {
             notes,
             style,
             function(id) { watchlist_delete(ctx, dsos_data, id); },
-            watchlist_save,
+            function(id) { watchlist_save(ctx, id); },
             function(id) { object_goto(ctx, dsos_data, id); }
         ).appendTo("#watchlist-table tbody");
 
@@ -371,21 +370,18 @@ function watchlist_add(ctx, dsos_data, id) {
 function watchlist_save(ctx, id) {
     $.ajax({
         type: "PUT",
-        url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        url: `/api/v1/watchlist/${id}`),
         headers: {
             "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
         },
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify({
-            id: id,
+            star_id: id,
             notes: $(`#watchlist-obj-${id} .objects-notes textarea`).val(),
             style: $(`#watchlist-obj-${id} .objects-style select`).val(),
         }),
-        dataType: "json",
     }).done(function(dsos_data) {
-
-        // TODO
-
+        console.log("watchlist_save() successful");
     }).fail(function(xhr, status, error) {
         console.error("watchlist_save() failed", xhr, status, error);
     });

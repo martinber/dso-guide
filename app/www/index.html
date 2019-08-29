@@ -80,11 +80,13 @@
 					<form class="observation-form" id="location-form" action="">
 						<div>
 							<label for="location-lat">Latitude:</label>
-							<input id="location-lat" name="lat" type="text" required />
+							<input id="location-lat" name="lat" step="0.00000001"
+									type="number" min="-90" max="90" required />
 						</div>
 						<div>
 							<label for="location-long">Longitude:</label>
-							<input id="location-long" name="long" type="text" required />
+							<input id="location-long" name="long" step="0.00000001"
+									type="number" min="-180" max="180" required />
 						</div>
 						<div>
 							<button id="location-submit">Update</button>
