@@ -205,7 +205,7 @@ def api_password():
         else:
             return "Unauthorized \n", 401
 
-@app.route('/api/v1/watchlist/<star_id>', methods=['DELETE','PUT'])
+@app.route('/api/v1/watchlist/<int:star_id>', methods=['DELETE','PUT'])
 def api_objects(star_id):
 
     query_parameters = request.json
@@ -216,7 +216,8 @@ def api_objects(star_id):
 
         if login(user, password, db.cur):
             if request.method == 'PUT':
-
+                print(star_id, type(star_id))
+                print(query_parameters.get('star_id'), type(query_parameters.get('star_id')))
                 if (star_id != query_parameters.get('star_id')):
                     return "Wrong parameters \n", 409
 

@@ -109,3 +109,7 @@ curl -u 'carlo:teve'  --request DELETE http://127.0.0.1:5000/api/v1/watchlist
 Cambiar contraseña:
 curl -u "nano:elbajo" --header "Content-Type: application/json" --request PUT \
 --data '{"new_password":"enano"}' http://127.0.0.1:5000/api/v1/password
+
+Cambiar parámetros de una estrella:
+curl -u "carlo:teve" --header "Content-Type: application/json" --request PUT --data \
+'{"star_id":12, "notes":"asda", "style":1}' http://127.0.0.1:5000/api/v1/watchlist/12
