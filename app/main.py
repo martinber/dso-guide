@@ -174,7 +174,7 @@ def api_watchlist():
                 return "Method not allowed \n", 405
 
         else:
-            return invalid_credentials(401)
+            return "Unauthorized \n", 401
 
 @app.route('/api/v1/password', methods=['PUT'])
 def api_password():
@@ -189,8 +189,13 @@ def api_password():
         if login(user, password, db.cur):
             if request.method == 'PUT':
                 new_password = query_parameters.get('new_password')
+                salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
+                pwdhash = hashlib.pbkdf2_hmac('sha256', new_password.encode('utf-8'), salt, 100000)
+                pwdhash = binascii.hexlify(pwdhash)
+                pwdhash = pwdhash.decode('utf-8')
+                salt = salt.decode('utf-8')
                 try:
-                    db.cur.execute('UPDATE users SET password = ? WHERE username = ?', (new_password, user))
+                    db.cur.execute('UPDATE users SET password = ?, salt = ? WHERE username = ? ;', (pwdhash, salt, user))
                     return "Operation Successful \n", 200
 
                 except sqlite3.IntegrityError:
@@ -198,7 +203,7 @@ def api_password():
             else:
                 return "Method not allowed \n", 405
         else:
-            return invalid_credentials(401)
+            return "Unauthorized \n", 401
 
 @app.route('/api/v1/watchlist/object', methods=['DELETE','PUT'])
 def api_objects():
