@@ -156,7 +156,28 @@ function main(ctx, dsos_data) {
 
     $("#location-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
-        update_map_location($("#location-lat").val(), $("#location-long").val());
+
+        let data = {
+            lat: $("#location-lat").val(),
+            lon: $("#location-long").val()
+        }
+
+        $.ajax({
+            type: "PUT",
+            url: "/api/v1/location",
+            headers: {
+                "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+            },
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+        }).done(function(json) {
+            console.log("location submitted to server");
+        }).fail(function(xhr, status, error) {
+            console.error("location submit to server failed", xhr, status, error);
+        });
+
+        update_map_location(data.lat, data.lon);
     });
 
     $("#login-form").submit(function(e) {
@@ -196,6 +217,7 @@ function main(ctx, dsos_data) {
             type: "POST",
             url: "/api/v1/login",
             data: $(this).serialize(),
+            contentType: "application/json",
             dataType: "json",
         }).done(function(json) {
             console.log("intentado_registrarse");
@@ -346,10 +368,13 @@ function watchlist_add(ctx, dsos_data, id) {
 /**
  * Save changes on given object id to server
  */
-function watchlist_save(id) {
+function watchlist_save(ctx, id) {
     $.ajax({
         type: "PUT",
         url: "/api/v1/watchlist/object" + $.param({ "id": id }),
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify({
             id: id,
@@ -394,8 +419,8 @@ function watchlist_get_all(ctx, dsos_data) {
                 obj.id,
                 obj.notes,
                 obj.style,
-                watchlist_delete,
-                watchlist_save,
+                function(id) { watchlist_delete(ctx, dsos_data, id); },
+                function(id) { watchlist_save(ctx, id); },
                 function(id) { object_goto(ctx, dsos_data, id); }
             ).appendTo("#watchlist-table tbody");
         }
