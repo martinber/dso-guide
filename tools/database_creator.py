@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3 import Error
 
 
-db = sqlite3.connect('prueba.db')
+db = sqlite3.connect('deepsky.db')
 
 cur = db.cursor()
 
@@ -18,9 +18,6 @@ cur.execute('CREATE TABLE watchlist \
 notes text CHECK(typeof(notes) == \"text\"),\
 style int CHECK(typeof(style) == \"integer\"), \
 username text NOT NULL CHECK(typeof(username) == \"text\"));')
-
-cur.execute('INSERT INTO users values (\'nano\', \'tuli\', -33.3, -62.4, \'asd123\');')
-cur.execute('INSERT INTO users values (\'tincho\', \'ucacha\', -33.54, -62.321, \'asdasd\');')
 
 cur.close()
 db.commit()
