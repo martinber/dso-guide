@@ -62,13 +62,14 @@ Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
-    --data '{"password":"new_password"}' \
+    --data '{"new_password":"password"}' \
     https://dsp.mbernardi.com.ar/api/v1/password
 ```
 
 | Name | Type | Description |
 | --- |:---:| ---:|
 | password      | string | New password |
+
 Response:
 
 TODO
@@ -97,7 +98,7 @@ Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request POST \
-    --data '{"star_id":3,"notes":"It's awesome - Rittano 2019","style":"1"}' \
+    --data '{"star_id":3,"notes":"It's awesome - Rittano 2019","style":1}' \
     https://dsp.mbernardi.com.ar/api/v1/watchlist
 ```
 | Name | Type | Description |
