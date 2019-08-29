@@ -35,16 +35,16 @@ def login(user, password, cursor):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "404", 404
+    return "404 Page not found \n", 404
 @app.errorhandler(401)
 def invalid_credentials(e):
-    return "401 \n"
+    return "Unauthorized \n", 401
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return "405"
+    return "Method not allowed \n", 405
 @app.errorhandler(500)
 def internal_server_error(e):
-    return "500"
+    return "Internal Server Error \n", 500
 
 class Database:
 
