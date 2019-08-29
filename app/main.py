@@ -69,7 +69,7 @@ def api_login():
 
         query_parameters = request.json
 
-        if method == 'GET':
+        if request.method == 'GET':
             user = request.authorization["username"]
             password = request.authorization["password"]
             if login(user, password, db.cur):
@@ -205,8 +205,8 @@ def api_password():
         else:
             return "Unauthorized \n", 401
 
-@app.route('/api/v1/watchlist/object', methods=['DELETE','PUT'])
-def api_objects():
+@app.route('/api/v1/watchlist/<star_id>', methods=['DELETE','PUT'])
+def api_objects(star_id):
 
     query_parameters = request.json
 
@@ -216,21 +216,25 @@ def api_objects():
 
         if login(user, password, db.cur):
             if request.method == 'PUT':
-                star_id = query_parameters.get('star_id')
-                notes = query_parameters.get('notes')
-                style = query_parameters.get('style')
 
-                try:
-                    db.cur.execute('UPDATE watchlist ')
-                    return "Operation Successful \n", 200
-                except sqlite3.IntegrityError:
-                    return "Wrong constraints", 500
+                if (star_id != query_parameters.get('star_id')):
+                    return "Wrong parameters \n", 409
+
+                else:
+                    notes = query_parameters.get('notes')
+                    style = query_parameters.get('style')
+
+                    try:
+                        db.cur.execute('UPDATE watchlist SET notes = ?, style = ? \
+                        WHERE username = ? and star_id = ?;',(notes, style, user, star_id))
+                        return "Operation Successful \n", 200
+                    except sqlite3.IntegrityError:
+                        return "Wrong constraints \n", 500
 
             elif request.method == 'DELETE':
-                star_id = query_parameters.get('star_id')
 
                 try:
-                    db.cur.execute('DELETE from watchlist WHERE username = ? and star_id = ?;', user, star_id)
+                    db.cur.execute('DELETE from watchlist WHERE username = ? and star_id = ?;', (user, star_id))
                     return "Operation Successful \n", 200
                 except sqlite3.IntegrityError:
                     return "Could not delete the object \n", 500
