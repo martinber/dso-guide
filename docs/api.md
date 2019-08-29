@@ -92,7 +92,7 @@ TODO
 
 ### POST
 
-Add a new star to the watchlist
+Add a new star to the watchlist.
 
 Request:
 ```
@@ -113,7 +113,7 @@ TODO
 
 ### DELETE
 
-Clears the watchlist
+Clears the watchlist.
 
 Request:
 ```
@@ -122,6 +122,14 @@ curl -u {username:password} --request DELETE https://dsp.mbernardi.com.ar/api/v1
 
 Response:
 
-TODO
+## Watchlist/<star_id>
 
-FALTA VER COMO DOCUMENTAR LO DE /watchlist/X
+Allowed methods: 'PUT'; 'DELETE'
+
+### PUT
+
+Change the notes or the style from a star on the watchlist.
+
+### DELETE
+
+Delete a single object from the watchlist.
