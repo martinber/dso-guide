@@ -268,18 +268,22 @@ export function watchlist_create_row(
                 }).append(
                     $("<button>", {
                         text: "X",
+                        class: "objects-delete",
                         click: function() {
                             delete_callback(id);
                         }
                     }),
                     $("<button>", {
                         text: "Save",
+                        disabled: true;
+                        class: "objects-save",
                         click: function() {
                             save_callback(id);
                         }
                     }),
                     $("<button>", {
                         text: "GoTo",
+                        class: "objects-goto",
                         click: function() {
                             goto_callback(id);
                         },
