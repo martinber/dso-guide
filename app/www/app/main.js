@@ -170,7 +170,7 @@ function main(ctx, dsos_data) {
             },
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
-        }).done(function(json) {
+        }).done(function(response) {
             console.log("location submitted to server");
         }).fail(function(xhr, status, error) {
             console.error("location submit to server failed", xhr, status, error);
@@ -191,9 +191,7 @@ function main(ctx, dsos_data) {
             headers: {
                 "Authorization": "Basic " + btoa(username + ":" + password)
             },
-            // data: $(this).serialize(),
-            dataType: "json",
-        }).done(function(json) {
+        }).done(function(response) {
             // TODO: Chequear si es correcto, capaz que al recibir 405 se entre
             // acá
             ctx.username = username;
@@ -202,10 +200,6 @@ function main(ctx, dsos_data) {
             location_get(ctx);
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
-            ctx.username = username;
-            ctx.password = password;
-            watchlist_get_all(ctx, dsos_data);
-            location_get(ctx);
         });
     });
 
@@ -217,7 +211,7 @@ function main(ctx, dsos_data) {
             url: "/api/v1/login",
             data: $(this).serialize(),
             contentType: "application/json",
-        }).done(function(json) {
+        }).done(function(response) {
             console.log("intentado_registrarse");
             // TODO
         }).fail(function(xhr, status, error) {
@@ -304,11 +298,11 @@ function location_get(ctx) {
 function watchlist_delete(ctx, dsos_data, id) {
     $.ajax({
         type: "DELETE",
-        url: `/api/v1/watchlist/${id}`),
+        url: `/api/v1/watchlist/${id}`,
         headers: {
             "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
         },
-    }).done(function(dsos_data) {
+    }).done(function(response) {
 
         watchlist_delete_row(id);
 
@@ -370,7 +364,7 @@ function watchlist_add(ctx, dsos_data, id) {
 function watchlist_save(ctx, id) {
     $.ajax({
         type: "PUT",
-        url: `/api/v1/watchlist/${id}`),
+        url: `/api/v1/watchlist/${id}`,
         headers: {
             "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
         },
@@ -380,7 +374,7 @@ function watchlist_save(ctx, id) {
             notes: $(`#watchlist-obj-${id} .objects-notes textarea`).val(),
             style: $(`#watchlist-obj-${id} .objects-style select`).val(),
         }),
-    }).done(function(dsos_data) {
+    }).done(function(response) {
         console.log("watchlist_save() successful");
     }).fail(function(xhr, status, error) {
         console.error("watchlist_save() failed", xhr, status, error);
