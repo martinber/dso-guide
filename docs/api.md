@@ -122,14 +122,27 @@ curl -u {username:password} --request DELETE https://dsp.mbernardi.com.ar/api/v1
 
 Response:
 
-## Watchlist/<star_id>
+## Watchlist/<int:star_id>
 
 Allowed methods: 'PUT'; 'DELETE'
 
 ### PUT
 
 Change the notes or the style from a star on the watchlist.
+Request:
+```
+curl -u {username:password} --header "Content-Type: application/json" \
+    --request PUT \
+    --data '{"star_id":12, "notes":"asda", "style":1}' \
+    https://dsp.mbernardi.com.ar/api/v1/location
+```
 
 ### DELETE
 
 Delete a single object from the watchlist.
+Request:
+```
+curl -u {username:password} \
+    --request PUT \
+    https://dsp.mbernardi.com.ar/api/v1/location
+```
