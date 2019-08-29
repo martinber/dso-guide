@@ -20,4 +20,17 @@ Users table
 
     - `long`: REAL
 
-    - Favourites?
+Favourites table
+---------------
+
+- Name: `watchlist`
+
+- Columns: 
+
+    - `star_id`: INT
+
+    - `notes`: TEXT
+
+    - `style`: INT
+
+    - `username`: TEXT
