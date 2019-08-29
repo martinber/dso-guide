@@ -32,5 +32,6 @@ COPY ./config/supervisord.conf /etc/supervisord.conf
 # Add demo app
 COPY ./app /app
 WORKDIR /app
+RUN chown -R nginx:nginx /app
 
 CMD ["/usr/bin/supervisord"]
