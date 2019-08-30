@@ -123,24 +123,27 @@ function create_alt_az_cell(dsos_data, id) {
 /**
  * Create table cell with object ALT and AZ
  */
-function create_notes_cell(notes) {
+function create_notes_cell(notes, id, notes_change_callback) {
 
     return $("<td>", {
         class: "objects-notes",
     }).append(
         $("<textarea placeholder='Notes....'>").val(notes)
+            .keyup(function() { notes_change_callback(id); })
+            .change(function() { notes_change_callback(id); })
     );
 }
 
 /**
  * Create table cell with style dropdown
  */
-function create_style_cell(selected_style) {
+function create_style_cell(selected_style, style_change_callback) {
     let td = $("<td>", {
         class: "objects-style",
     });
 
     let select = $("<select>");
+    select.change(function() { style_change_callback(this) });
 
     for (let i = 0; i < object_styles.length; i++) {
 
@@ -212,6 +215,10 @@ export function watchlist_delete_row(id) {
  *   as argument
  * - goto_callback(id): Called when user clicks the goto button, gives object
  *   id as argument
+ * - style_change_callback(select): Called when user changes the style using
+ *   the dropdown, gives as an argument a reference to the changed select
+ *   element
+ * - notes_change_callback(id): Called when user does something on the notes
  */
 export function watchlist_create_row(
     dsos_data,
@@ -220,7 +227,9 @@ export function watchlist_create_row(
     style,
     delete_callback,
     save_callback,
-    goto_callback
+    goto_callback,
+    style_change_callback,
+    notes_change_callback
 ) {
     let tr =  $("<tr>", {
         id: `watchlist-obj-${id}`,
@@ -253,11 +262,11 @@ export function watchlist_create_row(
                 break;
 
             case "notes":
-                tr.append(create_notes_cell(notes));
+                tr.append(create_notes_cell(notes, id, notes_change_callback));
                 break;
 
             case "style":
-                tr.append(create_style_cell(style));
+                tr.append(create_style_cell(style, style_change_callback));
                 break;
 
             case "controls":
@@ -268,18 +277,22 @@ export function watchlist_create_row(
                 }).append(
                     $("<button>", {
                         text: "X",
+                        class: "objects-delete",
                         click: function() {
                             delete_callback(id);
                         }
                     }),
                     $("<button>", {
                         text: "Save",
+                        disabled: true,
+                        class: "objects-save",
                         click: function() {
                             save_callback(id);
                         }
                     }),
                     $("<button>", {
                         text: "GoTo",
+                        class: "objects-goto",
                         click: function() {
                             goto_callback(id);
                         },

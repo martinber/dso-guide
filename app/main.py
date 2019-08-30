@@ -2,6 +2,7 @@ import flask
 from flask import request, jsonify, render_template
 import sqlite3
 import hashlib, os, binascii
+import re
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -118,21 +119,30 @@ def api_addusers():
         query_parameters = request.json
 
         if request.method == 'POST':
-            user = query_parameters.get('username')
+            user = query_parameters.get('username').lower()
             password = query_parameters.get('password')
-            salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
-            pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
-            pwdhash = binascii.hexlify(pwdhash)
-            pwdhash = pwdhash.decode('utf-8')
-            salt = salt.decode('utf-8')
-            lat = 0
-            lon = 0
+            pattern = r'[^\_\-a-z0-9]'
 
-            try:
-                db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, pwdhash, lat, lon, salt))
-                return "Operation Successful \n", 200
-            except sqlite3.IntegrityError:
-                return "User already exists \n ", 500
+            if re.search(pattern, user):
+                return "Character not accepted \n", 406
+
+            else:
+                if len(password) < 8:
+                    return "Too short \n", 406
+                else:
+                    salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
+                    pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+                    pwdhash = binascii.hexlify(pwdhash)
+                    pwdhash = pwdhash.decode('utf-8')
+                    salt = salt.decode('utf-8')
+                    lat = 0
+                    lon = 0
+
+                    try:
+                        db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, pwdhash, lat, lon, salt))
+                        return "Operation Successful \n", 200
+                    except sqlite3.IntegrityError:
+                        return "User already exists \n ", 500
         else:
             return "Method not allowed \n", 405
 
@@ -160,7 +170,7 @@ def api_watchlist():
                 style = query_parameters.get('style')
                 try:
                     if db.cur.execute('SELECT * FROM watchlist where username = ? and star_id = ?;', (user, star_id)).fetchall():
-                        return "Already exists \n", 200 
+                        return "Already exists \n", 200
                     else:
                         db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
                         return "Operation Successful \n", 200
@@ -242,7 +252,7 @@ def api_objects(star_id):
             else:
                 return "Method not allowed \n", 405
         else:
-            return "Unauthorized", 401
+            return "Unauthorized \n", 401
 
 if __name__ == "__main__":
 
