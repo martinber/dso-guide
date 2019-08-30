@@ -10,15 +10,15 @@ Users table
 
 - Columns:
 
-    - `user`: TEXT
+    - `user`: TEXT, `length >= 4` characters and no special characters except for `_` and `-`
 
     - `password`: TEXT
 
     - `salt`: TEXT
 
-    - `lat`: REAL
+    - `lat`: REAL, values between -90 and 90
 
-    - `long`: REAL
+    - `long`: REAL, values between -180 and 180
 
 Favourites table
 ---------------
@@ -31,6 +31,6 @@ Favourites table
 
     - `notes`: TEXT
 
-    - `style`: INT
+    - `style`: INT, values 0-4
 
     - `username`: TEXT

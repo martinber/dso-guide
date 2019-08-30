@@ -97,8 +97,7 @@ curl --header "Content-Type: application/json" --request POST --data \
 '{"username":"tincho", "password":"ucacha"}' http://127.0.0.1:5000/api/v1/users
 
 Agregar a la watchlist:
-curl -u "carlo:teve" --header "Content-Type: application/json" --request POST \
---data '{"star_id":12, "notes":"asdasdads", "style":1}' http://127.0.0.1:5000/api/v1/watchlist
+curl -u "test:dsptest00" --header "Content-Type: application/json" --request POST --data '{"star_id":37, "notes":"una estrella", "style":0}' http://127.0.0.1:5000/api/v1/watchlist
 
 Obtener la lista de fav:
 curl -i -u "carlo:teve" http://127.0.0.1:5000/api/v1/watchlist
@@ -113,3 +112,5 @@ curl -u "nano:elbajo" --header "Content-Type: application/json" --request PUT \
 Cambiar parámetros de una estrella:
 curl -u "carlo:teve" --header "Content-Type: application/json" --request PUT --data \
 '{"star_id":12, "notes":"asda", "style":1}' http://127.0.0.1:5000/api/v1/watchlist/12
+
+37, 4613, 3131, 5343, 861, 881, 2218, 5666
