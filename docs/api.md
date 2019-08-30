@@ -14,6 +14,12 @@ This is obligatory for ANY API resource that is trying to be accessed,
 and it MUST be sent on each request, except to create a new user,
 for this refer to Users.
 
+## Users
+
+Add a new user to the database. The user must have 4 characters or more with 
+no special ones except for "_" "and" -. Password 
+Allowed methods: 'POST' 
+
 ## Location
 
 Allowed methods: 'GET'; 'PUT'
