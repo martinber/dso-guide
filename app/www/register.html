@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Dark Sky Planner - Register</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+
+		<!-- For mobiles -->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!--
+			The below three lines are a fix to get HTML5 semantic elements working
+			in old versions of Internet Explorer.
+			From https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure
+		-->
+		<!--[if lt IE 9]>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+		<![endif]-->
+
+		<!-- TODO -->
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=47BKnLQyQq">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=47BKnLQyQq">
+
+		<script type="text/javascript" src="/lib/jquery-3.4.1.min.js"></script>
+
+		<link rel="stylesheet" href="normalize.css" />
+		<link rel="stylesheet" href="style.css" />
+		<link href="https://fonts.googleapis.com/css?family=Saira+Condensed:400,800&display=swap" rel="stylesheet">
+		<script type="module" src="/app/main_register.js"></script>
+
+	</head>
+
+	<body>
+
+		<header>
+			<div class="inner">
+				<h1>Dark Sky Planner</h1>
+
+
+			</div>
+		</header>
+
+		<main id="content">
+			<div id="user-controls">
+				<form class="user-form" id="register-form" action="">
+					<div>
+						<label for="register-username">Username</label><br>
+						<input id="register-username" name="username" type="text" required />
+					</div>
+					<div>
+						<label for="register-password">Password</label><br>
+						<input id="register-password" name="password" type="password" required />
+					</div>
+					<div>
+						<button id="register-submit">Register</button>
+					</div>
+				</form>
+			</div>
+		</main>
+
+		<footer>
+			<div class="inner">
+				<p><a href="https://github.com/martinber/dark-sky-planner">GitHub</a></p>
+				</p>
+				<p>Using
+					<a href="https://github.com/ofrohn/d3-celestial">D3-Celestial</a>
+					released under
+					<a href="http://opensource.org/licenses/BSD-3-Clause">BSD license</a>.
+					Copyright 2015-17
+					<a href="http://armchairastronautics.blogspot.com/" rel="author">Olaf Frohn</a>.
+				</p>
+			</div>
+		</footer>
+	</body>
+
+</html>
