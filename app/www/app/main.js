@@ -219,19 +219,6 @@ function main(ctx, dsos_data) {
         });
     });
 
-    $('.objects-style').change(function() {
-        // this is the td which has a select inside, the parent has an id of
-        // "watchlist-obj-{id}"
-        let row = $(this).parent();
-        let id = row.attr("id").
-
-        // Enable the save button
-        row.find(".objects-save").prop("disabled", false);
-
-        // TODO Trabajando
-        alert( $(this).find("option:selected").attr('value') );
-    });
-
     watchlist_create_header($("#watchlist-table thead tr"));
 
     catalog_create(
@@ -302,6 +289,40 @@ function location_get(ctx) {
 
 }
 
+/**
+ * This function should be called when the style of an object changes.
+ *
+ * This function us used as a callback to $(".objects-style select").change(),
+ * so the argument "select" should refer to the select element
+ */
+function watchlist_style_change(ctx, dsos_data, select) {
+    // this is the select, the parent is a "td" and the parent-parent is the
+    // "tr" who has an id of "watchlist-obj-{id}"
+    let row = $(select).closest("tr");
+
+    let id = parseInt(row.attr("id").split("-")[2]);
+
+    // Enable the save button
+    row.find(".objects-save").prop("disabled", false);
+
+    // Update the watchlist object
+    let index = ctx.watchlist.findIndex((obj) => {
+        return obj.id == id;
+    });
+    ctx.watchlist[index].style = get_style_id($(select).val());
+
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
+}
+
+/**
+ * This function should be called when the notes of an object changes.
+ *
+ * This function us used as a callback to $(".objects-style textarea").change()
+ */
+function watchlist_notes_change(ctx, id) {
+    // Enable the save button
+    $(`#watchlist-obj-${id} .objects-save`).prop("disabled", false);
+}
 
 /**
  * Delete object from watchlist
@@ -372,7 +393,9 @@ function watchlist_add(ctx, dsos_data, id) {
                 style,
                 function(id) { watchlist_delete(ctx, dsos_data, id); },
                 function(id) { watchlist_save(ctx, dsos_data, id); },
-                function(id) { object_goto(ctx, dsos_data, id); }
+                function(id) { object_goto(ctx, dsos_data, id); },
+                function(select) { watchlist_style_change(ctx, dsos_data, select); },
+                function(id) { watchlist_notes_change(ctx, id); }
             ).appendTo("#watchlist-table tbody");
 
             ctx.watchlist.push({
@@ -428,6 +451,7 @@ function watchlist_save(ctx, dsos_data, id) {
         }),
     }).done(function(response) {
         console.log("watchlist_save() successful");
+        $(`#watchlist-obj-${id} .objects-save`).prop("disabled", true);
         update_map_markers(ctx, dsos_data, ctx.watchlist);
     }).fail(function(xhr, status, error) {
         console.error("watchlist_save() failed", xhr, status, error);
@@ -464,7 +488,9 @@ function watchlist_get_all(ctx, dsos_data) {
                 obj.style,
                 function(id) { watchlist_delete(ctx, dsos_data, id); },
                 function(id) { watchlist_save(ctx, dsos_data, id); },
-                function(id) { object_goto(ctx, dsos_data, id); }
+                function(id) { object_goto(ctx, dsos_data, id); },
+                function(select) { watchlist_style_change(ctx, dsos_data, select); },
+                function(id) { watchlist_notes_change(ctx, id); }
             ).appendTo("#watchlist-table tbody");
         }
         update_map_markers(ctx, dsos_data, ctx.watchlist);
