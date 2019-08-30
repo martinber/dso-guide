@@ -10,7 +10,7 @@ Users table
 
 - Columns:
 
-    - `user`: TEXT, length > 4 characters and no special characters except for `_` and `-`
+    - `user`: TEXT, `length >= 4` characters and no special characters except for `_` and `-`
 
     - `password`: TEXT
 
