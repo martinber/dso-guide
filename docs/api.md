@@ -16,9 +16,22 @@ for this refer to Users.
 
 ## Users
 
-Add a new user to the database. The user must have 4 characters or more with 
-no special ones except for "_" "and" -. Password 
+Add a new user to the database. The user must have 4 characters or more with no 
+special ones except for "_" and "-". Password must have at least 8 characters.
+
 Allowed methods: 'POST' 
+
+Request:
+```
+curl --header "Content-Type: application/json" 
+     --request POST 
+     --data '{"username":"username", "password":"password"}' 
+     http://https://dsp.mbernardi.com.ar/api/v1/users
+```
+
+Response:
+
+`Operation Successful`
 
 ## Location
 
@@ -135,7 +148,7 @@ curl -u {username:password} --header "Content-Type: application/json" \
 
 Response:
 
-TODO
+`Operation Successful`
 
 ### DELETE
 
@@ -147,6 +160,8 @@ curl -u {username:password} --request DELETE https://dsp.mbernardi.com.ar/api/v1
 ```
 
 Response:
+
+`Operation Successful`
 
 ## Watchlist/<int:star_id>
 
@@ -164,7 +179,7 @@ curl -u {username:password} --header "Content-Type: application/json" \
 ```
 Response:
 
-TODO
+`Operation Successful`
 
 ### DELETE
 
@@ -177,4 +192,5 @@ curl -u {username:password} \
 ```
 Response:
 
-TODO
+`Operation Successful`
+
