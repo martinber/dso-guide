@@ -137,7 +137,7 @@ Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request POST \
-    --data '{"star_id":3,"notes":"It's awesome - Rittano 2019","style":1}' \
+    --data '{"star_id":value,"notes":"Description","style":value}' \
     https://dsp.mbernardi.com.ar/api/v1/watchlist
 ```
 | Name | Type | Description |
@@ -174,7 +174,7 @@ Request:
 ```
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
-    --data '{"star_id":12, "notes":"asda", "style":1}' \
+    --data '{"star_id":value, "notes":"Description", "style":value}' \
     https://dsp.mbernardi.com.ar/api/v1/location
 ```
 Response:

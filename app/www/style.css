@@ -104,22 +104,22 @@ header #user-controls
 	margin: auto;
 }
 #register-submit {
-    border: none;
-    background-color: #333;
-    color: #EEEEEE;
-    box-shadow: 0px 0px 3px #00000055;
-    outline: none;
-    background-color: #444444;
-    padding: 0.4em;
+	border: none;
+	background-color: #333;
+	color: #EEEEEE;
+	box-shadow: 0px 0px 3px #00000055;
+	outline: none;
+	background-color: #444444;
+	padding: 0.4em;
 	margin: 0;
-    margin-block-start: 0.5em;
+	margin-block-start: 0.5em;
 }
 #register-form{
 	max-width: 20em;
-    display: block;
-    margin: 0 auto;
-    background-color: #2d2c2c;
-    padding: 1em;
+	display: block;
+	margin: 0 auto;
+	background-color: #2d2c2c;
+	padding: 1em;
 }
 #register-password, #register-username, #confirm-password{
 	width: 100%
@@ -208,17 +208,17 @@ main#content h2
 
 .objects-table thead
 {
-  background-color: #444444;
+	background-color: #444444;
 }
 
 .objects-table tbody tr:nth-child(odd)
 {
-  background-color: #282828;
+	background-color: #282828;
 }
 
 .objects-table tbody tr:nth-child(even)
 {
-  background-color: #333333;
+	background-color: #333333;
 }
 
 .objects-label
@@ -268,16 +268,16 @@ main#content h2
 }
 
 .objects-table td.objects-appears-on ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
+	padding: 0;
+	margin: 0;
+	list-style: none;
 }
 
 .objects-table td.objects-appears-on li {
-    display: inline-block;
-    margin: 0 0.2em;
-    padding: 0.2em;
-    border: 1px solid #555555;
+	display: inline-block;
+	margin: 0 0.2em;
+	padding: 0.2em;
+	border: 1px solid #555555;
 }
 
 @media screen and (max-width: 750px) {

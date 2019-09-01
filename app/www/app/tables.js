@@ -56,9 +56,34 @@ function create_mag_cell(dsos_data, id) {
  * Create table cell with object type
  */
 function create_type_cell(dsos_data, id) {
+
+    let type = null;
+    switch (data.get_type(dsos_data, id)) {
+        case "gg": type = "Galaxy cluster"; break;
+        case "g": type = "Galaxy"; break;
+        case "s": type = "Spiral galaxy"; break;
+        case "s0": type = "Lenticular galaxy"; break;
+        case "sd": type = "Dwarf galaxy"; break;
+        case "i": type = "Irregular galaxy"; break;
+        case "e": type = "Elliptical galaxy"; break;
+        case "oc": type = "Open cluster"; break;
+        case "gc": type = "Globular cluster"; break;
+        case "dn": type = "Dark nebula"; break;
+        case "bn": type = "Bright nebula"; break;
+        case "sfr": type = "Star forming region"; break;
+        case "rn": type = "Reflection nebula"; break;
+        case "pn": type = "Planetary nebula"; break;
+        case "snr": type = "Supernova remnant"; break;
+        case "en": type = "Emmision nebula"; break;
+        default:
+            console.error(`Unknown DSO type ${data.get_type(dsos_data, id)}`);
+            type = "";
+            break;
+    }
+
     return $("<td>", {
         class: "objects-type",
-        text: `${data.get_type(dsos_data, id)}`,
+        text: type,
     });
 }
 

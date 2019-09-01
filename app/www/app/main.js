@@ -1,6 +1,7 @@
 "use strict";
 
-import { object_styles, catalog } from "./const.js";
+import { catalog } from "./catalog.js";
+import { object_styles } from "./const.js";
 import { config } from "./config.js";
 import * as data from "./data.js";
 import {
