@@ -80,13 +80,13 @@ header #user-controls
 	float: right;
 }
 
-header #user-controls form div
+#login-form div
 {
 	display: inline-block;
 	margin: 0.2em;
 }
 
-header #user-controls form div input
+#login-form div input
 {
 	height: 2em;
 	width: 8em;
@@ -97,6 +97,34 @@ header #user-controls form div input
 {
 	height: 2em;
 }
+
+/* Register -------------------------------------------------------------- */
+
+#user-controls{
+	margin: auto;
+}
+#register-submit {
+    border: none;
+    background-color: #333;
+    color: #EEEEEE;
+    box-shadow: 0px 0px 3px #00000055;
+    outline: none;
+    background-color: #444444;
+    padding: 0.4em;
+	margin: 0;
+    margin-block-start: 0.5em;
+}
+#register-form{
+	max-width: 20em;
+    display: block;
+    margin: 0 auto;
+    background-color: #2d2c2c;
+    padding: 1em;
+}
+#register-password, #register-username{
+	width: 100%
+}
+
 
 /* FOOTER ------------------------------------------------------------- */
 
