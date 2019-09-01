@@ -121,7 +121,7 @@ header #user-controls
     background-color: #2d2c2c;
     padding: 1em;
 }
-#register-password, #register-username{
+#register-password, #register-username, #confirm-password{
 	width: 100%
 }
 
