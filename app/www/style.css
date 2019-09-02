@@ -98,7 +98,70 @@ header #user-controls
 	height: 2em;
 }
 
-/* Register -------------------------------------------------------------- */
+/* INFO BANNER ------------------------------------------------------------- */
+
+#info-banner
+{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+
+	z-index: 999; /* Otherwise the aladin map is on top */
+	padding: 0.7em;
+	background-color: #664444;
+	box-shadow: 0px 0px 3px #00000055;
+	transition: all ease-in-out 0.1s;
+}
+
+/* Leave space so the banner is not shown above the footer */
+body
+{
+	/* margin-bottom: ???; */ /* Done on javascript at startup */
+}
+
+#info-toggle
+{
+	position: absolute;
+	top: -2em;
+	right: 1em;
+
+	height: 2em;
+	margin: 0;
+	background-color: #664444;
+	box-shadow: 0px 0px 3px #00000055;
+	visibility: visible; /* So this is shown even of the parent is hidden */
+
+	/* Leave space for the icon */
+	text-align: left;
+	padding-left: 1.9em;
+}
+
+/* Used to add a icon to the button */
+#info-toggle:before
+{
+	position: absolute;
+	left: 0em;
+	top: 0em;
+
+	content: "";
+	width: 1.3em;
+	height: 100%;
+	padding-left: 0.5em;
+	opacity: 0.8;
+	background-image: url('resources/info-toggle.svg');
+	background-position: left;
+	background-repeat: no-repeat;
+	background-origin: content-box; /* So the image is inside the padding */
+	background-size: contain;
+}
+
+#info-toggle:active
+{
+	background-color: #775555;
+}
+
+/* REGISTER -------------------------------------------------------------- */
 
 #user-controls{
 	margin: auto;

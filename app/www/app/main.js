@@ -32,63 +32,7 @@ $(document).ready(function() {
     ctx.aladin_catalogs = {};
 
     // Watchlist of the user
-    ctx.watchlist = [
-        // {
-            // id: 37,
-            // "notes": null,
-            // "style": 2,
-        // },
-        // {
-            // id: 4613,
-            // "notes": null,
-            // "style": 1,
-        // },
-        // {
-            // id: 3131,
-            // "notes": null,
-            // "style": 0,
-        // },
-        // {
-            // id: 1692,
-            // "notes": null,
-            // "style": 1,
-        // },
-        // {
-            // id: 5368,
-            // "notes": null,
-            // "style": 1,
-        // },
-        // {
-            // id: 1809,
-            // "notes": null,
-            // "style": 0,
-        // },
-        // {
-            // id: 881,
-            // "notes": null,
-            // "style": 1,
-        // },
-        // {
-            // id: 936,
-            // "notes": null,
-            // "style": 0,
-        // },
-        // {
-            // id: 2218,
-            // "notes": null,
-            // "style": 1,
-        // },
-        // {
-            // id: 5643,
-            // "notes": null,
-            // "style": 0,
-        // },
-        // {
-            // id: 5917,
-            // "notes": null,
-            // "style": 1,
-        // },
-    ];
+    ctx.watchlist = [];
 
     // Create aladin catalog for objects in the object catalog
     ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
@@ -147,6 +91,25 @@ function main(ctx, dsos_data) {
     $("#datetime-date").val(`${year}-${month}-${day}`);
     $("#datetime-time").val(`${hour}:${min}`);
 
+    // Leave space so the banner is not shown above the footer
+    let info_banner_height = $("#info-banner").css("height");
+    $("body").css("margin-bottom", info_banner_height);
+
+    $("#info-toggle").click(function(e) {
+
+        console.log($("#info-banner").css("visibility"));
+        if ($("#info-banner").css("visibility") == "hidden") {
+            $("#info-banner").css("visibility", "visible");
+            $("#info-banner").css("transform", "translateY(0)");
+            $("body").css("margin-bottom", info_banner_height);
+        } else {
+            $("#info-banner").css("visibility", "hidden");
+            $("#info-banner").css("transform", "translateY(100%)");
+            $("body").css("margin-bottom", "0");
+        }
+
+    });
+
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
         let [year, month, day] = $("#datetime-date").val().split("-");
@@ -197,6 +160,7 @@ function main(ctx, dsos_data) {
             // acá
             ctx.username = username;
             ctx.password = password;
+            $("#info-text").html(`Welcome <b>${username}</b>!`);
             watchlist_get_all(ctx, dsos_data);
             location_get(ctx);
         }).fail(function(xhr, status, error) {
