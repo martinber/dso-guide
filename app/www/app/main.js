@@ -1,6 +1,12 @@
 "use strict";
 
 import { catalog } from "./catalog.js";
+import {
+    status_is_visible,
+    status_hide,
+    status_show,
+    status_text
+} from "./status.js";
 import { object_styles } from "./const.js";
 import { config } from "./config.js";
 import * as data from "./data.js";
@@ -96,18 +102,11 @@ function main(ctx, dsos_data) {
     $("body").css("margin-bottom", info_banner_height);
 
     $("#info-toggle").click(function(e) {
-
-        console.log($("#info-banner").css("visibility"));
-        if ($("#info-banner").css("visibility") == "hidden") {
-            $("#info-banner").css("visibility", "visible");
-            $("#info-banner").css("transform", "translateY(0)");
-            $("body").css("margin-bottom", info_banner_height);
+        if (status_is_visible()) {
+            status_hide();
         } else {
-            $("#info-banner").css("visibility", "hidden");
-            $("#info-banner").css("transform", "translateY(100%)");
-            $("body").css("margin-bottom", "0");
+            status_show();
         }
-
     });
 
     $("#datetime-submit").click(function(e) {
@@ -160,7 +159,7 @@ function main(ctx, dsos_data) {
             // acá
             ctx.username = username;
             ctx.password = password;
-            $("#info-text").html(`Welcome <b>${username}</b>!`);
+            status_text(`Welcome <b>${username}</b>!`);
             watchlist_get_all(ctx, dsos_data);
             location_get(ctx);
         }).fail(function(xhr, status, error) {
