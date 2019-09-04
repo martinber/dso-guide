@@ -11,23 +11,29 @@ star chart
 
 - `docker run -it -p 80:80 dark-sky-planner:latest`
 
+## Tools used
 
-## Tools
+- Server-side:
 
-- Flask
+  - Webserver: NGINX.
 
-- [D3-celestial](https://github.com/ofrohn/d3-celestial)
+	- Web API: Flask and uWSGI.
 
-  - Looking at the source of
-    [this example](https://armchairastronautics.blogspot.com/p/skymap.html)
-    apparently we need D3 version 3 and D3-geo-projection version 0 (but I use
-    version 1 because version 0 returns 404).
+	- Database: SQLite3 on Python.
 
-- Javascript
+- Client-side:
 
-- https://swagger.io/specification/
+	- JQuery.
 
-- https://www.getpostman.com/products
+	- Sky chart: [D3-celestial](https://github.com/ofrohn/d3-celestial).
+
+	- Sky surveys: [Aladin Lite](http://aladin.u-strasbg.fr/#AladinLite).
+
+- Web API tests: [Postman](https://www.getpostman.com/products).
+
+## TODO
+
+- Look for every `console.error()` and show the error on the status banner.
 
 ## Tutorials
 
