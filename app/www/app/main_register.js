@@ -16,7 +16,7 @@ $(document).ready(function() {
                 contentType: "application/json",
             }).done(function(response) {
                 console.log("intentado_registrarse");
-                // TODO
+                window.location.replace("/index.html") //Martin tiene q tocar
             }).fail(function(xhr, status, error) {
                 console.error("register form sumbit failed", xhr, status, error);
             });
