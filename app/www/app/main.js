@@ -159,11 +159,18 @@ function main(ctx, dsos_data) {
             // acá
             ctx.username = username;
             ctx.password = password;
-            status_text(`Welcome <b>${username}</b>!`);
+
             watchlist_get_all(ctx, dsos_data);
             location_get(ctx);
+
+            status_text(`Welcome <b>${username}</b>!`);
+            status_hide();
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
+
+            let password = $("#login-password").val("");
+            status_text("<b>Username or password incorrect</b>, try again.");
+            status_show();
         });
     });
 
