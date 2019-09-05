@@ -33,7 +33,17 @@ star chart
 
 ## TODO
 
-- Look for every `console.error()` and show the error on the status banner.
+- Aladin map markers are not being cleared.
+
+- Add missing celestial markers.
+
+- Replace "dot" aladin marker.
+
+- Update footer.
+
+- Disable "add" buttons of objects already on the watchlist.
+
+- Change the login form when logged in
 
 ## Tutorials
 

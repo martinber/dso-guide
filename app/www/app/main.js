@@ -56,6 +56,10 @@ $(document).ready(function() {
         });
     }
 
+    // Leave space so the banner is not shown above the footer
+    let info_banner_height = $("#info-banner").css("height");
+    $("body").css("margin-bottom", info_banner_height);
+
     // Load JSON data of objects, then start on the main() function
 
     $.ajax({
@@ -66,6 +70,10 @@ $(document).ready(function() {
         main(ctx, dsos_data);
     }).fail(function(xhr, status, error) {
         console.error("get dsos_data failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, are you having connection \
+            issues?. Please <b>reload</b> this webpage.`);
+        status_show();
     });
 });
 
@@ -97,10 +105,6 @@ function main(ctx, dsos_data) {
     $("#datetime-date").val(`${year}-${month}-${day}`);
     $("#datetime-time").val(`${hour}:${min}`);
 
-    // Leave space so the banner is not shown above the footer
-    let info_banner_height = $("#info-banner").css("height");
-    $("body").css("margin-bottom", info_banner_height);
-
     $("#info-toggle").click(function(e) {
         if (status_is_visible()) {
             status_hide();
@@ -108,6 +112,8 @@ function main(ctx, dsos_data) {
             status_show();
         }
     });
+
+    status_hide();
 
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
@@ -125,19 +131,27 @@ function main(ctx, dsos_data) {
             lon: parseFloat($("#location-long").val())
         }
 
-        $.ajax({
-            type: "PUT",
-            url: "/api/v1/location",
-            headers: {
-                "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-            },
-            data: JSON.stringify(data),
-            contentType: "application/json; charset=utf-8",
-        }).done(function(response) {
-            console.log("location submitted to server");
-        }).fail(function(xhr, status, error) {
-            console.error("location submit to server failed", xhr, status, error);
-        });
+        if (logged_in(ctx)) {
+            $.ajax({
+                type: "PUT",
+                url: "/api/v1/location",
+                headers: {
+                    "Authorization": "Basic "
+                        + btoa(ctx.username + ":" + ctx.password)
+                },
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+            }).done(function(response) {
+                console.log("location submitted to server");
+            }).fail(function(xhr, status, error) {
+                console.error("location submit to server failed",
+                    xhr, status, error);
+
+                status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                    being saved!, reload the page and try again later.`);
+                status_show();
+            });
+        }
 
         update_map_location(data.lat, data.lon);
     });
@@ -155,8 +169,6 @@ function main(ctx, dsos_data) {
                 "Authorization": "Basic " + btoa(username + ":" + password)
             },
         }).done(function(response) {
-            // TODO: Chequear si es correcto, capaz que al recibir 405 se entre
-            // acá
             ctx.username = username;
             ctx.password = password;
 
@@ -168,25 +180,14 @@ function main(ctx, dsos_data) {
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
 
-            let password = $("#login-password").val("");
-            status_text("<b>Username or password incorrect</b>, try again.");
-            status_show();
-        });
-    });
-
-    $("#register-form").submit(function(e) {
-        e.preventDefault(); // Disable built-in HTML action
-        // TODO
-        $.ajax({
-            type: "POST",
-            url: "/api/v1/login",
-            data: $(this).serialize(),
-            contentType: "application/json",
-        }).done(function(response) {
-            console.log("intentado_registrarse");
-            // TODO
-        }).fail(function(xhr, status, error) {
-            console.error("register form sumbit failed", xhr, status, error);
+            if (xhr.status == 401) {
+                $("#login-password").val("");
+                status_text("<b>Username or password incorrect</b>, try again.");
+                status_show();
+            } else {
+                status_text(`<b>Error ${xhr.status}</b>, try again later.`);
+                status_show();
+            }
         });
     });
 
@@ -200,6 +201,13 @@ function main(ctx, dsos_data) {
         function(id) { object_goto(ctx, dsos_data, id); }
     );
 
+}
+
+/**
+ * Return true if we are logged in
+ */
+function logged_in(ctx) {
+    return ctx.username != null;
 }
 
 /**
@@ -256,6 +264,10 @@ function location_get(ctx) {
 
     }).fail(function(xhr, status, error) {
         console.error("location_get() failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
+            saved!, reload the page and try again later.`);
+        status_show();
     });
 
 }
@@ -301,30 +313,41 @@ function watchlist_notes_change(ctx, id) {
  * Deletes both on server and on client
  */
 function watchlist_delete(ctx, dsos_data, id) {
-    $.ajax({
-        type: "DELETE",
-        url: `/api/v1/watchlist/${id}`,
-        headers: {
-            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-        },
-    }).done(function(response) {
-
-        watchlist_delete_row(id);
-
-        let index = ctx.watchlist.findIndex((obj) => {
-            return obj.id == id;
-        });
-        if (index > -1) {
-            // Remove the element
-            ctx.watchlist.splice(index, 1);
-        } else {
-            console.error(`Tried to delete unexistent watchlist object id ${id}`);
-        }
-        update_map_markers(ctx, dsos_data, ctx.watchlist);
-
-    }).fail(function(xhr, status, error) {
-        console.error("watchlist_delete() failed", xhr, status, error);
+    let index = ctx.watchlist.findIndex((obj) => {
+        return obj.id == id;
     });
+    if (index < 0) {
+        console.error(`Tried to delete unexistent watchlist object id ${id}`);
+        return;
+    }
+
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "DELETE",
+            url: `/api/v1/watchlist/${id}`,
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+        }).done(function(response) {
+
+        }).fail(function(xhr, status, error) {
+            console.error("watchlist_delete() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    // Remove the element from the table
+    watchlist_delete_row(id);
+    if (index > -1) {
+        // Remove the element from the watchlist
+        ctx.watchlist.splice(index, 1);
+    }
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
+
 }
 
 /**
@@ -338,16 +361,19 @@ function watchlist_add(ctx, dsos_data, id) {
     });
     if (index > -1) {
         console.error("Element already exists id:", id);
-    } else {
+        return;
+    }
 
-        let style = 0;
-        let notes = "";
+    let style = 0;
+    let notes = "";
 
+    if (logged_in(ctx)) {
         $.ajax({
             type: "POST",
             url: "/api/v1/watchlist",
             headers: {
-                "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
             },
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
@@ -357,31 +383,39 @@ function watchlist_add(ctx, dsos_data, id) {
             }),
         }).done(function(response) {
 
-            watchlist_create_row(
-                dsos_data,
-                id,
-                notes,
-                style,
-                function(id) { watchlist_delete(ctx, dsos_data, id); },
-                function(id) { watchlist_save(ctx, dsos_data, id); },
-                function(id) { object_goto(ctx, dsos_data, id); },
-                function(select) { watchlist_style_change(ctx, dsos_data, select); },
-                function(id) { watchlist_notes_change(ctx, id); }
-            ).appendTo("#watchlist-table tbody");
-
-            ctx.watchlist.push({
-                id: id,
-                notes: notes,
-                style: style
-            });
-
-            update_map_markers(ctx, dsos_data, ctx.watchlist);
-
         }).fail(function(xhr, status, error) {
             console.error("watchlist_add() failed", xhr, status, error);
-        });
 
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
     }
+
+    watchlist_create_row(
+        dsos_data,
+        id,
+        notes,
+        style,
+        function(id) { watchlist_delete(ctx, dsos_data, id); },
+        function(id) { watchlist_save(ctx, dsos_data, id); },
+        function(id) { object_goto(ctx, dsos_data, id); },
+        function(select) { watchlist_style_change(ctx, dsos_data, select); },
+        function(id) { watchlist_notes_change(ctx, id); }
+    ).appendTo("#watchlist-table tbody");
+
+    if (!logged_in(ctx)) {
+        // Hide the save buttons
+        $(".objects-save").css("display", "none");
+    }
+
+    ctx.watchlist.push({
+        id: id,
+        notes: notes,
+        style: style
+    });
+
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
 }
 
 /**
@@ -408,25 +442,33 @@ function watchlist_save(ctx, dsos_data, id) {
         $(`#watchlist-obj-${id} .objects-style select`).val()
     );
 
-    $.ajax({
-        type: "PUT",
-        url: `/api/v1/watchlist/${id}`,
-        headers: {
-            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-        },
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({
-            star_id: id,
-            notes: notes,
-            style: style,
-        }),
-    }).done(function(response) {
-        console.log("watchlist_save() successful");
-        $(`#watchlist-obj-${id} .objects-save`).prop("disabled", true);
-        update_map_markers(ctx, dsos_data, ctx.watchlist);
-    }).fail(function(xhr, status, error) {
-        console.error("watchlist_save() failed", xhr, status, error);
-    });
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "PUT",
+            url: `/api/v1/watchlist/${id}`,
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                star_id: id,
+                notes: notes,
+                style: style,
+            }),
+        }).done(function(response) {
+            console.log("watchlist_save() successful");
+            $(`#watchlist-obj-${id} .objects-save`).prop("disabled", true);
+        }).fail(function(xhr, status, error) {
+            console.error("watchlist_save() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
 }
 
 /**
@@ -468,6 +510,10 @@ function watchlist_get_all(ctx, dsos_data) {
 
     }).fail(function(xhr, status, error) {
         console.error("watchlist_get_all() failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
+            saved!, reload the page and try again later.`);
+        status_show();
     });
 }
 
