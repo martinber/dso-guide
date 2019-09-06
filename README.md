@@ -33,12 +33,6 @@ star chart
 
 ## TODO
 
-- Aladin map markers are not being cleared.
-
-- Add missing celestial markers.
-
-- Replace "dot" aladin marker.
-
 - Update footer.
 
 - Disable "add" buttons of objects already on the watchlist.

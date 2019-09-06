@@ -40,6 +40,7 @@ $(document).ready(function() {
     // Watchlist of the user
     ctx.watchlist = [];
 
+    // TODO
     // Create aladin catalog for objects in the object catalog
     // ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
         // shape: function(source, context, view_params) {
@@ -606,32 +607,6 @@ function aladin_marker_draw(draw_function, source, context, view_params) {
     context.fillStyle = "rgba(255, 204, 255, 0.4)"
 
     draw_function(context, [source.x, source.y], 10);
-
-    /*
-    var fov = Math.max(viewParams['fov'][0], viewParams['fov'][1]);
-
-    // object name is displayed only if fov<10°
-    if (fov>10) {
-        return;
-    }
-
-    canvasCtx.globalAlpha = 0.9;
-    canvasCtx.globalAlpha = 1;
-
-    var xShift = 20;
-
-    canvasCtx.font = '15px Arial'
-    canvasCtx.fillStyle = '#eee';
-    canvasCtx.fillText(source.data['name'], source.x + xShift, source.y -4);
-
-    // object type is displayed only if fov<2°
-    if (fov>2) {
-        return;
-    }
-    canvasCtx.font = '12px Arial'
-    canvasCtx.fillStyle = '#abc';
-    canvasCtx.fillText(source.data['otype'], source.x + 2 + xShift, source.y + 10);
-    */
 };
 
 /**
