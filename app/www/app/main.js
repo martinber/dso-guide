@@ -41,20 +41,28 @@ $(document).ready(function() {
     ctx.watchlist = [];
 
     // Create aladin catalog for objects in the object catalog
-    ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
-        shape: "circle",
-        color: "#555555"
-    });
+    // ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
+        // shape: function(source, context, view_params) {
+            // aladin_marker_draw(draw_dot, source, context, view_params)
+        // },
+        // color: "#555555"
+    // });
 
     // Create aladin catalog for objects in "watchlist-{i}", one for each
     // available style
     for (let i = 0; i < object_styles.length; i++) {
         ctx.aladin_catalogs[get_class_string(i)] = A.catalog({
             name: object_styles[i].aladin_name,
-            shape: object_styles[i].aladin_shape,
+            shape: function(source, context, view_params) {
+                aladin_marker_draw(object_styles[i].draw, source, context, view_params)
+            },
             color: object_styles[i].color,
         });
     }
+
+    // Leave space so the banner is not shown above the footer
+    let info_banner_height = $("#info-banner").css("height");
+    $("body").css("margin-bottom", info_banner_height);
 
     // Load JSON data of objects, then start on the main() function
 
@@ -66,6 +74,10 @@ $(document).ready(function() {
         main(ctx, dsos_data);
     }).fail(function(xhr, status, error) {
         console.error("get dsos_data failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, are you having connection \
+            issues?. Please <b>reload</b> this webpage.`);
+        status_show();
     });
 });
 
@@ -97,10 +109,6 @@ function main(ctx, dsos_data) {
     $("#datetime-date").val(`${year}-${month}-${day}`);
     $("#datetime-time").val(`${hour}:${min}`);
 
-    // Leave space so the banner is not shown above the footer
-    let info_banner_height = $("#info-banner").css("height");
-    $("body").css("margin-bottom", info_banner_height);
-
     $("#info-toggle").click(function(e) {
         if (status_is_visible()) {
             status_hide();
@@ -108,6 +116,8 @@ function main(ctx, dsos_data) {
             status_show();
         }
     });
+
+    status_hide();
 
     $("#datetime-submit").click(function(e) {
         e.preventDefault(); // Disable built-in HTML action
@@ -125,19 +135,27 @@ function main(ctx, dsos_data) {
             lon: parseFloat($("#location-long").val())
         }
 
-        $.ajax({
-            type: "PUT",
-            url: "/api/v1/location",
-            headers: {
-                "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-            },
-            data: JSON.stringify(data),
-            contentType: "application/json; charset=utf-8",
-        }).done(function(response) {
-            console.log("location submitted to server");
-        }).fail(function(xhr, status, error) {
-            console.error("location submit to server failed", xhr, status, error);
-        });
+        if (logged_in(ctx)) {
+            $.ajax({
+                type: "PUT",
+                url: "/api/v1/location",
+                headers: {
+                    "Authorization": "Basic "
+                        + btoa(ctx.username + ":" + ctx.password)
+                },
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+            }).done(function(response) {
+                console.log("location submitted to server");
+            }).fail(function(xhr, status, error) {
+                console.error("location submit to server failed",
+                    xhr, status, error);
+
+                status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                    being saved!, reload the page and try again later.`);
+                status_show();
+            });
+        }
 
         update_map_location(data.lat, data.lon);
     });
@@ -155,31 +173,25 @@ function main(ctx, dsos_data) {
                 "Authorization": "Basic " + btoa(username + ":" + password)
             },
         }).done(function(response) {
-            // TODO: Chequear si es correcto, capaz que al recibir 405 se entre
-            // acá
             ctx.username = username;
             ctx.password = password;
-            status_text(`Welcome <b>${username}</b>!`);
+
             watchlist_get_all(ctx, dsos_data);
             location_get(ctx);
+
+            status_text(`Welcome <b>${username}</b>!`);
+            status_hide();
         }).fail(function(xhr, status, error) {
             console.error("login form submit failed", xhr, status, error);
-        });
-    });
 
-    $("#register-form").submit(function(e) {
-        e.preventDefault(); // Disable built-in HTML action
-        // TODO
-        $.ajax({
-            type: "POST",
-            url: "/api/v1/login",
-            data: $(this).serialize(),
-            contentType: "application/json",
-        }).done(function(response) {
-            console.log("intentado_registrarse");
-            // TODO
-        }).fail(function(xhr, status, error) {
-            console.error("register form sumbit failed", xhr, status, error);
+            if (xhr.status == 401) {
+                $("#login-password").val("");
+                status_text("<b>Username or password incorrect</b>, try again.");
+                status_show();
+            } else {
+                status_text(`<b>Error ${xhr.status}</b>, try again later.`);
+                status_show();
+            }
         });
     });
 
@@ -193,6 +205,13 @@ function main(ctx, dsos_data) {
         function(id) { object_goto(ctx, dsos_data, id); }
     );
 
+}
+
+/**
+ * Return true if we are logged in
+ */
+function logged_in(ctx) {
+    return ctx.username != null;
 }
 
 /**
@@ -249,6 +268,10 @@ function location_get(ctx) {
 
     }).fail(function(xhr, status, error) {
         console.error("location_get() failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
+            saved!, reload the page and try again later.`);
+        status_show();
     });
 
 }
@@ -294,30 +317,41 @@ function watchlist_notes_change(ctx, id) {
  * Deletes both on server and on client
  */
 function watchlist_delete(ctx, dsos_data, id) {
-    $.ajax({
-        type: "DELETE",
-        url: `/api/v1/watchlist/${id}`,
-        headers: {
-            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-        },
-    }).done(function(response) {
-
-        watchlist_delete_row(id);
-
-        let index = ctx.watchlist.findIndex((obj) => {
-            return obj.id == id;
-        });
-        if (index > -1) {
-            // Remove the element
-            ctx.watchlist.splice(index, 1);
-        } else {
-            console.error(`Tried to delete unexistent watchlist object id ${id}`);
-        }
-        update_map_markers(ctx, dsos_data, ctx.watchlist);
-
-    }).fail(function(xhr, status, error) {
-        console.error("watchlist_delete() failed", xhr, status, error);
+    let index = ctx.watchlist.findIndex((obj) => {
+        return obj.id == id;
     });
+    if (index < 0) {
+        console.error(`Tried to delete unexistent watchlist object id ${id}`);
+        return;
+    }
+
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "DELETE",
+            url: `/api/v1/watchlist/${id}`,
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+        }).done(function(response) {
+
+        }).fail(function(xhr, status, error) {
+            console.error("watchlist_delete() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    // Remove the element from the table
+    watchlist_delete_row(id);
+    if (index > -1) {
+        // Remove the element from the watchlist
+        ctx.watchlist.splice(index, 1);
+    }
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
+
 }
 
 /**
@@ -331,16 +365,19 @@ function watchlist_add(ctx, dsos_data, id) {
     });
     if (index > -1) {
         console.error("Element already exists id:", id);
-    } else {
+        return;
+    }
 
-        let style = 0;
-        let notes = "";
+    let style = 0;
+    let notes = "";
 
+    if (logged_in(ctx)) {
         $.ajax({
             type: "POST",
             url: "/api/v1/watchlist",
             headers: {
-                "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
             },
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
@@ -350,31 +387,39 @@ function watchlist_add(ctx, dsos_data, id) {
             }),
         }).done(function(response) {
 
-            watchlist_create_row(
-                dsos_data,
-                id,
-                notes,
-                style,
-                function(id) { watchlist_delete(ctx, dsos_data, id); },
-                function(id) { watchlist_save(ctx, dsos_data, id); },
-                function(id) { object_goto(ctx, dsos_data, id); },
-                function(select) { watchlist_style_change(ctx, dsos_data, select); },
-                function(id) { watchlist_notes_change(ctx, id); }
-            ).appendTo("#watchlist-table tbody");
-
-            ctx.watchlist.push({
-                id: id,
-                notes: notes,
-                style: style
-            });
-
-            update_map_markers(ctx, dsos_data, ctx.watchlist);
-
         }).fail(function(xhr, status, error) {
             console.error("watchlist_add() failed", xhr, status, error);
-        });
 
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
     }
+
+    watchlist_create_row(
+        dsos_data,
+        id,
+        notes,
+        style,
+        function(id) { watchlist_delete(ctx, dsos_data, id); },
+        function(id) { watchlist_save(ctx, dsos_data, id); },
+        function(id) { object_goto(ctx, dsos_data, id); },
+        function(select) { watchlist_style_change(ctx, dsos_data, select); },
+        function(id) { watchlist_notes_change(ctx, id); }
+    ).appendTo("#watchlist-table tbody");
+
+    if (!logged_in(ctx)) {
+        // Hide the save buttons
+        $(".objects-save").css("display", "none");
+    }
+
+    ctx.watchlist.push({
+        id: id,
+        notes: notes,
+        style: style
+    });
+
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
 }
 
 /**
@@ -401,25 +446,33 @@ function watchlist_save(ctx, dsos_data, id) {
         $(`#watchlist-obj-${id} .objects-style select`).val()
     );
 
-    $.ajax({
-        type: "PUT",
-        url: `/api/v1/watchlist/${id}`,
-        headers: {
-            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-        },
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({
-            star_id: id,
-            notes: notes,
-            style: style,
-        }),
-    }).done(function(response) {
-        console.log("watchlist_save() successful");
-        $(`#watchlist-obj-${id} .objects-save`).prop("disabled", true);
-        update_map_markers(ctx, dsos_data, ctx.watchlist);
-    }).fail(function(xhr, status, error) {
-        console.error("watchlist_save() failed", xhr, status, error);
-    });
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "PUT",
+            url: `/api/v1/watchlist/${id}`,
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                star_id: id,
+                notes: notes,
+                style: style,
+            }),
+        }).done(function(response) {
+            console.log("watchlist_save() successful");
+            $(`#watchlist-obj-${id} .objects-save`).prop("disabled", true);
+        }).fail(function(xhr, status, error) {
+            console.error("watchlist_save() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    update_map_markers(ctx, dsos_data, ctx.watchlist);
 }
 
 /**
@@ -461,6 +514,10 @@ function watchlist_get_all(ctx, dsos_data) {
 
     }).fail(function(xhr, status, error) {
         console.error("watchlist_get_all() failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
+            saved!, reload the page and try again later.`);
+        status_show();
     });
 }
 
@@ -491,83 +548,91 @@ function get_class_string(style) {
 /**
  * Set celestial redraw function
  *
- * Determines how the narkers will look on the celestial map
+ * Determines how the markers will look on the celestial map
  */
 function celestial_redraw() {
     let text_style = {
-        fill: "#f0f",
+        fill: "#FF3333",
         font: "bold 15px 'Saira Condensed', sans-serif",
         align: "left",
         baseline: "bottom"
     };
     let point_style = {
-        stroke: "#ff00ff",
+        stroke: "#FF3333",
         width: 3,
         fill: "rgba(255, 204, 255, 0.4)"
     };
+    let size = 20;
 
-    Celestial.container.selectAll(`.watchlist-0`).each(function(d) {
+    for (let style = 0; style < object_styles.length; style++) {
+        let class_string = get_class_string(style);
 
-        // If point is visible
-        if (Celestial.clip(d.geometry.coordinates)) {
+        // Select objects by style
+        Celestial.container.selectAll(`.${class_string}`).each(function(d) {
+            // If point is visible
+            if (Celestial.clip(d.geometry.coordinates)) {
 
-            // Get point coordinates
-            let pt = Celestial.mapProjection(d.geometry.coordinates);
+                // Get point coordinates
+                let position = Celestial.mapProjection(d.geometry.coordinates);
 
-            let radius = 10;
+                // Draw marker
+                Celestial.setStyle(point_style);
+                object_styles[style].draw(Celestial.context, position, size);
 
-            Celestial.setStyle(point_style);
-
-            // Draw a circle
-            Celestial.context.beginPath();
-            Celestial.context.arc(pt[0], pt[1], radius, 0, 2 * Math.PI);
-            Celestial.context.closePath();
-
-            Celestial.context.stroke();
-            Celestial.context.fill();
-
-            // Draw text
-            Celestial.setTextStyle(text_style);
-            Celestial.context.fillText(
-                d.properties.name, // Text
-                pt[0] + radius - 1, // X
-                pt[1] - radius + 1 // Y
-            );
-        }
-    });
-    Celestial.container.selectAll(`.watchlist-1`).each(function(d) {
-
-        // If point is visible
-        if (Celestial.clip(d.geometry.coordinates)) {
-
-            // Get point coordinates
-            let pt = Celestial.mapProjection(d.geometry.coordinates);
-
-            let size = 15;
-
-            Celestial.setStyle(point_style);
-
-            // Draw a circle
-            Celestial.context.beginPath();
-
-            let hsize = size/2;
-            Celestial.context.moveTo(pt[0] - hsize, pt[1] - hsize);
-            Celestial.context.lineTo(pt[0] + hsize, pt[1] + hsize);
-            Celestial.context.stroke();
-            Celestial.context.moveTo(pt[0] - hsize, pt[1] + hsize);
-            Celestial.context.lineTo(pt[0] + hsize, pt[1] - hsize);
-            Celestial.context.stroke();
-
-            // Draw text
-            Celestial.setTextStyle(text_style);
-            Celestial.context.fillText(
-                d.properties.name, // Text
-                pt[0] + size - 1, // X
-                pt[1] - size + 1 // Y
-            );
-        }
-    });
+                // Draw text
+                Celestial.setTextStyle(text_style);
+                Celestial.context.fillText(
+                    d.properties.name, // Text
+                    position[0] + size/2 - 1, // X
+                    position[1] - size/2 + 1 // Y
+                );
+            }
+        });
+    }
 }
+
+/**
+ * Set aladin marker draw function
+ *
+ * Determines how the markers will look on the aladin map.
+ * Takes the function to use to draw, should be one of the available on
+ * shapes.js
+ */
+function aladin_marker_draw(draw_function, source, context, view_params) {
+
+    // console.log(draw_function, source, context);
+    context.strokeStyle = "#FF3333";
+    context.lineWidth = 3;
+    context.fillStyle = "rgba(255, 204, 255, 0.4)"
+
+    draw_function(context, [source.x, source.y], 10);
+
+    /*
+    var fov = Math.max(viewParams['fov'][0], viewParams['fov'][1]);
+
+    // object name is displayed only if fov<10°
+    if (fov>10) {
+        return;
+    }
+
+    canvasCtx.globalAlpha = 0.9;
+    canvasCtx.globalAlpha = 1;
+
+    var xShift = 20;
+
+    canvasCtx.font = '15px Arial'
+    canvasCtx.fillStyle = '#eee';
+    canvasCtx.fillText(source.data['name'], source.x + xShift, source.y -4);
+
+    // object type is displayed only if fov<2°
+    if (fov>2) {
+        return;
+    }
+    canvasCtx.font = '12px Arial'
+    canvasCtx.fillStyle = '#abc';
+    canvasCtx.fillText(source.data['otype'], source.x + 2 + xShift, source.y + 10);
+    */
+};
 
 /**
  * Update the objects to show on the maps.
@@ -599,7 +664,7 @@ function celestial_redraw() {
  */
 function update_map_markers(ctx, dsos_data, watchlist) {
 
-    // Format the array elemts to what Celestial expects
+    // Format the array elements to what Celestial expects
     let objs = [];
     for (let obj of watchlist) {
         let dim = data.get_dimensions(dsos_data, obj.id);
@@ -632,6 +697,7 @@ function update_map_markers(ctx, dsos_data, watchlist) {
 
     ctx.aladin.removeLayers();
     for (let catalog in ctx.aladin_catalogs) {
+        ctx.aladin_catalogs[catalog].clear()
         ctx.aladin.addCatalog(ctx.aladin_catalogs[catalog]);
     }
 
@@ -706,9 +772,17 @@ function update_map_markers(ctx, dsos_data, watchlist) {
         for (let obj of objs_by_class[class_string]) {
 
             ctx.aladin_catalogs[class_string].addSources(
-                A.source(
+                A.marker(
                     obj.geometry.coordinates[0],
-                    obj.geometry.coordinates[1])
+                    obj.geometry.coordinates[1],
+                    {
+                        popupTitle: obj.properties.name,
+                        popupDesc:
+                            `${data.get_type(dsos_data, obj.id)}<br /> \
+                            Magnitude: ${data.get_mag(dsos_data, obj.id)}`,
+                        useMarkerDefaultIcon: false
+                    }
+                )
             );
         }
     }

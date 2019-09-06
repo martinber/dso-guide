@@ -64,14 +64,78 @@ header
 {
 	background-color: #333333;
 	padding: 0.5em;
-	display: flex;
+  overflow: auto; /* Otherwise the #user-controls float escapes the container */
 }
 
 header h1
 {
 	font-size: 50px;
 	margin: 0.1em;
+}
+
+#heading
+{
 	display: inline-block;
+}
+
+header nav ul
+{
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+
+header nav ul li
+{
+  display: inline-block;
+  padding: 0 0.5em;
+  margin: 0;
+  border-right: 1px solid #EEEEEE;
+}
+
+header nav ul li:last-child
+{
+  border-right: none;
+}
+
+header nav ul li a
+{
+	color: #EEEEEE;
+  text-decoration: none;
+}
+
+header nav ul li a:hover
+{
+  text-decoration: underline;
+}
+
+.inner
+{
+	width: 100%;
+	max-width: 70em;
+	margin: 0 auto;
+}
+
+a
+{
+	color: #AAAAFF;
+}
+
+*, *:before, *:after {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+}
+
+header nav ul li:after
+{
+}
+
+header nav ul li:last
+{
+  border-right: none;
 }
 
 header #user-controls
@@ -96,6 +160,11 @@ header #user-controls
 #login-submit
 {
 	height: 2em;
+}
+
+#login-welcome
+{
+  display: none;
 }
 
 /* INFO BANNER ------------------------------------------------------------- */
@@ -240,6 +309,11 @@ main#content h2
 	color: #000000;
 }
 
+.aladin-popup
+{
+	color: #333333;
+}
+
 .observation-form div
 {
 	display: inline-block;
@@ -311,7 +385,6 @@ main#content h2
 .objects-table td.objects-name
 {
 	font-weight: 700;
-
 }
 
 .objects-table td.objects-notes
