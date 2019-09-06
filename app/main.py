@@ -128,7 +128,7 @@ def api_addusers():
 
             else:
                 if len(password) < 8:
-                    return "Too short \n", 406
+                    return "Too short \n", 411
                 else:
                     salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
                     pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
