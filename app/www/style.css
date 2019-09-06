@@ -307,6 +307,11 @@ main#content h2
 	color: #000000;
 }
 
+.aladin-popup
+{
+	color: #333333;
+}
+
 .observation-form div
 {
 	display: inline-block;

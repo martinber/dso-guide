@@ -41,17 +41,21 @@ $(document).ready(function() {
     ctx.watchlist = [];
 
     // Create aladin catalog for objects in the object catalog
-    ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
-        shape: "circle",
-        color: "#555555"
-    });
+    // ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
+        // shape: function(source, context, view_params) {
+            // aladin_marker_draw(draw_dot, source, context, view_params)
+        // },
+        // color: "#555555"
+    // });
 
     // Create aladin catalog for objects in "watchlist-{i}", one for each
     // available style
     for (let i = 0; i < object_styles.length; i++) {
         ctx.aladin_catalogs[get_class_string(i)] = A.catalog({
             name: object_styles[i].aladin_name,
-            shape: object_styles[i].aladin_shape,
+            shape: function(source, context, view_params) {
+                aladin_marker_draw(object_styles[i].draw, source, context, view_params)
+            },
             color: object_styles[i].color,
         });
     }
@@ -544,83 +548,91 @@ function get_class_string(style) {
 /**
  * Set celestial redraw function
  *
- * Determines how the narkers will look on the celestial map
+ * Determines how the markers will look on the celestial map
  */
 function celestial_redraw() {
     let text_style = {
-        fill: "#f0f",
+        fill: "#FF3333",
         font: "bold 15px 'Saira Condensed', sans-serif",
         align: "left",
         baseline: "bottom"
     };
     let point_style = {
-        stroke: "#ff00ff",
+        stroke: "#FF3333",
         width: 3,
         fill: "rgba(255, 204, 255, 0.4)"
     };
+    let size = 20;
 
-    Celestial.container.selectAll(`.watchlist-0`).each(function(d) {
+    for (let style = 0; style < object_styles.length; style++) {
+        let class_string = get_class_string(style);
 
-        // If point is visible
-        if (Celestial.clip(d.geometry.coordinates)) {
+        // Select objects by style
+        Celestial.container.selectAll(`.${class_string}`).each(function(d) {
+            // If point is visible
+            if (Celestial.clip(d.geometry.coordinates)) {
 
-            // Get point coordinates
-            let pt = Celestial.mapProjection(d.geometry.coordinates);
+                // Get point coordinates
+                let position = Celestial.mapProjection(d.geometry.coordinates);
 
-            let radius = 10;
+                // Draw marker
+                Celestial.setStyle(point_style);
+                object_styles[style].draw(Celestial.context, position, size);
 
-            Celestial.setStyle(point_style);
-
-            // Draw a circle
-            Celestial.context.beginPath();
-            Celestial.context.arc(pt[0], pt[1], radius, 0, 2 * Math.PI);
-            Celestial.context.closePath();
-
-            Celestial.context.stroke();
-            Celestial.context.fill();
-
-            // Draw text
-            Celestial.setTextStyle(text_style);
-            Celestial.context.fillText(
-                d.properties.name, // Text
-                pt[0] + radius - 1, // X
-                pt[1] - radius + 1 // Y
-            );
-        }
-    });
-    Celestial.container.selectAll(`.watchlist-1`).each(function(d) {
-
-        // If point is visible
-        if (Celestial.clip(d.geometry.coordinates)) {
-
-            // Get point coordinates
-            let pt = Celestial.mapProjection(d.geometry.coordinates);
-
-            let size = 15;
-
-            Celestial.setStyle(point_style);
-
-            // Draw a circle
-            Celestial.context.beginPath();
-
-            let hsize = size/2;
-            Celestial.context.moveTo(pt[0] - hsize, pt[1] - hsize);
-            Celestial.context.lineTo(pt[0] + hsize, pt[1] + hsize);
-            Celestial.context.stroke();
-            Celestial.context.moveTo(pt[0] - hsize, pt[1] + hsize);
-            Celestial.context.lineTo(pt[0] + hsize, pt[1] - hsize);
-            Celestial.context.stroke();
-
-            // Draw text
-            Celestial.setTextStyle(text_style);
-            Celestial.context.fillText(
-                d.properties.name, // Text
-                pt[0] + size - 1, // X
-                pt[1] - size + 1 // Y
-            );
-        }
-    });
+                // Draw text
+                Celestial.setTextStyle(text_style);
+                Celestial.context.fillText(
+                    d.properties.name, // Text
+                    position[0] + size/2 - 1, // X
+                    position[1] - size/2 + 1 // Y
+                );
+            }
+        });
+    }
 }
+
+/**
+ * Set aladin marker draw function
+ *
+ * Determines how the markers will look on the aladin map.
+ * Takes the function to use to draw, should be one of the available on
+ * shapes.js
+ */
+function aladin_marker_draw(draw_function, source, context, view_params) {
+
+    // console.log(draw_function, source, context);
+    context.strokeStyle = "#FF3333";
+    context.lineWidth = 3;
+    context.fillStyle = "rgba(255, 204, 255, 0.4)"
+
+    draw_function(context, [source.x, source.y], 10);
+
+    /*
+    var fov = Math.max(viewParams['fov'][0], viewParams['fov'][1]);
+
+    // object name is displayed only if fov<10°
+    if (fov>10) {
+        return;
+    }
+
+    canvasCtx.globalAlpha = 0.9;
+    canvasCtx.globalAlpha = 1;
+
+    var xShift = 20;
+
+    canvasCtx.font = '15px Arial'
+    canvasCtx.fillStyle = '#eee';
+    canvasCtx.fillText(source.data['name'], source.x + xShift, source.y -4);
+
+    // object type is displayed only if fov<2°
+    if (fov>2) {
+        return;
+    }
+    canvasCtx.font = '12px Arial'
+    canvasCtx.fillStyle = '#abc';
+    canvasCtx.fillText(source.data['otype'], source.x + 2 + xShift, source.y + 10);
+    */
+};
 
 /**
  * Update the objects to show on the maps.
@@ -652,7 +664,7 @@ function celestial_redraw() {
  */
 function update_map_markers(ctx, dsos_data, watchlist) {
 
-    // Format the array elemts to what Celestial expects
+    // Format the array elements to what Celestial expects
     let objs = [];
     for (let obj of watchlist) {
         let dim = data.get_dimensions(dsos_data, obj.id);
@@ -685,6 +697,7 @@ function update_map_markers(ctx, dsos_data, watchlist) {
 
     ctx.aladin.removeLayers();
     for (let catalog in ctx.aladin_catalogs) {
+        ctx.aladin_catalogs[catalog].clear()
         ctx.aladin.addCatalog(ctx.aladin_catalogs[catalog]);
     }
 
@@ -759,9 +772,17 @@ function update_map_markers(ctx, dsos_data, watchlist) {
         for (let obj of objs_by_class[class_string]) {
 
             ctx.aladin_catalogs[class_string].addSources(
-                A.source(
+                A.marker(
                     obj.geometry.coordinates[0],
-                    obj.geometry.coordinates[1])
+                    obj.geometry.coordinates[1],
+                    {
+                        popupTitle: obj.properties.name,
+                        popupDesc:
+                            `${data.get_type(dsos_data, obj.id)}<br /> \
+                            Magnitude: ${data.get_mag(dsos_data, obj.id)}`,
+                        useMarkerDefaultIcon: false
+                    }
+                )
             );
         }
     }

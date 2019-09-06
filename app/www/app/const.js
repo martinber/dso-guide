@@ -2,6 +2,8 @@
  * Misc. constants
  */
 
+import { draw_circle, draw_cross, draw_square, draw_dot } from "./shapes.js";
+
 /**
  * List of rows on the wishlist, including the string that is shown to the user
  * on the table header
@@ -43,6 +45,7 @@ export const object_styles = [
         string: "Circle",
         aladin_shape: "circle",
         aladin_name: "Watchlist-circle",
+        draw: draw_circle,
         color: "#FF0000"
     },
     {
@@ -50,20 +53,23 @@ export const object_styles = [
         string: "Cross",
         aladin_shape: "cross",
         aladin_name: "Watchlist-cross",
-        color: "#00FF00"
+        draw: draw_cross,
+        color: "#FF0000"
     },
     {
         name: "square",
         string: "Square",
         aladin_shape: "square",
         aladin_name: "Watchlist-square",
-        color: "#0000FF"
+        draw: draw_square,
+        color: "#FF0000"
     },
     {
         name: "dot",
         string: "Dot",
         aladin_shape: "circle",
         aladin_name: "Watchlist-dot",
+        draw: draw_dot,
         color: "#555555"
     },
 ];
