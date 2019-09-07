@@ -2,8 +2,9 @@
 
 ## Schema
 
-All API resources must be accessed through this URL https://dsp.mbernardi.com.ar: . Data must be sent and will
-be received in JSON format.
+All API resources must be accessed through the URL
+`https://dso.mbernardi.com.ar`. Data must be sent and will be received in JSON
+format.
 
 ## Authentication
 
@@ -26,7 +27,7 @@ Request:
 curl --header "Content-Type: application/json" 
      --request POST 
      --data '{"username":"username", "password":"password"}' 
-     http://https://dsp.mbernardi.com.ar/api/v1/users
+     http://https://dso.mbernardi.com.ar/api/v1/users
 ```
 
 Response:
@@ -42,7 +43,7 @@ Allowed methods: 'GET'; 'PUT'
 Obtain user's location.
 Request:
 ```
-curl -u {username:password} --request GET https://dsp.mbernardi.com.ar/api/v1/location
+curl -u {username:password} --request GET https://dso.mbernardi.com.ar/api/v1/location
 ```
 Response:
 ```
@@ -64,7 +65,7 @@ Request:
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
     --data '{"lat":value,"lon":value}' \
-    https://dsp.mbernardi.com.ar/api/v1/location
+    https://dso.mbernardi.com.ar/api/v1/location
 ```
 
 | Name | Type | Description |
@@ -90,7 +91,7 @@ Request:
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
     --data '{"new_password":"password"}' \
-    https://dsp.mbernardi.com.ar/api/v1/password
+    https://dso.mbernardi.com.ar/api/v1/password
 ```
 
 | Name | Type | Description |
@@ -138,7 +139,7 @@ Request:
 curl -u {username:password} --header "Content-Type: application/json" \
     --request POST \
     --data '{"star_id":value,"notes":"Description","style":value}' \
-    https://dsp.mbernardi.com.ar/api/v1/watchlist
+    https://dso.mbernardi.com.ar/api/v1/watchlist
 ```
 | Name | Type | Description |
 | --- |:---:| ---:|
@@ -156,7 +157,7 @@ Clears the watchlist.
 
 Request:
 ```
-curl -u {username:password} --request DELETE https://dsp.mbernardi.com.ar/api/v1/watchlist
+curl -u {username:password} --request DELETE https://dso.mbernardi.com.ar/api/v1/watchlist
 ```
 
 Response:
@@ -175,7 +176,7 @@ Request:
 curl -u {username:password} --header "Content-Type: application/json" \
     --request PUT \
     --data '{"star_id":value, "notes":"Description", "style":value}' \
-    https://dsp.mbernardi.com.ar/api/v1/location
+    https://dso.mbernardi.com.ar/api/v1/location
 ```
 Response:
 
@@ -188,7 +189,7 @@ Request:
 ```
 curl -u {username:password} \
     --request PUT \
-    https://dsp.mbernardi.com.ar/api/v1/location
+    https://dso.mbernardi.com.ar/api/v1/location
 ```
 Response:
 

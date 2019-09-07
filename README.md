@@ -1,4 +1,4 @@
-# dark-sky-planner
+# DSO Guide
 
 Astronomy web app.
 
@@ -7,27 +7,29 @@ star chart
 
 ## Running
 
-- `docker build -t dark-sky-planner ./`
+- `docker build -t dso-guide ./`
 
-- `docker run -it -p 80:80 dark-sky-planner:latest`
+- `docker run -it -p 80:80 dso-guide:latest`
 
 ## Tools used
 
 - Server-side:
 
-  - Webserver: NGINX.
+    - Webserver: NGINX.
 
-	- Web API: Flask and uWSGI.
+    - Web API: Flask and uWSGI.
 
-	- Database: SQLite3 on Python.
+    - Database: SQLite3 on Python.
+
+    - Docker container: Based on [nginx-uwsgi-flask-alpine-docker](https://github.com/hellt/nginx-uwsgi-flask-alpine-docker).
 
 - Client-side:
 
-	- JQuery.
+    - JQuery.
 
-	- Sky chart: [D3-celestial](https://github.com/ofrohn/d3-celestial).
+    - Sky chart: [D3-celestial](https://github.com/ofrohn/d3-celestial).
 
-	- Sky surveys: [Aladin Lite](http://aladin.u-strasbg.fr/#AladinLite).
+    - Sky surveys: [Aladin Lite](http://aladin.u-strasbg.fr/#AladinLite).
 
 - Web API tests: [Postman](https://www.getpostman.com/products).
 
@@ -38,6 +40,8 @@ star chart
 - Disable "add" buttons of objects already on the watchlist.
 
 - Change the login form when logged in
+
+- Rebuild database, rename `star_id` to `dso_id`
 
 ## Tutorials
 
