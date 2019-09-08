@@ -3,6 +3,9 @@ from flask import request, jsonify, render_template
 import sqlite3
 import hashlib, os, binascii
 import re
+import os
+
+DB_PATH = os.environ.get('DSO_DB_PATH', './dso-guide.db')
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -54,7 +57,7 @@ class Database:
         self.conn = None
 
     def __enter__(self):
-        self.conn = sqlite3.connect('deepsky.db')
+        self.conn = sqlite3.connect(DB_PATH)
         self.conn.row_factory = dict_factory
         self.cur = self.conn.cursor()
         return self

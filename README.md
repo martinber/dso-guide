@@ -43,6 +43,12 @@ star chart
 
 - Rebuild database, rename `star_id` to `dso_id`
 
+- Rename repository, update links to GitHub
+
+- Flask logging, remove the debug setting
+
+- Change logo, and favicon
+
 ## Tutorials
 
 - https://realpython.com/handling-email-confirmation-in-flask/

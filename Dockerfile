@@ -23,4 +23,6 @@ COPY ./app /app
 WORKDIR /app
 RUN chown -R nginx:nginx /app
 
+ENV DSO_DB_PATH="/app/deepsky.db"
+
 CMD ["/usr/bin/supervisord"]
