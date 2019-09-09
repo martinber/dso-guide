@@ -49,6 +49,9 @@ star chart
 
 - Change logo, and favicon
 
+- Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
+  `hostmaster`, `root`, `info`.
+
 ## Tutorials
 
 - https://realpython.com/handling-email-confirmation-in-flask/

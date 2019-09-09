@@ -17,7 +17,7 @@ $(document).ready(function() {
                 data: JSON.stringify({username: user, password: pass,}),
                 contentType: "application/json",
             }).done(function(response) {
-                window.location.replace("/index.html") //Martin tiene q tocar
+                window.location.replace("/index.html") //TODO send username
             }).fail(function(xhr, status, error) {
                 console.error("register form sumbit failed", xhr, status, error);
                 CustomErrorHandler(xhr.status)
