@@ -7,9 +7,32 @@
 	"item": [
 		{
 			"name": "add_user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "eec61796-ce33-4bb6-b2ba-1acdf208e79c",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"testpostman\", \"password\":\"postman0\"}"
+				},
 				"url": {
 					"raw": "https://dso.mbernardi.com.ar/api/v1/users",
 					"protocol": "https",
@@ -30,7 +53,73 @@
 		},
 		{
 			"name": "check_if_login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5f2464f8-02b4-4bc5-8851-d145787ab3c1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/login",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check_if_login_wrong",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "29727930-5a07-44ba-a813-57bae56e9660",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "postman00",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "testpostman",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -109,10 +198,78 @@
 			"response": []
 		},
 		{
+			"name": "location wrong lat",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"lat\":30, \"lon\":\"190\"}"
+				},
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/location",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "watchlist",
 			"request": {
 				"method": "GET",
 				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watchlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "watchlist",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n   \"notes\": \"Andromeda, nunca se eleva mucho acá en Argentina\",\n   \"star_id\": 37,\n   \"style\": 1\n }"
+				},
 				"url": {
 					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist",
 					"protocol": "https",
@@ -155,7 +312,7 @@
 			"response": []
 		},
 		{
-			"name": "watchlist",
+			"name": "watchlist 2nd object",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -168,7 +325,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[\n  {\n    \"notes\": \"Andromeda, nunca se eleva mucho acá en Argentina\",\n    \"star_id\": 37,\n    \"style\": 1\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 3131,\n    \"style\": 2\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 6055,\n    \"style\": 3\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 5368,\n    \"style\": 0\n  },\n  {\n    \"notes\": \"Pleyades del sur, cerca de la cruz del sur\",\n    \"star_id\": 908,\n    \"style\": 1\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 5643,\n    \"style\": 2\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 5917,\n    \"style\": 3\n  },\n  {\n    \"notes\": \"Orion\",\n    \"star_id\": 4615,\n    \"style\": 0\n  }\n]"
+					"raw": " {\n   \"notes\": \"Andromeda, nunca se eleva mucho acá en Argentina\",\n   \"star_id\": 37,\n   \"style\": 1\n }"
 				},
 				"url": {
 					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist",
@@ -189,12 +346,23 @@
 			"response": []
 		},
 		{
-			"name": "password",
+			"name": "watchlist modify star",
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"star_id\":37, \"notes\":\"Test postman\", \"style\":0}"
+				},
 				"url": {
-					"raw": "https://dso.mbernardi.com.ar/api/v1/password",
+					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist/37",
 					"protocol": "https",
 					"host": [
 						"dso",
@@ -205,7 +373,32 @@
 					"path": [
 						"api",
 						"v1",
-						"password"
+						"watchlist",
+						"37"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "watchlist delete by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist/37",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watchlist",
+						"37"
 					]
 				}
 			},
@@ -217,12 +410,12 @@
 		"basic": [
 			{
 				"key": "password",
-				"value": "agumarigna00",
+				"value": "postman0",
 				"type": "string"
 			},
 			{
 				"key": "username",
-				"value": "test",
+				"value": "testpostman",
 				"type": "string"
 			}
 		]
