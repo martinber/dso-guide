@@ -234,7 +234,7 @@ Request:
 
 ```
 curl -u {username:password} \
-    --request PUT \
+    --request DELETE \
     https://dso.mbernardi.com.ar/api/v1/watchlist/43
 ```
 

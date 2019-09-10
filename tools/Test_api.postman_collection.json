@@ -1,0 +1,252 @@
+{
+	"info": {
+		"_postman_id": "7cef4b6c-05c5-4cb1-ab03-74e14c19f492",
+		"name": "Test_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "add_user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/users",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check_if_login",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/login",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "location",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/location",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "location",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"lat\":10, \"lon\":10}"
+				},
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/location",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "watchlist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watchlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "watchlist",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watchlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "watchlist",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n  {\n    \"notes\": \"Andromeda, nunca se eleva mucho acá en Argentina\",\n    \"star_id\": 37,\n    \"style\": 1\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 3131,\n    \"style\": 2\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 6055,\n    \"style\": 3\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 5368,\n    \"style\": 0\n  },\n  {\n    \"notes\": \"Pleyades del sur, cerca de la cruz del sur\",\n    \"star_id\": 908,\n    \"style\": 1\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 5643,\n    \"style\": 2\n  },\n  {\n    \"notes\": \"\",\n    \"star_id\": 5917,\n    \"style\": 3\n  },\n  {\n    \"notes\": \"Orion\",\n    \"star_id\": 4615,\n    \"style\": 0\n  }\n]"
+				},
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/watchlist",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watchlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "password",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dso.mbernardi.com.ar/api/v1/password",
+					"protocol": "https",
+					"host": [
+						"dso",
+						"mbernardi",
+						"com",
+						"ar"
+					],
+					"path": [
+						"api",
+						"v1",
+						"password"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "agumarigna00",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "test",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8bc7cd77-1980-4cdb-9355-c398a2822721",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8ea3ce37-d2f4-461d-9e27-de331a381274",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
