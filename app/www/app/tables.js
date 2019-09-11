@@ -368,7 +368,7 @@ export function catalog_create(
     goto_callback
 ) {
 
-    // TODO: Stop hardconding #catalog-table
+    // TODO: Stop hardcoding #catalog-table
     for (let row of catalog_rows) {
 
         $("#catalog-table thead tr").append(
