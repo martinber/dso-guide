@@ -1,19 +1,19 @@
 /**
- * Tools to manipulate the watchlist and catalog tables
+ * Helper functions to manipulate the watchlist and catalog tables
  */
 
-import { watchlist_rows, catalog_rows, object_styles } from "./const.js";
+import { watchlist_columns, catalog_columns, object_styles } from "./const.js";
 import * as data from "./data.js";
 
 /**
  * Create table cell with object name
  */
-function create_name_cell(dsos_data, id) {
+function create_name_cell(name) {
     return $("<td>", {
         class: "objects-name",
     }).append(
         $("<span>", {
-            text: `${data.get_name(dsos_data, id)}`,
+            text: name,
         })
     );
 }
@@ -30,7 +30,7 @@ function create_id_cell(id) {
             text: "ID:",
         }),
         $("<span>", {
-            text: `${id}`,
+            text: String(id),
         })
     );
 }
@@ -38,7 +38,7 @@ function create_id_cell(id) {
 /**
  * Create table cell with object magnitude
  */
-function create_mag_cell(dsos_data, id) {
+function create_mag_cell(mag) {
     return $("<td>", {
         class: "objects-mag",
     }).append(
@@ -47,7 +47,7 @@ function create_mag_cell(dsos_data, id) {
             text: "Mag:",
         }),
         $("<span>", {
-            text: `${data.get_mag(dsos_data, id)}`,
+            text: String(mag),
         })
     );
 }
@@ -55,31 +55,7 @@ function create_mag_cell(dsos_data, id) {
 /**
  * Create table cell with object type
  */
-function create_type_cell(dsos_data, id) {
-
-    let type = null;
-    switch (data.get_type(dsos_data, id)) {
-        case "gg": type = "Galaxy cluster"; break;
-        case "g": type = "Galaxy"; break;
-        case "s": type = "Spiral galaxy"; break;
-        case "s0": type = "Lenticular galaxy"; break;
-        case "sd": type = "Dwarf galaxy"; break;
-        case "i": type = "Irregular galaxy"; break;
-        case "e": type = "Elliptical galaxy"; break;
-        case "oc": type = "Open cluster"; break;
-        case "gc": type = "Globular cluster"; break;
-        case "dn": type = "Dark nebula"; break;
-        case "bn": type = "Bright nebula"; break;
-        case "sfr": type = "Star forming region"; break;
-        case "rn": type = "Reflection nebula"; break;
-        case "pn": type = "Planetary nebula"; break;
-        case "snr": type = "Supernova remnant"; break;
-        case "en": type = "Emmision nebula"; break;
-        default:
-            console.error(`Unknown DSO type ${data.get_type(dsos_data, id)}`);
-            type = "";
-            break;
-    }
+function create_type_cell(type) {
 
     return $("<td>", {
         class: "objects-type",
@@ -90,7 +66,7 @@ function create_type_cell(dsos_data, id) {
 /**
  * Create table cell with object RA and DEC
  */
-function create_ra_dec_cell(dsos_data, id) {
+function create_ra_dec_cell(ra_dec) {
 
     return $("<td>", {
         class: "objects-ra-dec",
@@ -101,7 +77,7 @@ function create_ra_dec_cell(dsos_data, id) {
                 text: "RA:",
             }),
             $("<span>", {
-                text: `${data.get_ra(dsos_data, id)}`,
+                text: String(ra_dec[0]),
             })
         ),
         $("<span>").append(
@@ -110,7 +86,7 @@ function create_ra_dec_cell(dsos_data, id) {
                 text: "DEC:",
             }),
             $("<span>", {
-                text: `${data.get_dec(dsos_data, id)}`,
+                text: String(ra_dec[1]),
             })
         )
     );
@@ -119,7 +95,7 @@ function create_ra_dec_cell(dsos_data, id) {
 /**
  * Create table cell with object ALT and AZ
  */
-function create_alt_az_cell(dsos_data, id) {
+function create_alt_az_cell(alt_az) {
 
     return $("<td>", {
         class: "objects-alt-az",
@@ -130,7 +106,7 @@ function create_alt_az_cell(dsos_data, id) {
                 text: "ALT:",
             }),
             $("<span>", {
-                text: `${data.get_alt(dsos_data, id)}`,
+                text: String(alt_az[0]),
             })
         ),
         $("<span>").append(
@@ -139,36 +115,55 @@ function create_alt_az_cell(dsos_data, id) {
                 text: "AZ:",
             }),
             $("<span>", {
-                text: `${data.get_az(dsos_data, id)}`,
+                text: String(alt_az[1]),
             })
         )
     );
 }
 
 /**
- * Create table cell with object ALT and AZ
+ * Create table cell with object notes
  */
-function create_notes_cell(notes, id, notes_change_callback) {
+function create_notes_cell(notes, watch_dso, notes_change_callback) {
 
     return $("<td>", {
         class: "objects-notes",
     }).append(
         $("<textarea placeholder='Notes....'>").val(notes)
-            .keyup(function() { notes_change_callback(id); })
-            .change(function() { notes_change_callback(id); })
+            .keyup(function() { notes_change_callback(watch_dso); })
+            .change(function() { notes_change_callback(watch_dso); })
     );
 }
 
+
 /**
  * Create table cell with style dropdown
+ *
+ * selected_style must be an integer
  */
-function create_style_cell(selected_style, style_change_callback) {
+function create_style_cell(selected_style, watch_dso, style_change_callback) {
     let td = $("<td>", {
         class: "objects-style",
     });
 
+    /**
+     * Get the integer that represents a style by its name
+     *
+     * If the given name could not be found returns -1
+     */
+    function get_style_id(style_name) {
+        for (let i = 0; i < object_styles.length; i++) {
+            if (object_styles[i].name == style_name) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     let select = $("<select>");
-    select.change(function() { style_change_callback(this) });
+    select.change(function() {
+        style_change_callback(watch_dso, get_style_id($(this).val()));
+    });
 
     for (let i = 0; i < object_styles.length; i++) {
 
@@ -195,7 +190,6 @@ function create_style_cell(selected_style, style_change_callback) {
     return td;
 }
 
-
 /**
  * Create watchlist header
  *
@@ -203,7 +197,23 @@ function create_style_cell(selected_style, style_change_callback) {
  */
 export function watchlist_create_header(tr) {
 
-    for (let row of watchlist_rows) {
+    for (let row of watchlist_columns) {
+        tr.append(
+            $("<th>", {
+                text: row.string,
+            })
+        );
+    }
+}
+
+/**
+ * Create catalog header
+ *
+ * Give as an argument the already created "table thead tr"
+ */
+export function catalog_create_header(tr) {
+
+    for (let row of catalog_columns) {
         tr.append(
             $("<th>", {
                 text: row.string,
@@ -219,84 +229,78 @@ export function watchlist_delete_row_all() {
     $("#watchlist-table tbody").empty();
 }
 
+// TODO
 /**
  * Delete table row from id
  */
-export function watchlist_delete_row(id) {
+export function watchlist_delete_row(watch_dso) {
     $(`#watchlist-obj-${id}`).remove();
 }
 
 /**
- * Create table row from arguments and dsos_data
+ * Create watchlist table row
  *
  * Args:
- * - dsos_data: JSON of object data
- * - id: Object id
- * - notes: String of user notes, can be null
- * - style: Integer id of object style, can be null
- * - delete_callback(id): Called when user clicks the delete button, gives
- *   object id as argument
- * - save_callback(id): Called when user clicks the save button, gives object id
- *   as argument
- * - goto_callback(id): Called when user clicks the goto button, gives object
- *   id as argument
- * - style_change_callback(select): Called when user changes the style using
- *   the dropdown, gives as an argument a reference to the changed select
- *   element
- * - notes_change_callback(id): Called when user does something on the notes
+ * - watch_dso: WatchDso object
+ * - delete_callback(watch_dso): Called when user clicks the delete button,
+ *   gives watch_dso as argument
+ * - save_callback(watch_dso): Called when user clicks the save button, gives
+ *   watch_dso as argument
+ * - goto_callback(watch_dso): Called when user clicks the goto button, gives
+ *   watch_dso as argument
+ * - style_change_callback(watch_dso, style): Called when user changes the style
+ *   using the dropdown, gives as an argument the watch_dso and the new style
+ * - notes_change_callback(watch_dso): Called when user does something on the
+ *   notes, gives watch_dso as argument
  */
 export function watchlist_create_row(
-    dsos_data,
-    id,
-    notes,
-    style,
+    watch_dso,
     delete_callback,
     save_callback,
     goto_callback,
     style_change_callback,
     notes_change_callback
 ) {
+    // TODO remove ID
     let tr =  $("<tr>", {
-        id: `watchlist-obj-${id}`,
+        id: `watchlist-obj-${watch_dso.dso.id}`,
     });
 
-    for (let row of watchlist_rows) {
-        switch (row.name) {
+    for (let col of watchlist_columns) {
+        switch (col.name) {
             case "id":
-                tr.append(create_id_cell(id));
+                tr.append(create_id_cell(watch_dso.dso.id));
                 break;
 
             case "name":
-                tr.append(create_name_cell(dsos_data, id));
+                tr.append(create_name_cell(watch_dso.dso.name));
                 break;
 
             case "mag":
-                tr.append(create_mag_cell(dsos_data, id));
+                tr.append(create_mag_cell(watch_dso.dso.mag));
                 break;
 
             case "type":
-                tr.append(create_type_cell(dsos_data, id));
+                tr.append(create_type_cell(watch_dso.dso.type.long_name));
                 break;
 
             case "ra-dec":
-                tr.append(create_ra_dec_cell(dsos_data, id));
+                tr.append(create_ra_dec_cell(watch_dso.dso.coords));
                 break;
 
             case "alt-az":
-                tr.append(create_alt_az_cell(dsos_data, id));
+                tr.append(create_alt_az_cell([0, 0]));
                 break;
 
             case "notes":
-                tr.append(create_notes_cell(notes, id, notes_change_callback));
+                tr.append(create_notes_cell(watch_dso.notes, watch_dso, notes_change_callback));
                 break;
 
             case "style":
-                tr.append(create_style_cell(style, style_change_callback));
+                tr.append(create_style_cell(watch_dso.style, watch_dso, style_change_callback));
                 break;
 
             case "controls":
-                let dim = data.get_dimensions(dsos_data, id);
-
                 tr.append($("<td>", {
                     class: "objects-controls",
                 }).append(
@@ -304,7 +308,7 @@ export function watchlist_create_row(
                         text: "X",
                         class: "objects-delete",
                         click: function() {
-                            delete_callback(id);
+                            delete_callback(watch_dso);
                         }
                     }),
                     $("<button>", {
@@ -312,14 +316,14 @@ export function watchlist_create_row(
                         disabled: true,
                         class: "objects-save",
                         click: function() {
-                            save_callback(id);
+                            save_callback(watch_dso);
                         }
                     }),
                     $("<button>", {
                         text: "GoTo",
                         class: "objects-goto",
                         click: function() {
-                            goto_callback(id);
+                            goto_callback(watch_dso);
                         },
                     })
                 ));
@@ -331,124 +335,87 @@ export function watchlist_create_row(
 }
 
 /**
- * Create catalog table
+ * Create catalog table row
  *
  * Args:
- * - dsos_data: JSON of object data
- * - table: Table where to create the catalog
- * - catalog: Catalog array
- * - ass_callback(id): Called when user clicks the add button, gives object id
- *   as argument
- * - goto_callback(id): Called when user clicks the goto button, gives object
- *   id as argument
- *
- * Catalog array:
- *
- * [
- *     {
- *         id: 32,
- *         appears_on: [
- *             "Binosky",
- *             "Caldwell",
- *         ],
- *     },
- *     {
- *         id: 77,
- *         appears_on: [
- *             "Caldwell",
- *         ],
- *     },
- * ]
+ * - dso: Dso object
+ * - add_callback(dso): Called when user clicks the add button, gives dso as
+ *   argument
+ * - goto_callback(dso): Called when user clicks the goto button, gives dso as
+ *   argument
  */
-export function catalog_create(
-    dsos_data,
-    table,
-    catalog,
+export function catalog_create_row(
+    dso,
     add_callback,
-    goto_callback
+    goto_callback,
 ) {
+    // TODO remove ID
+    let tr =  $("<tr>", {
+        id: `catalog-obj-${dso.id}`,
+    });
 
-    // TODO: Stop hardcoding #catalog-table
-    for (let row of catalog_rows) {
+    for (let col of catalog_columns) {
+        switch (col.name) {
+            case "id":
+                tr.append(create_id_cell(dso.id));
+                break;
 
-        $("#catalog-table thead tr").append(
-            $("<th>", {
-                text: row.string,
-            })
-        );
-    };
+            case "name":
+                tr.append(create_name_cell(dso.name));
+                break;
 
-    for (let object of catalog) {
+            case "mag":
+                tr.append(create_mag_cell(dso.mag));
+                break;
 
-        let tr =  $("<tr>", {
-            id: `watchlist-obj-${object.id}`,
-        });
+            case "type":
+                tr.append(create_type_cell(dso.type.long_name));
+                break;
 
-        for (let row of catalog_rows) {
-            switch (row.name) {
-                case "id":
-                    tr.append(create_id_cell(object.id));
-                    break;
+            case "ra-dec":
+                tr.append(create_ra_dec_cell(dso.coords));
+                break;
 
-                case "name":
-                    tr.append(create_name_cell(dsos_data, object.id));
-                    break
+            case "alt-az":
+                tr.append(create_alt_az_cell([0, 0]));
+                break;
 
-                case "mag":
-                    tr.append(create_mag_cell(dsos_data, object.id));
-                    break;
+            case "controls":
+                tr.append($("<td>", {
+                    class: "objects-controls",
+                }).append(
+                    $("<button>", {
+                        text: `Add`,
+                        click: () => {
+                            add_callback(dso);
+                        }
+                    }),
+                    $("<button>", {
+                        text: "GoTo",
+                        click: () => {
+                            goto_callback(dso);
+                        },
+                    })
+                ));
+                break;
 
-                case "type":
-                    tr.append(create_type_cell(dsos_data, object.id));
-                    break;
+            case "appears_on":
+                let td = $("<td>", {
+                    class: "objects-appears-on",
+                });
+                let ul = $("<ul>");
 
-                case "ra-dec":
-                    tr.append(create_ra_dec_cell(dsos_data, object.id));
-                    break;
+                for (let catalog of dso.appears_on) {
+                    ul.append(
+                        $("<li>", { text: catalog, })
+                    );
+                }
 
-                case "alt-az":
-                    tr.append(create_alt_az_cell(dsos_data, object.id));
-                    break;
-
-                case "controls":
-                    let dim = data.get_dimensions(dsos_data, object.id);
-
-                    tr.append($("<td>", {
-                        class: "objects-controls",
-                    }).append(
-                        $("<button>", {
-                            text: `Add`,
-                            click: () => {
-                                add_callback(object.id);
-                            }
-                        }),
-                        $("<button>", {
-                            text: "GoTo",
-                            click: () => {
-                                goto_callback(object.id);
-                            },
-                        })
-                    ));
-                    break;
-
-                case "appears_on":
-                    let td = $("<td>", {
-                        class: "objects-appears-on",
-                    });
-                    let ul = $("<ul>");
-
-                    for (let catalog of object.appears_on) {
-                        ul.append(
-                            $("<li>", { text: catalog, })
-                        );
-                    }
-
-                    td.append(ul);
-                    tr.append(td);
-                    break;
-            }
+                td.append(ul);
+                tr.append(td);
+                break;
         }
-
-        tr.appendTo("#catalog-table tbody");
     }
+
+    return tr;
 }

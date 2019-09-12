@@ -5,10 +5,10 @@
 import { draw_circle, draw_cross, draw_square, draw_dot } from "./shapes.js";
 
 /**
- * List of rows on the wishlist, including the string that is shown to the user
- * on the table header
+ * List of columns on the wishlist, including the string that is shown to the
+ * user on the table header
  */
-export const watchlist_rows = [
+export const watchlist_columns = [
     { name: "name", string: "Name" },
     { name: "id", string: "ID" },
     { name: "mag", string: "Mag" },
@@ -21,10 +21,10 @@ export const watchlist_rows = [
 ];
 
 /**
- * List of rows on the wishlist, including the string that is shown to the user
- * on the table header
+ * List of columns on the wishlist, including the string that is shown to the
+ * user on the table header
  */
-export const catalog_rows = [
+export const catalog_columns = [
     { name: "name", string: "Name" },
     { name: "id", string: "ID" },
     { name: "mag", string: "Mag" },

@@ -1,6 +1,6 @@
 "use strict";
 
-import { catalog } from "./catalog.js";
+import { catalog as catalogs_data } from "./catalog.js";
 import {
     status_is_visible,
     status_hide,
@@ -9,13 +9,15 @@ import {
 } from "./status.js";
 import { object_styles } from "./const.js";
 import { config } from "./config.js";
+import { DsoManager } from "./dso.js";
 import * as data from "./data.js";
 import {
     watchlist_create_header,
     watchlist_create_row,
+    catalog_create_header,
+    catalog_create_row,
     watchlist_delete_row,
-    watchlist_delete_row_all,
-    catalog_create
+    watchlist_delete_row_all
 } from "./tables.js";
 
 $(document).ready(function() {
@@ -37,8 +39,8 @@ $(document).ready(function() {
     // shape and color)
     ctx.aladin_catalogs = {};
 
-    // Watchlist of the user
-    ctx.watchlist = [];
+    // DSO manager, keeps track of watchlist and catalogs
+    ctx.manager = null;
 
     // TODO
     // Create aladin catalog for objects in the object catalog
@@ -72,7 +74,12 @@ $(document).ready(function() {
         url: "/data/dsos.14.json",
         dataType: "json",
     }).done(function(dsos_data) {
-        main(ctx, dsos_data);
+
+        // DSO manager, keeps track of watchlist and catalogs
+        ctx.manager = new DsoManager(dsos_data, catalogs_data);
+
+        main(ctx);
+
     }).fail(function(xhr, status, error) {
         console.error("get dsos_data failed", xhr, status, error);
 
@@ -82,7 +89,7 @@ $(document).ready(function() {
     });
 });
 
-function main(ctx, dsos_data) {
+function main(ctx) {
 
     Celestial.display(config);
     ctx.aladin = A.aladin("#aladin-map", {
@@ -177,7 +184,7 @@ function main(ctx, dsos_data) {
             ctx.username = username;
             ctx.password = password;
 
-            watchlist_get_all(ctx, dsos_data);
+            watchlist_get_all(ctx);
             location_get(ctx);
 
             status_text(`Welcome <b>${username}</b>!`);
@@ -198,14 +205,21 @@ function main(ctx, dsos_data) {
 
     watchlist_create_header($("#watchlist-table thead tr"));
 
-    catalog_create(
-        dsos_data,
-        null,
-        catalog,
-        function(id) { watchlist_add(ctx, dsos_data, id); },
-        function(id) { object_goto(ctx, dsos_data, id); }
-    );
+    // Create catalog table
+    // TODO: Add filters
 
+    catalog_create_header($("#catalog-table thead tr"));
+
+    for (let i = 0; i < ctx.manager.catalog.length; i++) {
+        if (i >= 99) { break; }
+
+        let dso = ctx.manager.catalog[i]
+        catalog_create_row(
+            dso,
+            function(dso) { watchlist_add(ctx, dso.id); },
+            function(dso) { object_goto(dso); },
+        ).appendTo("#catalog-table tbody");
+    }
 }
 
 /**
@@ -358,19 +372,13 @@ function watchlist_delete(ctx, dsos_data, id) {
 /**
  * Add object to watchlist, both on client and on server
  */
-function watchlist_add(ctx, dsos_data, id) {
+function watchlist_add(ctx, id) {
 
-    // Check if the object already exists
-    let index = ctx.watchlist.findIndex((obj) => {
-        return obj.id == id;
-    });
-    if (index > -1) {
-        console.error("Element already exists id:", id);
+    let watch_dso = ctx.manager.watchlist_add(id, null, null);
+
+    if (watch_dso == null) {
         return;
     }
-
-    let style = 0;
-    let notes = "";
 
     if (logged_in(ctx)) {
         $.ajax({
@@ -382,9 +390,9 @@ function watchlist_add(ctx, dsos_data, id) {
             },
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
-                star_id: id,
-                notes: notes,
-                style: style,
+                star_id: watch_dso.dso.id,
+                notes: watch_dso.notes,
+                style: watch_dso.style,
             }),
         }).done(function(response) {
 
@@ -397,44 +405,16 @@ function watchlist_add(ctx, dsos_data, id) {
         });
     }
 
-    watchlist_create_row(
-        dsos_data,
-        id,
-        notes,
-        style,
-        function(id) { watchlist_delete(ctx, dsos_data, id); },
-        function(id) { watchlist_save(ctx, dsos_data, id); },
-        function(id) { object_goto(ctx, dsos_data, id); },
-        function(select) { watchlist_style_change(ctx, dsos_data, select); },
-        function(id) { watchlist_notes_change(ctx, id); }
-    ).appendTo("#watchlist-table tbody");
+    watchlist_table_insert(ctx, watch_dso);
 
+    // TODO
     if (!logged_in(ctx)) {
         // Hide the save buttons
         $(".objects-save").css("display", "none");
     }
 
-    ctx.watchlist.push({
-        id: id,
-        notes: notes,
-        style: style
-    });
-
-    update_map_markers(ctx, dsos_data, ctx.watchlist);
-}
-
-/**
- * Get the integer that represents a style by its name
- *
- * If the given name could not be found returns -1
- */
-function get_style_id(style_name) {
-    for (let i = 0; i < object_styles.length; i++) {
-        if (object_styles[i].name == style_name) {
-            return i;
-        }
-    }
-    return -1;
+    // TODO
+    // update_map_markers(ctx, dsos_data, ctx.watchlist);
 }
 
 /**
@@ -476,10 +456,24 @@ function watchlist_save(ctx, dsos_data, id) {
     update_map_markers(ctx, dsos_data, ctx.watchlist);
 }
 
+function watchlist_table_insert(ctx, watch_dso) {
+
+    let tr = watchlist_create_row(
+        watch_dso,
+        function(watch_dso) { watchlist_delete(watch_dso); },
+        function(watch_dso) { watchlist_save(watch_dso); },
+        function(watch_dso) { object_goto(watch_dso.dso); },
+        function(watch_dso, style) { watchlist_style_change(watch_dso, style); },
+        function(watch_dso) { watchlist_notes_change(watch_dso); }
+    );
+    watch_dso.set_watchlist_tr(tr);
+    tr.appendTo("#watchlist-table tbody");
+}
+
 /**
  * Replace client watchlist with watchlist from server
  */
-function watchlist_get_all(ctx, dsos_data) {
+function watchlist_get_all(ctx) {
     $.ajax({
         type: "GET",
         url: "/api/v1/watchlist",
@@ -489,29 +483,21 @@ function watchlist_get_all(ctx, dsos_data) {
         dataType: "json",
     }).done(function(json) {
 
-        // Check the API, the field is named star_id instead of just id
-        for (let obj of json) {
-            obj.id = obj.star_id;
-            obj.star_id = undefined;
-        }
-        ctx.watchlist = json;
-
         watchlist_delete_row_all();
 
-        for (let obj of ctx.watchlist) {
-            watchlist_create_row(
-                dsos_data,
-                obj.id,
-                obj.notes,
-                obj.style,
-                function(id) { watchlist_delete(ctx, dsos_data, id); },
-                function(id) { watchlist_save(ctx, dsos_data, id); },
-                function(id) { object_goto(ctx, dsos_data, id); },
-                function(select) { watchlist_style_change(ctx, dsos_data, select); },
-                function(id) { watchlist_notes_change(ctx, id); }
-            ).appendTo("#watchlist-table tbody");
+        // Check the API, the field is named star_id instead of just id
+        for (let obj of json) {
+
+            let watch_dso = ctx.manager.watchlist_add(obj.star_id, obj.notes, obj.style);
+
+            if (watch_dso != null) {
+                return;
+                watchlist_table_insert(ctx, watch_dso);
+            }
         }
-        update_map_markers(ctx, dsos_data, ctx.watchlist);
+
+        // TODO
+        // update_map_markers(ctx, dsos_data, ctx.watchlist);
 
     }).fail(function(xhr, status, error) {
         console.error("watchlist_get_all() failed", xhr, status, error);
