@@ -42,11 +42,30 @@ export function Dso(dsos_data, id, appears_on) {
     this.coords = dsos_data.features[id].geometry.coordinates;
     this.type = new Type(dsos_data.features[id].properties.type);
     this.mag = dsos_data.features[id].properties.mag;
-    this.dimensions = dsos_data.features[id].properties.dim;
 
     this.appears_on = appears_on;
 
     this.catalog_tr = null; // Reference to JQuery table row
+
+    // Get dimensions
+    {
+        let values = dsos_data.features[id].properties.dim.split("x");
+
+        let result;
+        if (values.length == 2) {
+            this.dimensions = [parseFloat(values[0]), parseFloat(values[1])];
+        } else if (values.length == 1) {
+            this.dimensions = [parseFloat(values[0]), parseFloat(values[0])];
+        } else {
+            let string = dsos_data.features[id].properties.dim;
+            console.error(`Failed to parse dimensions: ${string}`);
+        }
+
+        if (isNaN(this.dimensions[0]) || isNaN(this.dimensions[1])) {
+            let string = dsos_data.features[id].properties.dim;
+            console.error(`Failed to parse dimensions: ${string}`);
+        }
+    }
 
     /**
      * Set reference to the JQuery tr where this object is being shown
@@ -158,7 +177,7 @@ export function DsoManager(dsos_data, catalogs_data) {
      */
     this.watchlist_remove = function(watch_dso) {
 
-        let index = watchlist.findIndex(function(e) {
+        let index = this.watchlist.findIndex(function(e) {
             return watch_dso.dso.id == e.dso.id;
         });
         if (index > -1) {

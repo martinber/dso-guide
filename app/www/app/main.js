@@ -217,7 +217,7 @@ function main(ctx) {
         catalog_create_row(
             dso,
             function(dso) { watchlist_add(ctx, dso.id); },
-            function(dso) { object_goto(dso); },
+            function(dso) { object_goto(ctx, dso); },
         ).appendTo("#catalog-table tbody");
     }
 }
@@ -232,16 +232,16 @@ function logged_in(ctx) {
 /**
  * Show given id on the sky survey map
  */
-function object_goto(ctx, dsos_data, id) {
-    let dim = data.get_dimensions(dsos_data, id);
+function object_goto(ctx, dso) {
 
     ctx.aladin.gotoRaDec(
-        data.get_ra(dsos_data, id),
-        data.get_dec(dsos_data, id)
+        dso.coords[0],
+        dso.coords[1],
     );
 
     // Set FOV to the biggest of width,height of object, convert dimensions from
     // arcminutes to degrees
+    let dim = dso.dimensions;
     ctx.aladin.setFov(Math.max(dim[0], dim[1]) / 60);
 
     // Scroll page to map
@@ -331,14 +331,10 @@ function watchlist_notes_change(ctx, id) {
  *
  * Deletes both on server and on client
  */
-function watchlist_delete(ctx, dsos_data, id) {
-    let index = ctx.watchlist.findIndex((obj) => {
-        return obj.id == id;
-    });
-    if (index < 0) {
-        console.error(`Tried to delete unexistent watchlist object id ${id}`);
-        return;
-    }
+function watchlist_delete(ctx, watch_dso) {
+
+    ctx.manager.watchlist_remove(watch_dso);
+    watchlist_table_remove(ctx, watch_dso);
 
     if (logged_in(ctx)) {
         $.ajax({
@@ -359,13 +355,8 @@ function watchlist_delete(ctx, dsos_data, id) {
         });
     }
 
-    // Remove the element from the table
-    watchlist_delete_row(id);
-    if (index > -1) {
-        // Remove the element from the watchlist
-        ctx.watchlist.splice(index, 1);
-    }
-    update_map_markers(ctx, dsos_data, ctx.watchlist);
+    // TODO
+    //update_map_markers(ctx, dsos_data, ctx.watchlist);
 
 }
 
@@ -460,14 +451,24 @@ function watchlist_table_insert(ctx, watch_dso) {
 
     let tr = watchlist_create_row(
         watch_dso,
-        function(watch_dso) { watchlist_delete(watch_dso); },
+        function(watch_dso) { watchlist_delete(ctx, watch_dso); },
         function(watch_dso) { watchlist_save(watch_dso); },
-        function(watch_dso) { object_goto(watch_dso.dso); },
+        function(watch_dso) { object_goto(ctx, watch_dso.dso); },
         function(watch_dso, style) { watchlist_style_change(watch_dso, style); },
         function(watch_dso) { watchlist_notes_change(watch_dso); }
     );
     watch_dso.set_watchlist_tr(tr);
     tr.appendTo("#watchlist-table tbody");
+}
+
+function watchlist_table_remove(ctx, watch_dso) {
+
+    let tr = watch_dso.get_watchlist_tr();
+    if (tr != null) {
+        tr.remove();
+    } else {
+        console.error(`Error removing tr from watchlist table, watch_dso: ${watch_dso}`);
+    }
 }
 
 /**
@@ -491,7 +492,6 @@ function watchlist_get_all(ctx) {
             let watch_dso = ctx.manager.watchlist_add(obj.star_id, obj.notes, obj.style);
 
             if (watch_dso != null) {
-                return;
                 watchlist_table_insert(ctx, watch_dso);
             }
         }
