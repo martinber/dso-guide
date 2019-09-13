@@ -94,7 +94,7 @@ function main(ctx) {
     Celestial.display(config);
     ctx.aladin = A.aladin("#aladin-map", {
         fov: 1,
-        target: "M31",
+        target: "M81",
         reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
         showReticle: false,
     });
@@ -292,38 +292,44 @@ function location_get(ctx) {
 }
 
 /**
- * This function should be called when the style of an object changes.
+ * Get the integer that represents a style by its name
  *
- * This function us used as a callback to $(".objects-style select").change(),
- * so the argument "select" should refer to the select element
+ * If the given name could not be found returns -1
+ *
+ * TODO
  */
-function watchlist_style_change(ctx, dsos_data, select) {
-    // this is the select, the parent is a "td" and the parent-parent is the
-    // "tr" who has an id of "watchlist-obj-{id}"
-    let row = $(select).closest("tr");
+function get_style_id(style_name) {
+    for (let i = 0; i < object_styles.length; i++) {
+        if (object_styles[i].name == style_name) {
+            return i;
+        }
+    }
+    return -1;
+}
 
-    let id = parseInt(row.attr("id").split("-")[2]);
+/**
+ * This function should be called when the style of an object changes.
+ */
+function watchlist_style_change(ctx, watch_dso, style_id) {
 
     // Enable the save button
-    row.find(".objects-save").prop("disabled", false);
+    let tr = watch_dso.get_watchlist_tr();
+    tr.find(".objects-save").prop("disabled", false);
 
     // Update the watchlist object
-    let index = ctx.watchlist.findIndex((obj) => {
-        return obj.id == id;
-    });
-    ctx.watchlist[index].style = get_style_id($(select).val());
+    watch_dso.style = style_id;
 
-    update_map_markers(ctx, dsos_data, ctx.watchlist);
+    // Update the map
+    update_map_markers(ctx);
 }
 
 /**
  * This function should be called when the notes of an object changes.
- *
- * This function us used as a callback to $(".objects-style textarea").change()
  */
-function watchlist_notes_change(ctx, id) {
+function watchlist_notes_change(watch_dso) {
     // Enable the save button
-    $(`#watchlist-obj-${id} .objects-save`).prop("disabled", false);
+    let tr = watch_dso.get_watchlist_tr();
+    tr.find(".objects-save").prop("disabled", false);
 }
 
 /**
@@ -355,8 +361,7 @@ function watchlist_delete(ctx, watch_dso) {
         });
     }
 
-    // TODO
-    //update_map_markers(ctx, dsos_data, ctx.watchlist);
+    update_map_markers(ctx);
 
 }
 
@@ -367,7 +372,7 @@ function watchlist_add(ctx, id) {
 
     let watch_dso = ctx.manager.watchlist_add(id, null, null);
 
-    if (watch_dso == null) {
+    if (watch_dso == null) { // Object already in watchlist
         return;
     }
 
@@ -398,43 +403,37 @@ function watchlist_add(ctx, id) {
 
     watchlist_table_insert(ctx, watch_dso);
 
-    // TODO
-    if (!logged_in(ctx)) {
-        // Hide the save buttons
-        $(".objects-save").css("display", "none");
-    }
-
-    // TODO
-    // update_map_markers(ctx, dsos_data, ctx.watchlist);
+    update_map_markers(ctx);
 }
 
 /**
  * Save changes on given object id to server
  */
-function watchlist_save(ctx, dsos_data, id) {
+function watchlist_save(ctx, watch_dso) {
 
-    let notes = $(`#watchlist-obj-${id} .objects-notes textarea`).val();
+    let tr = watch_dso.get_watchlist_tr();
+    let notes = tr.find(".objects-notes textarea").val();
     let style = get_style_id(
-        $(`#watchlist-obj-${id} .objects-style select`).val()
+        tr.find(".objects-style select").val()
     );
 
     if (logged_in(ctx)) {
         $.ajax({
             type: "PUT",
-            url: `/api/v1/watchlist/${id}`,
+            url: `/api/v1/watchlist/${watch_dso.dso.id}`,
             headers: {
                 "Authorization": "Basic "
                     + btoa(ctx.username + ":" + ctx.password)
             },
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
-                star_id: id,
+                star_id: watch_dso.dso.id,
                 notes: notes,
                 style: style,
             }),
         }).done(function(response) {
             console.log("watchlist_save() successful");
-            $(`#watchlist-obj-${id} .objects-save`).prop("disabled", true);
+            tr.find(".objects-save").prop("disabled", true);
         }).fail(function(xhr, status, error) {
             console.error("watchlist_save() failed", xhr, status, error);
 
@@ -444,35 +443,43 @@ function watchlist_save(ctx, dsos_data, id) {
         });
     }
 
-    update_map_markers(ctx, dsos_data, ctx.watchlist);
+    update_map_markers(ctx);
 }
 
+/**
+ * Insert row on watchlist table
+ */
 function watchlist_table_insert(ctx, watch_dso) {
 
     let tr = watchlist_create_row(
         watch_dso,
         function(watch_dso) { watchlist_delete(ctx, watch_dso); },
-        function(watch_dso) { watchlist_save(watch_dso); },
+        function(watch_dso) { watchlist_save(ctx, watch_dso); },
         function(watch_dso) { object_goto(ctx, watch_dso.dso); },
-        function(watch_dso, style) { watchlist_style_change(watch_dso, style); },
+        function(watch_dso, style) { watchlist_style_change(ctx, watch_dso, style); },
         function(watch_dso) { watchlist_notes_change(watch_dso); }
     );
+
+    if (!logged_in(ctx)) {
+        // Hide the save buttons
+        tr.find(".objects-save").css("display", "none");
+    }
+
     watch_dso.set_watchlist_tr(tr);
     tr.appendTo("#watchlist-table tbody");
 }
 
+/**
+ * Insert row on watchlist table
+ */
 function watchlist_table_remove(ctx, watch_dso) {
 
     let tr = watch_dso.get_watchlist_tr();
-    if (tr != null) {
-        tr.remove();
-    } else {
-        console.error(`Error removing tr from watchlist table, watch_dso: ${watch_dso}`);
-    }
+    tr.remove();
 }
 
 /**
- * Replace client watchlist with watchlist from server
+ * Load watchlist from server
  */
 function watchlist_get_all(ctx) {
     $.ajax({
@@ -496,8 +503,7 @@ function watchlist_get_all(ctx) {
             }
         }
 
-        // TODO
-        // update_map_markers(ctx, dsos_data, ctx.watchlist);
+        update_map_markers(ctx);
 
     }).fail(function(xhr, status, error) {
         console.error("watchlist_get_all() failed", xhr, status, error);
@@ -597,53 +603,30 @@ function aladin_marker_draw(draw_function, source, context, view_params) {
 
 /**
  * Update the objects to show on the maps.
- *
- * Provide a list of objects to show. Most properties are taken directly from
- * the json database.
- *
- * The style must be an integer, -1 means that the object is from the catalog,
- * numbers from 0 represent styles from const.js:object_styles
- *
- * Example of obj argument:
- * [
- *     {
- *         "type": "Feature",
- *         "id": 43,
- *         "style": 2,
- *         "properties": {
- *             "name": "NGC 54",
- *             "dim": "1.5x3" // Size in arcminutes
- *         },
- *         "geometry":{
- *             "type": "Point",
- *             "coordinates": [-80.7653, 38.7837]
- *         }
- *     },
- *     ...
- *  ]
- *
  */
-function update_map_markers(ctx, dsos_data, watchlist) {
+function update_map_markers(ctx) {
 
     // Format the array elements to what Celestial expects
     let objs = [];
-    for (let obj of watchlist) {
-        let dim = data.get_dimensions(dsos_data, obj.id);
+    for (let watch_dso of ctx.manager.watchlist) {
+
+        let dim = watch_dso.dso.dimensions;
 
         objs.push({
+            // Properties not used by Celestial, but I use them
+            "watch_dso": watch_dso,
+            "style": watch_dso.style,
+
+            // Properties that Celestial expects
             "type": "Feature",
-            "id": obj.id,
-            "style": obj.style,
+            "id": watch_dso.dso.id,
             "properties": {
-                "name": data.get_name(dsos_data, obj.id),
+                "name": watch_dso.dso.name,
                 "dim": `${dim[0]}x${dim[1]}`,
             },
             "geometry":{
                 "type": "Point",
-                "coordinates": [
-                    data.get_ra(dsos_data, obj.id),
-                    data.get_dec(dsos_data, obj.id),
-                ],
+                "coordinates": watch_dso.dso.coords,
             }
         });
     }
@@ -667,10 +650,10 @@ function update_map_markers(ctx, dsos_data, watchlist) {
     // style So you get something like
     // objs_by_class = {
     //     "catalog": [{obj}, {obj}, ...],    // Objects on catalog
-    //     "wishlist-0": [{obj}, {obj}, ...], // Objects that share style 0
-    //     "wishlist-1": [{obj}, {obj}, ...], // Objects that share style 1
-    //     "wishlist-2": undefined,           // No objects share style 2
-    //     "wishlist-3": [{obj}, {obj}, ...], // Objects that share style 3
+    //     "watchlist-0": [{obj}, {obj}, ...], // Objects that share style 0
+    //     "watchlist-1": [{obj}, {obj}, ...], // Objects that share style 1
+    //     "watchlist-2": undefined,           // No objects share style 2
+    //     "watchlist-3": [{obj}, {obj}, ...], // Objects that share style 3
     // ]
     let objs_by_class = {};
 
@@ -739,8 +722,8 @@ function update_map_markers(ctx, dsos_data, watchlist) {
                     {
                         popupTitle: obj.properties.name,
                         popupDesc:
-                            `${data.get_type(dsos_data, obj.id)}<br /> \
-                            Magnitude: ${data.get_mag(dsos_data, obj.id)}`,
+                            `${obj.watch_dso.dso.type.long_name}<br /> \
+                            Magnitude: ${obj.watch_dso.dso.mag}`,
                         useMarkerDefaultIcon: false
                     }
                 )

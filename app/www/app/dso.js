@@ -92,7 +92,7 @@ export function Dso(dsos_data, id, appears_on) {
 export function WatchDso(dso, notes, style) {
     this.dso = dso; // Reference to Dso object on the Catalog
     this.notes = notes;
-    this.style = notes;
+    this.style = style;
 
     this.watchlist_tr = null; // Reference to JQuery table row
 
@@ -106,11 +106,13 @@ export function WatchDso(dso, notes, style) {
 
     /**
      * Get reference to the JQuery tr where this object is being shown
-     *
-     * Can return null
      */
     this.get_watchlist_tr = function() {
 
+        if (this.watchlist_tr == null) {
+            console.error(`Can't get tr of watch_dso: ${watch_dso}`);
+            return;
+        }
         return this.watchlist_tr;
     }
 }
