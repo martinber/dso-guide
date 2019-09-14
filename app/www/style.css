@@ -310,9 +310,16 @@ main#content h2
 	color: #333333;
 }
 
+.observation-form
+{
+	display: flex;
+	align-items: flex-end;
+	max-width: 30em;
+}
+
 .observation-form div
 {
-	display: inline-block;
+	flex: 1;
 	margin: 0.2em;
 }
 
