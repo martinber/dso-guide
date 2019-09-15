@@ -126,6 +126,50 @@
 					</table>
 
 					<h2>Catalog</h2>
+					<form class="filter-form" id="catalog-filter">
+						<fieldset>
+							<legend>Visible columns</legend>
+
+							<input type="checkbox" id="catalog-filter-mag"
+									name="mag" checked>
+							<label for="catalog-filter-mag">Magnitude</label>
+
+							<input type="checkbox" id="catalog-filter-ra-dec"
+									name="ra-dec" checked>
+							<label for="catalog-filter-ra-dec">RA/DEC</label>
+
+							<input type="checkbox" id="catalog-filter-alt-az"
+									name="alt-az" checked>
+							<label for="catalog-filter-mag">ALT/AZ</label>
+
+							<input type="checkbox" id="catalog-filter-appears-on"
+									name="appears-on" checked>
+							<label for="catalog-filter-mag">Appears on</label>
+
+						</fieldset>
+
+						<fieldset>
+							<legend>Filter catalogs</legend>
+
+							<input type="checkbox" id="catalog-filter-mag"
+									name="mag" checked>
+							<label for="catalog-filter-mag">Magnitude</label>
+
+							<input type="checkbox" id="catalog-filter-ra-dec"
+									name="ra-dec" checked>
+							<label for="catalog-filter-ra-dec">RA/DEC</label>
+
+							<input type="checkbox" id="catalog-filter-alt-az"
+									name="alt-az" checked>
+							<label for="catalog-filter-mag">ALT/AZ</label>
+
+							<input type="checkbox" id="catalog-filter-appears-on"
+									name="appears-on" checked>
+							<label for="catalog-filter-mag">Appears on</label>
+
+						</fieldset>
+						<button class="filter-submit">Apply</button>
+					</form>
 					<table class="objects-table" id="catalog-table">
 						<thead>
 							<tr>
