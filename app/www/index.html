@@ -116,6 +116,51 @@
 					</form>
 
 					<h2>Watchlist</h2>
+
+					<button class="filter-toggle">Show filters</button>
+
+					<div class="filter-collapse">
+						<form class="filter-form" id="watchlist-filter" action="">
+							<fieldset>
+								<legend>Visible columns</legend>
+
+								<div>
+									<input type="checkbox" id="watchlist-filter-mag"
+											name="mag" checked \>
+									<label for="watchlist-filter-mag">Magnitude</label>
+								</div>
+
+								<div>
+									<input type="checkbox" id="watchlist-filter-ra-dec"
+											name="ra-dec" checked \>
+									<label for="watchlist-filter-ra-dec">RA/DEC</label>
+								</div>
+
+								<div>
+									<input type="checkbox" id="watchlist-filter-alt-az"
+											name="alt-az" checked \>
+									<label for="watchlist-filter-alt-az">ALT/AZ</label>
+								</div>
+
+								<div>
+									<input type="checkbox" id="watchlist-notes"
+											name="notes" checked \>
+									<label for="watchlist-filter-notes">Notes</label>
+								</div>
+
+							</fieldset>
+
+							<div class="filter-form-search-div">
+								<label for="watchlist-filter-search">Filter by name:</label>
+								<input type="search" id="watchlist-filter-search"
+										name="search" \>
+							</div>
+
+							<button class="filter-submit">Apply</button>
+
+						</form>
+					</div>
+
 					<table class="objects-table" id="watchlist-table">
 						<thead>
 							<tr>
@@ -126,50 +171,55 @@
 					</table>
 
 					<h2>Catalog</h2>
-					<form class="filter-form" id="catalog-filter">
-						<fieldset>
-							<legend>Visible columns</legend>
 
-							<input type="checkbox" id="catalog-filter-mag"
-									name="mag" checked>
-							<label for="catalog-filter-mag">Magnitude</label>
+					<button class="filter-toggle">Show filters</button>
 
-							<input type="checkbox" id="catalog-filter-ra-dec"
-									name="ra-dec" checked>
-							<label for="catalog-filter-ra-dec">RA/DEC</label>
+					<div class="filter-collapse">
+						<form class="filter-form" id="catalog-filter" action="">
+							<fieldset>
+								<legend>Visible columns</legend>
 
-							<input type="checkbox" id="catalog-filter-alt-az"
-									name="alt-az" checked>
-							<label for="catalog-filter-mag">ALT/AZ</label>
+								<div>
+									<input type="checkbox" id="catalog-filter-mag"
+											name="mag" checked \>
+									<label for="catalog-filter-mag">Magnitude</label>
+								</div>
 
-							<input type="checkbox" id="catalog-filter-appears-on"
-									name="appears-on" checked>
-							<label for="catalog-filter-mag">Appears on</label>
+								<div>
+									<input type="checkbox" id="catalog-filter-ra-dec"
+											name="ra-dec" checked \>
+									<label for="catalog-filter-ra-dec">RA/DEC</label>
+								</div>
 
-						</fieldset>
+								<div>
+									<input type="checkbox" id="catalog-filter-alt-az"
+											name="alt-az" checked \>
+									<label for="catalog-filter-alt-az">ALT/AZ</label>
+								</div>
 
-						<fieldset>
-							<legend>Filter catalogs</legend>
+								<div>
+									<input type="checkbox" id="catalog-filter-appears-on"
+											name="appears-on" checked \>
+									<label for="catalog-filter-appears-on">Appears on</label>
+								</div>
 
-							<input type="checkbox" id="catalog-filter-mag"
-									name="mag" checked>
-							<label for="catalog-filter-mag">Magnitude</label>
+							</fieldset>
 
-							<input type="checkbox" id="catalog-filter-ra-dec"
-									name="ra-dec" checked>
-							<label for="catalog-filter-ra-dec">RA/DEC</label>
+							<fieldset>
+								<legend>Filter catalogs</legend>
+							</fieldset>
 
-							<input type="checkbox" id="catalog-filter-alt-az"
-									name="alt-az" checked>
-							<label for="catalog-filter-mag">ALT/AZ</label>
+							<div class="filter-form-search-div">
+								<label for="catalog-filter-search">Filter by name:</label>
+								<input type="search" id="catalog-filter-search"
+										name="search" \>
+							</div>
 
-							<input type="checkbox" id="catalog-filter-appears-on"
-									name="appears-on" checked>
-							<label for="catalog-filter-mag">Appears on</label>
+							<button class="filter-submit">Apply</button>
 
-						</fieldset>
-						<button class="filter-submit">Apply</button>
-					</form>
+						</form>
+					</div>
+
 					<table class="objects-table" id="catalog-table">
 						<thead>
 							<tr>
