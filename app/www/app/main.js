@@ -245,7 +245,7 @@ function object_goto(ctx, dso) {
     ctx.aladin.setFov(Math.max(dim[0], dim[1]) / 60);
 
     // Scroll page to map
-    window.location.hash = "aladin-map";
+    window.location.hash = "sky-surveys";
 }
 
 /**

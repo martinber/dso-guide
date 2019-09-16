@@ -72,164 +72,181 @@
 			</div>
 		</header>
 
-		<main id="content">
+		<main>
+
 			<div class="inner">
 
-				<h2>Sky chart</h2>
-				<section id="celestial-container">
-					<div id="celestial-map"></div>
-					<div id="celestial-form"></div>
-				</section>
+				<aside id="sidebar">
+					<span>Jump to:</span>
+					<nav><ol>
+						<li><a href="#">Top</a></li>
+						<li><a href="#sky-chart">Sky chart</a></li>
+						<li><a href="#sky-surveys">Sky surveys</a></li>
+						<li><a href="#observing-location">Observing location</a></li>
+						<li><a href="#watchlist">Watchlist</a></li>
+						<li><a href="#catalog">Catalog</a></li>
+					</ol></nav>
+				</aside>
 
-				<h2>Sky surveys</h2>
-				<section id="aladin-container">
-					<div id='aladin-map'></div>
-				</section>
+				<div id="content">
 
-				<section id="user-data">
-					<h2>Observing location</h2>
-					<p>Formatted as signed degrees, e.g. -23.235</p>
-					<form class="observation-form" id="location-form" action="">
-						<div>
-							<label for="location-lat">Latitude:</label>
-							<input id="location-lat" name="lat" step="0.00000001"
-									type="number" min="-90" max="90" required />
-						</div>
-						<div>
-							<label for="location-long">Longitude:</label>
-							<input id="location-long" name="long" step="0.00000001"
-									type="number" min="-180" max="180" required />
-						</div>
-						<button id="location-submit">Update</button>
-					</form>
+					<h2 id="sky-chart">Sky chart</h2>
+					<section id="celestial-container">
+						<div id="celestial-map"></div>
+						<div id="celestial-form"></div>
+					</section>
 
-					<form class="observation-form" id="datetime-form" action="">
-						<div>
-							<label for="datetime-date">Date:</label>
-							<input id="datetime-date" name="date" type="date" required />
-						</div>
-						<div>
-							<label for="datetime-time">Time:</label>
-							<input id="datetime-time" name="time" type="time" required />
-						</div>
-						<button id="datetime-submit">Update</button>
-					</form>
+					<h2 id="sky-surveys">Sky surveys</h2>
+					<section id="aladin-container">
+						<div id='aladin-map'></div>
+					</section>
 
-					<h2>Watchlist</h2>
-
-					<button class="filter-toggle">Show filters</button>
-
-					<div class="filter-collapse">
-						<form class="filter-form" id="watchlist-filter" action="">
-							<fieldset>
-								<legend>Visible columns</legend>
-
-								<div>
-									<input type="checkbox" id="watchlist-filter-mag"
-											name="mag" checked \>
-									<label for="watchlist-filter-mag">Magnitude</label>
-								</div>
-
-								<div>
-									<input type="checkbox" id="watchlist-filter-ra-dec"
-											name="ra-dec" checked \>
-									<label for="watchlist-filter-ra-dec">RA/DEC</label>
-								</div>
-
-								<div>
-									<input type="checkbox" id="watchlist-filter-alt-az"
-											name="alt-az" checked \>
-									<label for="watchlist-filter-alt-az">ALT/AZ</label>
-								</div>
-
-								<div>
-									<input type="checkbox" id="watchlist-notes"
-											name="notes" checked \>
-									<label for="watchlist-filter-notes">Notes</label>
-								</div>
-
-							</fieldset>
-
-							<div class="filter-form-search-div">
-								<label for="watchlist-filter-search">Filter by name:</label>
-								<input type="search" id="watchlist-filter-search"
-										name="search" \>
+					<section id="user-data">
+						<h2 id="observing-location">Observing location</h2>
+						<p>Formatted as signed degrees, e.g. -23.235</p>
+						<form class="observation-form" id="location-form" action="">
+							<div>
+								<label for="location-lat">Latitude:</label>
+								<input id="location-lat" name="lat" step="0.00000001"
+										type="number" min="-90" max="90" required />
 							</div>
-
-							<button class="filter-submit">Apply</button>
-
-						</form>
-					</div>
-
-					<table class="objects-table" id="watchlist-table">
-						<thead>
-							<tr>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-
-					<h2>Catalog</h2>
-
-					<button class="filter-toggle">Show filters</button>
-
-					<div class="filter-collapse">
-						<form class="filter-form" id="catalog-filter" action="">
-							<fieldset>
-								<legend>Visible columns</legend>
-
-								<div>
-									<input type="checkbox" id="catalog-filter-mag"
-											name="mag" checked \>
-									<label for="catalog-filter-mag">Magnitude</label>
-								</div>
-
-								<div>
-									<input type="checkbox" id="catalog-filter-ra-dec"
-											name="ra-dec" checked \>
-									<label for="catalog-filter-ra-dec">RA/DEC</label>
-								</div>
-
-								<div>
-									<input type="checkbox" id="catalog-filter-alt-az"
-											name="alt-az" checked \>
-									<label for="catalog-filter-alt-az">ALT/AZ</label>
-								</div>
-
-								<div>
-									<input type="checkbox" id="catalog-filter-appears-on"
-											name="appears-on" checked \>
-									<label for="catalog-filter-appears-on">Appears on</label>
-								</div>
-
-							</fieldset>
-
-							<fieldset>
-								<legend>Filter catalogs</legend>
-							</fieldset>
-
-							<div class="filter-form-search-div">
-								<label for="catalog-filter-search">Filter by name:</label>
-								<input type="search" id="catalog-filter-search"
-										name="search" \>
+							<div>
+								<label for="location-long">Longitude:</label>
+								<input id="location-long" name="long" step="0.00000001"
+										type="number" min="-180" max="180" required />
 							</div>
-
-							<button class="filter-submit">Apply</button>
-
+							<button id="location-submit">Update</button>
 						</form>
-					</div>
 
-					<table class="objects-table" id="catalog-table">
-						<thead>
-							<tr>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
+						<form class="observation-form" id="datetime-form" action="">
+							<div>
+								<label for="datetime-date">Date:</label>
+								<input id="datetime-date" name="date" type="date" required />
+							</div>
+							<div>
+								<label for="datetime-time">Time:</label>
+								<input id="datetime-time" name="time" type="time" required />
+							</div>
+							<button id="datetime-submit">Update</button>
+						</form>
 
-				</section>
+						<h2 id="watchlist">Watchlist</h2>
+
+						<button class="filter-toggle">Show filters</button>
+
+						<div class="filter-collapse">
+							<form class="filter-form" id="watchlist-filter" action="">
+								<fieldset>
+									<legend>Visible columns</legend>
+
+									<div>
+										<input type="checkbox" id="watchlist-filter-mag"
+												name="mag" checked \>
+										<label for="watchlist-filter-mag">Magnitude</label>
+									</div>
+
+									<div>
+										<input type="checkbox" id="watchlist-filter-ra-dec"
+												name="ra-dec" checked \>
+										<label for="watchlist-filter-ra-dec">RA/DEC</label>
+									</div>
+
+									<div>
+										<input type="checkbox" id="watchlist-filter-alt-az"
+												name="alt-az" checked \>
+										<label for="watchlist-filter-alt-az">ALT/AZ</label>
+									</div>
+
+									<div>
+										<input type="checkbox" id="watchlist-notes"
+												name="notes" checked \>
+										<label for="watchlist-filter-notes">Notes</label>
+									</div>
+
+								</fieldset>
+
+								<div class="filter-form-search-div">
+									<label for="watchlist-filter-search">Filter by name:</label>
+									<input type="search" id="watchlist-filter-search"
+											name="search" \>
+								</div>
+
+								<button class="filter-submit">Apply</button>
+
+							</form>
+						</div>
+
+						<table class="objects-table" id="watchlist-table">
+							<thead>
+								<tr>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+
+						<h2 id="catalog">Catalog</h2>
+
+						<button class="filter-toggle">Show filters</button>
+
+						<div class="filter-collapse">
+							<form class="filter-form" id="catalog-filter" action="">
+								<fieldset>
+									<legend>Visible columns</legend>
+
+									<div>
+										<input type="checkbox" id="catalog-filter-mag"
+												name="mag" checked \>
+										<label for="catalog-filter-mag">Magnitude</label>
+									</div>
+
+									<div>
+										<input type="checkbox" id="catalog-filter-ra-dec"
+												name="ra-dec" checked \>
+										<label for="catalog-filter-ra-dec">RA/DEC</label>
+									</div>
+
+									<div>
+										<input type="checkbox" id="catalog-filter-alt-az"
+												name="alt-az" checked \>
+										<label for="catalog-filter-alt-az">ALT/AZ</label>
+									</div>
+
+									<div>
+										<input type="checkbox" id="catalog-filter-appears-on"
+												name="appears-on" checked \>
+										<label for="catalog-filter-appears-on">Appears on</label>
+									</div>
+
+								</fieldset>
+
+								<fieldset>
+									<legend>Filter catalogs</legend>
+								</fieldset>
+
+								<div class="filter-form-search-div">
+									<label for="catalog-filter-search">Filter by name:</label>
+									<input type="search" id="catalog-filter-search"
+											name="search" \>
+								</div>
+
+								<button class="filter-submit">Apply</button>
+
+							</form>
+						</div>
+
+						<table class="objects-table" id="catalog-table">
+							<thead>
+								<tr>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+
+					</section>
+
+				</div>
 
 			</div>
 		</main>
