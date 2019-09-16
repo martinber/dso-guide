@@ -53,13 +53,13 @@ $(document).ready(function() {
 
     // Create aladin catalog for objects in "watchlist-{i}", one for each
     // available style
-    for (let i = 0; i < object_styles.length; i++) {
-        ctx.aladin_catalogs[get_class_string(i)] = A.catalog({
-            name: object_styles[i].aladin_name,
+    for (let style of object_styles) {
+        ctx.aladin_catalogs[style.class_string] = A.catalog({
+            name: style.aladin_name,
             shape: function(source, context, view_params) {
-                aladin_marker_draw(object_styles[i].draw, source, context, view_params)
+                aladin_marker_draw(style.draw, source, context, view_params)
             },
-            color: object_styles[i].color,
+            color: style.color,
         });
     }
 
@@ -292,22 +292,6 @@ function location_get(ctx) {
 }
 
 /**
- * Get the integer that represents a style by its name
- *
- * If the given name could not be found returns -1
- *
- * TODO
- */
-function get_style_id(style_name) {
-    for (let i = 0; i < object_styles.length; i++) {
-        if (object_styles[i].name == style_name) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-/**
  * This function should be called when the style of an object changes.
  */
 function watchlist_style_change(ctx, watch_dso, style_id) {
@@ -413,9 +397,7 @@ function watchlist_save(ctx, watch_dso) {
 
     let tr = watch_dso.get_watchlist_tr();
     let notes = tr.find(".objects-notes textarea").val();
-    let style = get_style_id(
-        tr.find(".objects-style select").val()
-    );
+    let style = tr.find(".objects-style select").index();
 
     if (logged_in(ctx)) {
         $.ajax({
@@ -514,30 +496,6 @@ function watchlist_get_all(ctx) {
     });
 }
 
-
-/**
- * Translate the given integer to a class string
- *
- * Mapping:
- *
- * - -1: "catalog"
- * - 0: "watchlist-0"
- * - 1: "watchlist-1"
- * - 2: "watchlist-2"
- * - ...
- *
- * Used to indicate the style of an object. I use it to work with Celestial or
- * Aladin
- */
-function get_class_string(style) {
-    let class_string = "catalog";
-    if (style >= 0)
-    {
-        class_string = `watchlist-${style}`;
-    }
-    return class_string;
-}
-
 /**
  * Set celestial redraw function
  *
@@ -557,11 +515,10 @@ function celestial_redraw() {
     };
     let size = 20;
 
-    for (let style = 0; style < object_styles.length; style++) {
-        let class_string = get_class_string(style);
+    for (let style of object_styles) {
 
         // Select objects by style
-        Celestial.container.selectAll(`.${class_string}`).each(function(d) {
+        Celestial.container.selectAll(`.${style.class_string}`).each(function(d) {
             // If point is visible
             if (Celestial.clip(d.geometry.coordinates)) {
 
@@ -570,7 +527,7 @@ function celestial_redraw() {
 
                 // Draw marker
                 Celestial.setStyle(point_style);
-                object_styles[style].draw(Celestial.context, position, size);
+                object_styles[style.id].draw(Celestial.context, position, size);
 
                 // Draw text
                 Celestial.setTextStyle(text_style);
@@ -635,8 +592,8 @@ function update_map_markers(ctx) {
     Celestial.clear();
     // TODO: Add issue to celestial, I would expect that these items would be
     // removed by clear()
-    for (let i = 0; i < object_styles.length; i++) {
-        Celestial.container.selectAll(`.${get_class_string(i)}`).remove();
+    for (let style of object_styles) {
+        Celestial.container.selectAll(`.${style.class_string}`).remove();
     }
 
     ctx.aladin.removeLayers();
@@ -659,7 +616,7 @@ function update_map_markers(ctx) {
 
     for (let obj of objs) {
 
-        let class_string = get_class_string(obj.style);
+        let class_string = object_styles[obj.style].class_string;
 
         // If this is the first object with this class, create the list
         if (typeof objs_by_class[class_string] == "undefined") {

@@ -41,35 +41,39 @@ export const catalog_columns = [
  */
 export const object_styles = [
     {
+        id: 0,
         name: "circle",
         string: "Circle",
-        aladin_shape: "circle",
-        aladin_name: "Watchlist-circle",
+        aladin_name: "Circle",
+        class_string: "watchlist-0",
         draw: draw_circle,
         color: "#FF0000"
     },
     {
+        id: 1,
         name: "cross",
         string: "Cross",
-        aladin_shape: "cross",
-        aladin_name: "Watchlist-cross",
+        aladin_name: "Cross",
+        class_string: "watchlist-1",
         draw: draw_cross,
         color: "#FF0000"
     },
     {
+        id: 2,
         name: "square",
         string: "Square",
-        aladin_shape: "square",
-        aladin_name: "Watchlist-square",
+        aladin_name: "Square",
+        class_string: "watchlist-2",
         draw: draw_square,
         color: "#FF0000"
     },
     {
+        id: 3,
         name: "dot",
         string: "Dot",
-        aladin_shape: "circle",
-        aladin_name: "Watchlist-dot",
+        aladin_name: "Dot",
+        class_string: "watchlist-3",
         draw: draw_dot,
-        color: "#555555"
+        color: "#FF0000"
     },
 ];
