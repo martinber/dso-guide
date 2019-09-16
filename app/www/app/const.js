@@ -10,7 +10,6 @@ import { draw_circle, draw_cross, draw_square, draw_dot } from "./shapes.js";
  */
 export const watchlist_columns = [
     { name: "name", string: "Name" },
-    { name: "id", string: "ID" },
     { name: "mag", string: "Mag" },
     { name: "type", string: "Type" },
     { name: "ra-dec", string: "RA/DEC" },
@@ -26,7 +25,6 @@ export const watchlist_columns = [
  */
 export const catalog_columns = [
     { name: "name", string: "Name" },
-    { name: "id", string: "ID" },
     { name: "mag", string: "Mag" },
     { name: "type", string: "Type" },
     { name: "ra-dec", string: "RA/DEC" },

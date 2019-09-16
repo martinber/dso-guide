@@ -100,9 +100,7 @@
 							<input id="location-long" name="long" step="0.00000001"
 									type="number" min="-180" max="180" required />
 						</div>
-						<div>
-							<button id="location-submit">Update</button>
-						</div>
+						<button id="location-submit">Update</button>
 					</form>
 
 					<form class="observation-form" id="datetime-form" action="">
@@ -114,9 +112,7 @@
 							<label for="datetime-time">Time:</label>
 							<input id="datetime-time" name="time" type="time" required />
 						</div>
-						<div>
-							<button id="datetime-submit">Update</button>
-						</div>
+						<button id="datetime-submit">Update</button>
 					</form>
 
 					<h2>Watchlist</h2>
@@ -130,6 +126,50 @@
 					</table>
 
 					<h2>Catalog</h2>
+					<form class="filter-form" id="catalog-filter">
+						<fieldset>
+							<legend>Visible columns</legend>
+
+							<input type="checkbox" id="catalog-filter-mag"
+									name="mag" checked>
+							<label for="catalog-filter-mag">Magnitude</label>
+
+							<input type="checkbox" id="catalog-filter-ra-dec"
+									name="ra-dec" checked>
+							<label for="catalog-filter-ra-dec">RA/DEC</label>
+
+							<input type="checkbox" id="catalog-filter-alt-az"
+									name="alt-az" checked>
+							<label for="catalog-filter-mag">ALT/AZ</label>
+
+							<input type="checkbox" id="catalog-filter-appears-on"
+									name="appears-on" checked>
+							<label for="catalog-filter-mag">Appears on</label>
+
+						</fieldset>
+
+						<fieldset>
+							<legend>Filter catalogs</legend>
+
+							<input type="checkbox" id="catalog-filter-mag"
+									name="mag" checked>
+							<label for="catalog-filter-mag">Magnitude</label>
+
+							<input type="checkbox" id="catalog-filter-ra-dec"
+									name="ra-dec" checked>
+							<label for="catalog-filter-ra-dec">RA/DEC</label>
+
+							<input type="checkbox" id="catalog-filter-alt-az"
+									name="alt-az" checked>
+							<label for="catalog-filter-mag">ALT/AZ</label>
+
+							<input type="checkbox" id="catalog-filter-appears-on"
+									name="appears-on" checked>
+							<label for="catalog-filter-mag">Appears on</label>
+
+						</fieldset>
+						<button class="filter-submit">Apply</button>
+					</form>
 					<table class="objects-table" id="catalog-table">
 						<thead>
 							<tr>
