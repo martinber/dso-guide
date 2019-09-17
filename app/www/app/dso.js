@@ -37,7 +37,9 @@ export function Dso(dsos_data, id, appears_on) {
     // Equal to the index on the DsoManager.catalog where this object is located
     this.id = id;
 
-    this.data_id = dsos_data.features[id].id; // Original ID from data
+    // Original ID from data, similar to name but without spaces
+    this.data_id = dsos_data.features[id].id;
+
     this.name = dsos_data.features[id].properties.name;
     this.coords = dsos_data.features[id].geometry.coordinates;
     this.type = new Type(dsos_data.features[id].properties.type);

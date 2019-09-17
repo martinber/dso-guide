@@ -2,7 +2,7 @@
  * Contains the celestial configuration
  */
 
-export let config = {
+export let celestial_config = {
 
     // Default width, 0 = full parent element width; height is determined by
     // projection

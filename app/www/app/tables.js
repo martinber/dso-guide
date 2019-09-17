@@ -3,7 +3,6 @@
  */
 
 import { watchlist_columns, catalog_columns, object_styles } from "./const.js";
-import * as data from "./data.js";
 
 /**
  * Create table cell with object name
@@ -223,18 +222,10 @@ export function catalog_create_header(tr) {
 }
 
 /**
- * Delete every row
+ * Delete every row on watchlist table
  */
 export function watchlist_delete_row_all() {
     $("#watchlist-table tbody").empty();
-}
-
-// TODO
-/**
- * Delete table row from id
- */
-export function watchlist_delete_row(watch_dso) {
-    $(`#watchlist-obj-${id}`).remove();
 }
 
 /**
@@ -261,11 +252,7 @@ export function watchlist_create_row(
     style_change_callback,
     notes_change_callback
 ) {
-    // TODO remove ID
-    let tr =  $("<tr>", {
-        id: `watchlist-obj-${watch_dso.dso.id}`,
-    });
-
+    let tr =  $("<tr>");
     for (let col of watchlist_columns) {
         switch (col.name) {
             case "id":
@@ -349,11 +336,7 @@ export function catalog_create_row(
     add_callback,
     goto_callback,
 ) {
-    // TODO remove ID
-    let tr =  $("<tr>", {
-        id: `catalog-obj-${dso.id}`,
-    });
-
+    let tr =  $("<tr>");
     for (let col of catalog_columns) {
         switch (col.name) {
             case "id":

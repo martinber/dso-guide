@@ -1,5 +1,6 @@
 "use strict";
 
+import { celestial_config } from "./config.js";
 import { catalog as catalogs_data } from "./catalog.js";
 import {
     status_is_visible,
@@ -8,15 +9,12 @@ import {
     status_text
 } from "./status.js";
 import { object_styles } from "./const.js";
-import { config } from "./config.js";
 import { DsoManager } from "./dso.js";
-import * as data from "./data.js";
 import {
     watchlist_create_header,
     watchlist_create_row,
     catalog_create_header,
     catalog_create_row,
-    watchlist_delete_row,
     watchlist_delete_row_all
 } from "./tables.js";
 
@@ -91,7 +89,7 @@ $(document).ready(function() {
 
 function main(ctx) {
 
-    Celestial.display(config);
+    Celestial.display(celestial_config);
     ctx.aladin = A.aladin("#aladin-map", {
         fov: 1,
         target: "M81",
@@ -132,7 +130,7 @@ function main(ctx) {
         let [year, month, day] = $("#datetime-date").val().split("-");
         let [hour, min] = $("#datetime-time").val().split(":");
         let date = new Date(year, month, day, hour, min);
-        update_map_datetime(date);
+        ui_celestial_datetime_update(date);
     });
 
     $("#location-submit").click(function(e) {
@@ -165,7 +163,7 @@ function main(ctx) {
             });
         }
 
-        update_map_location(data.lat, data.lon);
+        ui_celestial_location_update(data.lat, data.lon);
     });
 
     $("#login-form").submit(function(e) {
@@ -184,8 +182,8 @@ function main(ctx) {
             ctx.username = username;
             ctx.password = password;
 
-            watchlist_get_all(ctx);
-            location_get(ctx);
+            server_watchlist_get(ctx);
+            server_location_get(ctx);
 
             status_text(`Welcome <b>${username}</b>!`);
             status_hide();
@@ -216,8 +214,8 @@ function main(ctx) {
         let dso = ctx.manager.catalog[i]
         catalog_create_row(
             dso,
-            function(dso) { watchlist_add(ctx, dso.id); },
-            function(dso) { object_goto(ctx, dso); },
+            function(dso) { server_watchlist_add(ctx, dso.id); },
+            function(dso) { ui_aladin_goto(ctx, dso); },
         ).appendTo("#catalog-table tbody");
     }
 }
@@ -230,9 +228,9 @@ function logged_in(ctx) {
 }
 
 /**
- * Show given id on the sky survey map
+ * Show given dso on the aladin map
  */
-function object_goto(ctx, dso) {
+function ui_aladin_goto(ctx, dso) {
 
     ctx.aladin.gotoRaDec(
         dso.coords[0],
@@ -251,7 +249,7 @@ function object_goto(ctx, dso) {
 /**
  * Set the observing time for the Celestial map
  */
-function update_map_datetime(datetime) {
+function ui_celestial_datetime_update(datetime) {
     Celestial.date(datetime);
     Celestial._go();
 }
@@ -259,309 +257,15 @@ function update_map_datetime(datetime) {
 /**
  * Set the observing location for the Celestial map
  */
-function update_map_location(lat, long) {
+function ui_celestial_location_update(lat, long) {
     Celestial._location(lat, long);
     Celestial._go();
 }
 
 /**
- * Get location from server and update the map and location form
+ * Update the objects to show on the maps
  */
-function location_get(ctx) {
-    $.ajax({
-        type: "GET",
-        url: "/api/v1/location",
-        headers: {
-            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-        },
-        dataType: "json",
-    }).done(function(json) {
-
-        $("#location-lat").val(`${json.lat}`);
-        $("#location-long").val(`${json.lon}`);
-        update_map_location(json.lat, json.lon);
-
-    }).fail(function(xhr, status, error) {
-        console.error("location_get() failed", xhr, status, error);
-
-        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
-            saved!, reload the page and try again later.`);
-        status_show();
-    });
-
-}
-
-/**
- * This function should be called when the style of an object changes.
- */
-function watchlist_style_change(ctx, watch_dso, style_id) {
-
-    // Enable the save button
-    let tr = watch_dso.get_watchlist_tr();
-    tr.find(".objects-save").prop("disabled", false);
-
-    // Update the watchlist object
-    watch_dso.style = style_id;
-
-    // Update the map
-    update_map_markers(ctx);
-}
-
-/**
- * This function should be called when the notes of an object changes.
- */
-function watchlist_notes_change(watch_dso) {
-    // Enable the save button
-    let tr = watch_dso.get_watchlist_tr();
-    tr.find(".objects-save").prop("disabled", false);
-}
-
-/**
- * Delete object from watchlist
- *
- * Deletes both on server and on client
- */
-function watchlist_delete(ctx, watch_dso) {
-
-    ctx.manager.watchlist_remove(watch_dso);
-    watchlist_table_remove(ctx, watch_dso);
-
-    if (logged_in(ctx)) {
-        $.ajax({
-            type: "DELETE",
-            url: `/api/v1/watchlist/${id}`,
-            headers: {
-                "Authorization": "Basic "
-                    + btoa(ctx.username + ":" + ctx.password)
-            },
-        }).done(function(response) {
-
-        }).fail(function(xhr, status, error) {
-            console.error("watchlist_delete() failed", xhr, status, error);
-
-            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
-                being saved!, reload the page and try again later.`);
-            status_show();
-        });
-    }
-
-    update_map_markers(ctx);
-
-}
-
-/**
- * Add object to watchlist, both on client and on server
- */
-function watchlist_add(ctx, id) {
-
-    let watch_dso = ctx.manager.watchlist_add(id, null, null);
-
-    if (watch_dso == null) { // Object already in watchlist
-        return;
-    }
-
-    if (logged_in(ctx)) {
-        $.ajax({
-            type: "POST",
-            url: "/api/v1/watchlist",
-            headers: {
-                "Authorization": "Basic "
-                    + btoa(ctx.username + ":" + ctx.password)
-            },
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({
-                star_id: watch_dso.dso.id,
-                notes: watch_dso.notes,
-                style: watch_dso.style,
-            }),
-        }).done(function(response) {
-
-        }).fail(function(xhr, status, error) {
-            console.error("watchlist_add() failed", xhr, status, error);
-
-            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
-                being saved!, reload the page and try again later.`);
-            status_show();
-        });
-    }
-
-    watchlist_table_insert(ctx, watch_dso);
-
-    update_map_markers(ctx);
-}
-
-/**
- * Save changes on given object id to server
- */
-function watchlist_save(ctx, watch_dso) {
-
-    let tr = watch_dso.get_watchlist_tr();
-    let notes = tr.find(".objects-notes textarea").val();
-    let style = tr.find(".objects-style select").index();
-
-    if (logged_in(ctx)) {
-        $.ajax({
-            type: "PUT",
-            url: `/api/v1/watchlist/${watch_dso.dso.id}`,
-            headers: {
-                "Authorization": "Basic "
-                    + btoa(ctx.username + ":" + ctx.password)
-            },
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({
-                star_id: watch_dso.dso.id,
-                notes: notes,
-                style: style,
-            }),
-        }).done(function(response) {
-            console.log("watchlist_save() successful");
-            tr.find(".objects-save").prop("disabled", true);
-        }).fail(function(xhr, status, error) {
-            console.error("watchlist_save() failed", xhr, status, error);
-
-            status_text(`<b>Error ${xhr.status}</b>, your changes are not
-                being saved!, reload the page and try again later.`);
-            status_show();
-        });
-    }
-
-    update_map_markers(ctx);
-}
-
-/**
- * Insert row on watchlist table
- */
-function watchlist_table_insert(ctx, watch_dso) {
-
-    let tr = watchlist_create_row(
-        watch_dso,
-        function(watch_dso) { watchlist_delete(ctx, watch_dso); },
-        function(watch_dso) { watchlist_save(ctx, watch_dso); },
-        function(watch_dso) { object_goto(ctx, watch_dso.dso); },
-        function(watch_dso, style) { watchlist_style_change(ctx, watch_dso, style); },
-        function(watch_dso) { watchlist_notes_change(watch_dso); }
-    );
-
-    if (!logged_in(ctx)) {
-        // Hide the save buttons
-        tr.find(".objects-save").css("display", "none");
-    }
-
-    watch_dso.set_watchlist_tr(tr);
-    tr.appendTo("#watchlist-table tbody");
-}
-
-/**
- * Insert row on watchlist table
- */
-function watchlist_table_remove(ctx, watch_dso) {
-
-    let tr = watch_dso.get_watchlist_tr();
-    tr.remove();
-}
-
-/**
- * Load watchlist from server
- */
-function watchlist_get_all(ctx) {
-    $.ajax({
-        type: "GET",
-        url: "/api/v1/watchlist",
-        headers: {
-            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
-        },
-        dataType: "json",
-    }).done(function(json) {
-
-        watchlist_delete_row_all();
-
-        // Check the API, the field is named star_id instead of just id
-        for (let obj of json) {
-
-            let watch_dso = ctx.manager.watchlist_add(obj.star_id, obj.notes, obj.style);
-
-            if (watch_dso != null) {
-                watchlist_table_insert(ctx, watch_dso);
-            }
-        }
-
-        update_map_markers(ctx);
-
-    }).fail(function(xhr, status, error) {
-        console.error("watchlist_get_all() failed", xhr, status, error);
-
-        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
-            saved!, reload the page and try again later.`);
-        status_show();
-    });
-}
-
-/**
- * Set celestial redraw function
- *
- * Determines how the markers will look on the celestial map
- */
-function celestial_redraw() {
-    let text_style = {
-        fill: "#FF3333",
-        font: "bold 15px 'Saira Condensed', sans-serif",
-        align: "left",
-        baseline: "bottom"
-    };
-    let point_style = {
-        stroke: "#FF3333",
-        width: 3,
-        fill: "rgba(255, 204, 255, 0.4)"
-    };
-    let size = 20;
-
-    for (let style of object_styles) {
-
-        // Select objects by style
-        Celestial.container.selectAll(`.${style.class_string}`).each(function(d) {
-            // If point is visible
-            if (Celestial.clip(d.geometry.coordinates)) {
-
-                // Get point coordinates
-                let position = Celestial.mapProjection(d.geometry.coordinates);
-
-                // Draw marker
-                Celestial.setStyle(point_style);
-                object_styles[style.id].draw(Celestial.context, position, size);
-
-                // Draw text
-                Celestial.setTextStyle(text_style);
-                Celestial.context.fillText(
-                    d.properties.name, // Text
-                    position[0] + size/2 - 1, // X
-                    position[1] - size/2 + 1 // Y
-                );
-            }
-        });
-    }
-}
-
-/**
- * Set aladin marker draw function
- *
- * Determines how the markers will look on the aladin map.
- * Takes the function to use to draw, should be one of the available on
- * shapes.js
- */
-function aladin_marker_draw(draw_function, source, context, view_params) {
-
-    // console.log(draw_function, source, context);
-    context.strokeStyle = "#FF3333";
-    context.lineWidth = 3;
-    context.fillStyle = "rgba(255, 204, 255, 0.4)"
-
-    draw_function(context, [source.x, source.y], 10);
-};
-
-/**
- * Update the objects to show on the maps.
- */
-function update_map_markers(ctx) {
+function ui_markers_update(ctx) {
 
     // Format the array elements to what Celestial expects
     let objs = [];
@@ -639,7 +343,7 @@ function update_map_markers(ctx) {
                 let data = Celestial.getData({
                     "type": "FeatureCollection",
                     "features": objs_by_class[class_string],
-                }, config.transform);
+                }, celestial_config.transform);
 
                 // Add to celestial objects container from d3 library
                 // I guess that ".asterisms" is used by convention because it
@@ -688,3 +392,295 @@ function update_map_markers(ctx) {
         }
     }
 }
+/**
+ * This function should be called when the style of an object changes on the UI
+ */
+function ui_style_change_callback(ctx, watch_dso, style_id) {
+
+    // Enable the save button
+    let tr = watch_dso.get_watchlist_tr();
+    tr.find(".objects-save").prop("disabled", false);
+
+    // Update the watchlist object
+    watch_dso.style = style_id;
+
+    // Update the map
+    ui_markers_update(ctx);
+}
+
+/**
+ * This function should be called when the notes of an object changes on the UI
+ */
+function ui_notes_change_callback(watch_dso) {
+    // Enable the save button
+    let tr = watch_dso.get_watchlist_tr();
+    tr.find(".objects-save").prop("disabled", false);
+}
+
+/**
+ * Get location from server and update the user interface accordingly
+ */
+function server_location_get(ctx) {
+    $.ajax({
+        type: "GET",
+        url: "/api/v1/location",
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
+        dataType: "json",
+    }).done(function(json) {
+
+        $("#location-lat").val(`${json.lat}`);
+        $("#location-long").val(`${json.lon}`);
+        ui_celestial_datetime_update(json.lat, json.lon);
+
+    }).fail(function(xhr, status, error) {
+        console.error("server_location_get() failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
+            saved!, reload the page and try again later.`);
+        status_show();
+    });
+
+}
+
+/**
+ * Load watchlist from server
+ */
+function server_watchlist_get(ctx) {
+    $.ajax({
+        type: "GET",
+        url: "/api/v1/watchlist",
+        headers: {
+            "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
+        },
+        dataType: "json",
+    }).done(function(json) {
+
+        watchlist_delete_row_all();
+
+        // Check the API, the field is named star_id instead of just id
+        for (let obj of json) {
+
+            let watch_dso = ctx.manager.watchlist_add(obj.star_id, obj.notes, obj.style);
+
+            if (watch_dso != null) {
+                ui_watchlist_table_insert(ctx, watch_dso);
+            }
+        }
+
+        ui_markers_update(ctx);
+
+    }).fail(function(xhr, status, error) {
+        console.error("server_watchlist_get() failed", xhr, status, error);
+
+        status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
+            saved!, reload the page and try again later.`);
+        status_show();
+    });
+}
+
+
+/**
+ * Delete object from watchlist, both on server and on client
+ */
+function server_watchlist_delete(ctx, watch_dso) {
+
+    ctx.manager.watchlist_remove(watch_dso);
+    ui_watchlist_table_remove(ctx, watch_dso);
+
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "DELETE",
+            url: `/api/v1/watchlist/${watch_dso.dso.id}`,
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+        }).done(function(response) {
+
+        }).fail(function(xhr, status, error) {
+            console.error("server_watchlist_delete() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    ui_markers_update(ctx);
+
+}
+
+/**
+ * Add object to watchlist, both on client and on server
+ */
+function server_watchlist_add(ctx, id) {
+
+    let watch_dso = ctx.manager.watchlist_add(id, null, null);
+
+    if (watch_dso == null) { // Object already in watchlist
+        return;
+    }
+
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "POST",
+            url: "/api/v1/watchlist",
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                star_id: watch_dso.dso.id,
+                notes: watch_dso.notes,
+                style: watch_dso.style,
+            }),
+        }).done(function(response) {
+
+        }).fail(function(xhr, status, error) {
+            console.error("server_watchlist_add() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not \
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    ui_watchlist_table_insert(ctx, watch_dso);
+
+    ui_markers_update(ctx);
+}
+
+/**
+ * Save changes on given object id to server
+ */
+function server_watchlist_save(ctx, watch_dso) {
+
+    let tr = watch_dso.get_watchlist_tr();
+    let notes = tr.find(".objects-notes textarea").val();
+    let style = tr.find(".objects-style select").index();
+
+    if (logged_in(ctx)) {
+        $.ajax({
+            type: "PUT",
+            url: `/api/v1/watchlist/${watch_dso.dso.id}`,
+            headers: {
+                "Authorization": "Basic "
+                    + btoa(ctx.username + ":" + ctx.password)
+            },
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                star_id: watch_dso.dso.id,
+                notes: notes,
+                style: style,
+            }),
+        }).done(function(response) {
+            tr.find(".objects-save").prop("disabled", true);
+        }).fail(function(xhr, status, error) {
+            console.error("server_watchlist_save() failed", xhr, status, error);
+
+            status_text(`<b>Error ${xhr.status}</b>, your changes are not
+                being saved!, reload the page and try again later.`);
+            status_show();
+        });
+    }
+
+    ui_markers_update(ctx);
+}
+
+/**
+ * Insert row on watchlist table
+ */
+function ui_watchlist_table_insert(ctx, watch_dso) {
+
+    let tr = watchlist_create_row(
+        watch_dso,
+        function(watch_dso) { server_watchlist_delete(ctx, watch_dso); },
+        function(watch_dso) { server_watchlist_save(ctx, watch_dso); },
+        function(watch_dso) { ui_aladin_goto(ctx, watch_dso.dso); },
+        function(watch_dso, style) { ui_style_change_callback(ctx, watch_dso, style); },
+        function(watch_dso) { ui_notes_change_callback(watch_dso); }
+    );
+
+    if (!logged_in(ctx)) {
+        // Hide the save buttons
+        tr.find(".objects-save").css("display", "none");
+    }
+
+    watch_dso.set_watchlist_tr(tr);
+    tr.appendTo("#watchlist-table tbody");
+}
+
+/**
+ * Insert row on watchlist table
+ */
+function ui_watchlist_table_remove(ctx, watch_dso) {
+
+    let tr = watch_dso.get_watchlist_tr();
+    tr.remove();
+}
+
+/**
+ * Set celestial redraw function
+ *
+ * Determines how the markers will look on the celestial map
+ */
+function celestial_redraw() {
+    let text_style = {
+        fill: "#FF3333",
+        font: "bold 15px 'Saira Condensed', sans-serif",
+        align: "left",
+        baseline: "bottom"
+    };
+    let point_style = {
+        stroke: "#FF3333",
+        width: 3,
+        fill: "rgba(255, 204, 255, 0.4)"
+    };
+    let size = 20;
+
+    for (let style of object_styles) {
+
+        // Select objects by style
+        Celestial.container.selectAll(`.${style.class_string}`).each(function(d) {
+            // If point is visible
+            if (Celestial.clip(d.geometry.coordinates)) {
+
+                // Get point coordinates
+                let position = Celestial.mapProjection(d.geometry.coordinates);
+
+                // Draw marker
+                Celestial.setStyle(point_style);
+                object_styles[style.id].draw(Celestial.context, position, size);
+
+                // Draw text
+                Celestial.setTextStyle(text_style);
+                Celestial.context.fillText(
+                    d.properties.name, // Text
+                    position[0] + size/2 - 1, // X
+                    position[1] - size/2 + 1 // Y
+                );
+            }
+        });
+    }
+}
+
+/**
+ * Set aladin marker draw function
+ *
+ * Determines how the markers will look on the aladin map.
+ * Takes the function to use to draw, should be one of the available on
+ * shapes.js
+ */
+function aladin_marker_draw(draw_function, source, context, view_params) {
+
+    // console.log(draw_function, source, context);
+    context.strokeStyle = "#FF3333";
+    context.lineWidth = 3;
+    context.fillStyle = "rgba(255, 204, 255, 0.4)"
+
+    draw_function(context, [source.x, source.y], 10);
+};
+
