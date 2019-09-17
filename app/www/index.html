@@ -82,38 +82,27 @@
 						<li><a href="#">Top</a></li>
 						<li><a href="#sky-chart">Sky chart</a></li>
 						<li><a href="#sky-surveys">Sky surveys</a></li>
-						<li><a href="#observing-location">Observing location</a></li>
 						<li><a href="#watchlist">Watchlist</a></li>
 						<li><a href="#catalog">Catalog</a></li>
+						<li><a href="#footer">Bottom</a></li>
 					</ol></nav>
 				</aside>
 
 				<div id="content">
 
-					<h2 id="sky-chart">Sky chart</h2>
-					<section id="celestial-container">
-						<div id="celestial-map"></div>
-						<div id="celestial-form"></div>
-					</section>
-
-					<h2 id="sky-surveys">Sky surveys</h2>
-					<section id="aladin-container">
-						<div id='aladin-map'></div>
-					</section>
-
 					<section id="user-data">
-						<h2 id="observing-location">Observing location</h2>
+
 						<p>Formatted as signed degrees, e.g. -23.235</p>
 						<form class="observation-form" id="location-form" action="">
 							<div>
 								<label for="location-lat">Latitude:</label>
 								<input id="location-lat" name="lat" step="0.00000001"
-										type="number" min="-90" max="90" required />
+										type="number" min="-90" max="90" value="0.0" required />
 							</div>
 							<div>
 								<label for="location-long">Longitude:</label>
 								<input id="location-long" name="long" step="0.00000001"
-										type="number" min="-180" max="180" required />
+										type="number" min="-180" max="180" value="0.0" required />
 							</div>
 							<button id="location-submit">Update</button>
 						</form>
@@ -130,11 +119,28 @@
 							<button id="datetime-submit">Update</button>
 						</form>
 
+					</section>
+
+					<h2 id="sky-chart">Sky chart</h2>
+					<section id="celestial-container">
+						<div id="celestial-map"></div>
+						<div id="celestial-form"></div>
+					</section>
+
+					<h2 id="sky-surveys">Sky surveys</h2>
+					<section id="aladin-container">
+						<div id='aladin-map'></div>
+					</section>
+
+					<section id="lists">
+
 						<h2 id="watchlist">Watchlist</h2>
 
-						<button class="filter-toggle">Show filters</button>
+						<button class="filter-toggle" id="watchlist-filter-toggle">
+							Show filters
+						</button>
 
-						<div class="filter-collapse">
+						<div class="filter-collapse" id="watchlist-filter-collapse">
 							<form class="filter-form" id="watchlist-filter" action="">
 								<fieldset>
 									<legend>Visible columns</legend>
@@ -187,9 +193,11 @@
 
 						<h2 id="catalog">Catalog</h2>
 
-						<button class="filter-toggle">Show filters</button>
+						<button class="filter-toggle" id="catalog-filter-toggle">
+							Show filters
+						</button>
 
-						<div class="filter-collapse">
+						<div class="filter-collapse" id="catalog-filter-collapse">
 							<form class="filter-form" id="catalog-filter" action="">
 								<fieldset>
 									<legend>Visible columns</legend>
@@ -259,7 +267,7 @@
 			<button id="info-toggle">Status</button>
 		</aside>
 
-		<footer>
+		<footer id="footer">
 			<div class="inner">
 				<p>
 					<strong>DSO Guide</strong> released under

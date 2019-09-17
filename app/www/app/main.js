@@ -123,6 +123,21 @@ function main(ctx) {
         }
     });
 
+    let make_toggle = (button, collapse) => {
+        button.click(function(e) {
+            if (collapse.css("visibility") == "hidden") {
+                collapse.css("visibility", "visible");
+                collapse.css("display", "block");
+            } else {
+                collapse.css("visibility", "hidden");
+                collapse.css("display", "none");
+            }
+        });
+    }
+
+    make_toggle($("#watchlist-filter-toggle"), $("#watchlist-filter-collapse"));
+    make_toggle($("#catalog-filter-toggle"), $("#catalog-filter-collapse"));
+
     status_hide();
 
     $("#datetime-submit").click(function(e) {

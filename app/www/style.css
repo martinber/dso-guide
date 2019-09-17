@@ -382,8 +382,6 @@ main .inner {
 
 }
 
-
-
 /* FILTER --------------------------------------------------------------*/
 
 .filter-toggle
@@ -418,10 +416,15 @@ main .inner {
 
 .filter-collapse
 {
-	/* display: none; */
-	/* visibility: hidden; */
-	padding: 0.7em;
+	display: none;
+	visibility: hidden;
+	overflow: hidden;
 	background-color: #333333;
+}
+
+.filter-form
+{
+	margin: 0.7em;
 	overflow: auto; /* Otherwise the .filter-submit float escapes the container */
 }
 
