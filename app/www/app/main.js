@@ -18,7 +18,7 @@ import {
     watchlist_delete_row_all
 } from "./tables.js";
 
-$(document).ready(function() {
+$(document).ready(() => {
 
     // Define global variables inside the "context" object
 
@@ -43,7 +43,7 @@ $(document).ready(function() {
     // TODO
     // Create aladin catalog for objects in the object catalog
     // ctx.aladin_catalogs[get_class_string(-1)] = A.catalog({
-        // shape: function(source, context, view_params) {
+        // shape: (source, context, view_params) => {
             // aladin_marker_draw(draw_dot, source, context, view_params)
         // },
         // color: "#555555"
@@ -54,7 +54,7 @@ $(document).ready(function() {
     for (let style of object_styles) {
         ctx.aladin_catalogs[style.class_string] = A.catalog({
             name: style.aladin_name,
-            shape: function(source, context, view_params) {
+            shape: (source, context, view_params) => {
                 aladin_marker_draw(style.draw, source, context, view_params)
             },
             color: style.color,
@@ -71,14 +71,14 @@ $(document).ready(function() {
         type: "GET",
         url: "/data/dsos.14.json",
         dataType: "json",
-    }).done(function(dsos_data) {
+    }).done(dsos_data => {
 
         // DSO manager, keeps track of watchlist and catalogs
         ctx.manager = new DsoManager(dsos_data, catalogs_data);
 
         main(ctx);
 
-    }).fail(function(xhr, status, error) {
+    }).fail((xhr, status, error) => {
         console.error("get dsos_data failed", xhr, status, error);
 
         status_text(`<b>Error ${xhr.status}</b>, are you having connection \
@@ -115,7 +115,7 @@ function main(ctx) {
     $("#datetime-date").val(`${year}-${month}-${day}`);
     $("#datetime-time").val(`${hour}:${min}`);
 
-    $("#info-toggle").click(function(e) {
+    $("#info-toggle").click(e => {
         if (status_is_visible()) {
             status_hide();
         } else {
@@ -124,7 +124,7 @@ function main(ctx) {
     });
 
     let make_toggle = (button, collapse) => {
-        button.click(function(e) {
+        button.click(e => {
             if (collapse.css("visibility") == "hidden") {
                 collapse.css("visibility", "visible");
                 collapse.css("display", "block");
@@ -140,7 +140,7 @@ function main(ctx) {
 
     status_hide();
 
-    $("#datetime-submit").click(function(e) {
+    $("#datetime-submit").click(e => {
         e.preventDefault(); // Disable built-in HTML action
         let [year, month, day] = $("#datetime-date").val().split("-");
         let [hour, min] = $("#datetime-time").val().split(":");
@@ -148,7 +148,7 @@ function main(ctx) {
         ui_celestial_datetime_update(date);
     });
 
-    $("#location-submit").click(function(e) {
+    $("#location-submit").click(e => {
         e.preventDefault(); // Disable built-in HTML action
 
         let data = {
@@ -166,9 +166,9 @@ function main(ctx) {
                 },
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
-            }).done(function(response) {
-                console.log("location submitted to server");
-            }).fail(function(xhr, status, error) {
+            }).done(response => {
+
+            }).fail((xhr, status, error) => {
                 console.error("location submit to server failed",
                     xhr, status, error);
 
@@ -181,7 +181,7 @@ function main(ctx) {
         ui_celestial_location_update(data.lat, data.lon);
     });
 
-    $("#login-form").submit(function(e) {
+    $("#login-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
         let username = $("#login-username").val();
@@ -193,7 +193,7 @@ function main(ctx) {
             headers: {
                 "Authorization": "Basic " + btoa(username + ":" + password)
             },
-        }).done(function(response) {
+        }).done(response => {
             ctx.username = username;
             ctx.password = password;
 
@@ -202,7 +202,7 @@ function main(ctx) {
 
             status_text(`Welcome <b>${username}</b>!`);
             status_hide();
-        }).fail(function(xhr, status, error) {
+        }).fail((xhr, status, error) => {
             console.error("login form submit failed", xhr, status, error);
 
             if (xhr.status == 401) {
@@ -229,8 +229,8 @@ function main(ctx) {
         let dso = ctx.manager.catalog[i]
         catalog_create_row(
             dso,
-            function(dso) { server_watchlist_add(ctx, dso.id); },
-            function(dso) { ui_aladin_goto(ctx, dso); },
+            dso => server_watchlist_add(ctx, dso.id),
+            dso => ui_aladin_goto(ctx, dso),
         ).appendTo("#catalog-table tbody");
     }
 }
@@ -347,7 +347,7 @@ function ui_markers_update(ctx) {
 
     Celestial.add({
         type: "line",
-        callback: function(error, _json) {
+        callback: (error, _json) => {
             if (error) return console.warn(error);
 
             // For each group, each one with a style/class
@@ -443,13 +443,13 @@ function server_location_get(ctx) {
             "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
         },
         dataType: "json",
-    }).done(function(json) {
+    }).done(json => {
 
         $("#location-lat").val(`${json.lat}`);
         $("#location-long").val(`${json.lon}`);
         ui_celestial_datetime_update(json.lat, json.lon);
 
-    }).fail(function(xhr, status, error) {
+    }).fail((xhr, status, error) => {
         console.error("server_location_get() failed", xhr, status, error);
 
         status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
@@ -470,7 +470,7 @@ function server_watchlist_get(ctx) {
             "Authorization": "Basic " + btoa(ctx.username + ":" + ctx.password)
         },
         dataType: "json",
-    }).done(function(json) {
+    }).done(json => {
 
         watchlist_delete_row_all();
 
@@ -486,7 +486,7 @@ function server_watchlist_get(ctx) {
 
         ui_markers_update(ctx);
 
-    }).fail(function(xhr, status, error) {
+    }).fail((xhr, status, error) => {
         console.error("server_watchlist_get() failed", xhr, status, error);
 
         status_text(`<b>Error ${xhr.status}</b>, your changes are not being \
@@ -512,9 +512,9 @@ function server_watchlist_delete(ctx, watch_dso) {
                 "Authorization": "Basic "
                     + btoa(ctx.username + ":" + ctx.password)
             },
-        }).done(function(response) {
+        }).done(response => {
 
-        }).fail(function(xhr, status, error) {
+        }).fail((xhr, status, error) => {
             console.error("server_watchlist_delete() failed", xhr, status, error);
 
             status_text(`<b>Error ${xhr.status}</b>, your changes are not \
@@ -552,9 +552,9 @@ function server_watchlist_add(ctx, id) {
                 notes: watch_dso.notes,
                 style: watch_dso.style,
             }),
-        }).done(function(response) {
+        }).done(response => {
 
-        }).fail(function(xhr, status, error) {
+        }).fail((xhr, status, error) => {
             console.error("server_watchlist_add() failed", xhr, status, error);
 
             status_text(`<b>Error ${xhr.status}</b>, your changes are not \
@@ -591,9 +591,9 @@ function server_watchlist_save(ctx, watch_dso) {
                 notes: notes,
                 style: style,
             }),
-        }).done(function(response) {
+        }).done(response => {
             tr.find(".objects-save").prop("disabled", true);
-        }).fail(function(xhr, status, error) {
+        }).fail((xhr, status, error) => {
             console.error("server_watchlist_save() failed", xhr, status, error);
 
             status_text(`<b>Error ${xhr.status}</b>, your changes are not
@@ -612,11 +612,11 @@ function ui_watchlist_table_insert(ctx, watch_dso) {
 
     let tr = watchlist_create_row(
         watch_dso,
-        function(watch_dso) { server_watchlist_delete(ctx, watch_dso); },
-        function(watch_dso) { server_watchlist_save(ctx, watch_dso); },
-        function(watch_dso) { ui_aladin_goto(ctx, watch_dso.dso); },
-        function(watch_dso, style) { ui_style_change_callback(ctx, watch_dso, style); },
-        function(watch_dso) { ui_notes_change_callback(watch_dso); }
+        watch_dso => server_watchlist_delete(ctx, watch_dso),
+        watch_dso => server_watchlist_save(ctx, watch_dso),
+        watch_dso => ui_aladin_goto(ctx, watch_dso.dso),
+        (watch_dso, style) => ui_style_change_callback(ctx, watch_dso, style),
+        watch_dso => ui_notes_change_callback(watch_dso)
     );
 
     if (!logged_in(ctx)) {
@@ -659,7 +659,7 @@ function celestial_redraw() {
     for (let style of object_styles) {
 
         // Select objects by style
-        Celestial.container.selectAll(`.${style.class_string}`).each(function(d) {
+        Celestial.container.selectAll(`.${style.class_string}`).each(d => {
             // If point is visible
             if (Celestial.clip(d.geometry.coordinates)) {
 

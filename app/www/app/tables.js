@@ -129,8 +129,8 @@ function create_notes_cell(notes, watch_dso, notes_change_callback) {
         class: "objects-notes",
     }).append(
         $("<textarea placeholder='Notes....'>").val(notes)
-            .keyup(function() { notes_change_callback(watch_dso); })
-            .change(function() { notes_change_callback(watch_dso); })
+            .keyup(() => notes_change_callback(watch_dso))
+            .change(() => notes_change_callback(watch_dso))
     );
 }
 
@@ -160,7 +160,7 @@ function create_style_cell(selected_style, watch_dso, style_change_callback) {
     }
 
     let select = $("<select>");
-    select.change(function() {
+    select.change(() => {
         style_change_callback(watch_dso, get_style_id($(this).val()));
     });
 
@@ -294,24 +294,18 @@ export function watchlist_create_row(
                     $("<button>", {
                         text: "X",
                         class: "objects-delete",
-                        click: function() {
-                            delete_callback(watch_dso);
-                        }
+                        click: () => delete_callback(watch_dso)
                     }),
                     $("<button>", {
                         text: "Save",
                         disabled: true,
                         class: "objects-save",
-                        click: function() {
-                            save_callback(watch_dso);
-                        }
+                        click: () => save_callback(watch_dso)
                     }),
                     $("<button>", {
                         text: "GoTo",
                         class: "objects-goto",
-                        click: function() {
-                            goto_callback(watch_dso);
-                        },
+                        click: () => goto_callback(watch_dso)
                     })
                 ));
                 break;

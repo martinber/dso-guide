@@ -1,7 +1,7 @@
 "use strict";
 
-$(document).ready(function() {
-    $("#register-form").submit(function(e) {
+$(document).ready(() => {
+    $("#register-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
         refresh_error_text()
@@ -16,11 +16,11 @@ $(document).ready(function() {
                 url: "/api/v1/users",
                 data: JSON.stringify({username: user, password: pass,}),
                 contentType: "application/json",
-            }).done(function(response) {
+            }).done(response => {
                 window.location.replace("/index.html") //TODO send username
-            }).fail(function(xhr, status, error) {
+            }).fail((xhr, status, error) => {
                 console.error("register form sumbit failed", xhr, status, error);
-                CustomErrorHandler(xhr.status)
+                handle_error(xhr.status)
             });
         }
         else {
@@ -39,7 +39,7 @@ function refresh_error_text() {
     }
 }
 
-function CustomErrorHandler(status_number) {
+function handle_error(status_number) {
 
     if (status_number == 406) {
         $("#error-text").text("Username can only contain letters, numbers and _")

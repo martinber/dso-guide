@@ -132,9 +132,7 @@ export function DsoManager(dsos_data, catalogs_data) {
         // Find in the catalogs list the id and return the appears_on array
         // of the element
 
-        let element = catalogs_data.find(function(e) {
-            return e.id == id;
-        })
+        let element = catalogs_data.find(e => e.id == id);
 
         let appears_on;
         if (typeof element == "undefined") {
@@ -159,9 +157,8 @@ export function DsoManager(dsos_data, catalogs_data) {
     this.watchlist_add = function(id, notes, style) {
 
         // Check if the object already exists
-        let index = this.watchlist.findIndex((watch_dso) => {
-            return watch_dso.dso.id == id;
-        });
+        let index = this.watchlist.findIndex(watch_dso => watch_dso.dso.id == id);
+
         if (index > -1) {
             console.error("Element already exists id:", id);
             return null;
@@ -181,9 +178,7 @@ export function DsoManager(dsos_data, catalogs_data) {
      */
     this.watchlist_remove = function(watch_dso) {
 
-        let index = this.watchlist.findIndex(function(e) {
-            return watch_dso.dso.id == e.dso.id;
-        });
+        let index = this.watchlist.findIndex(e => watch_dso.dso.id == e.dso.id);
         if (index > -1) {
             this.watchlist.splice(index, 1);
             return;
