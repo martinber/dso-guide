@@ -159,9 +159,11 @@ header #user-controls
 	display: block;
 }
 
-#login-welcome
+#login-welcome, #login-logout
 {
 	display: none;
+	float: right;
+	clear: both;
 }
 
 /* INFO BANNER ------------------------------------------------------------- */

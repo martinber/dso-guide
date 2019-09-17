@@ -181,6 +181,11 @@ function main(ctx) {
         ui_celestial_location_update(data.lat, data.lon);
     });
 
+    // Reloading the page logs out
+    $("#login-logout").click(e => {
+        window.location.reload(false); // Reload from cache
+    });
+
     $("#login-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
@@ -199,6 +204,16 @@ function main(ctx) {
 
             server_watchlist_get(ctx);
             server_location_get(ctx);
+
+            $("#login-form, #register-link").css({
+                "display": "none",
+                "visibility": "hidden"
+            });
+            $("#login-welcome, #login-logout").css({
+                "display": "inherit",
+                "visibility": "visible"
+            });
+            $("#login-welcome").html(`Welcome <b>${username}</b>!`);
 
             status_text(`Welcome <b>${username}</b>!`);
             status_hide();
