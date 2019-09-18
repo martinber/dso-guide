@@ -35,22 +35,26 @@ star chart
 
 ## TODO
 
-- Update footer.
-
 - Disable "add" buttons of objects already on the watchlist.
-
-- Change the login form when logged in
 
 - Rebuild database, rename `star_id` to `dso_id`
 
-- Rename repository, update links to GitHub
-
 - Flask logging, remove the debug setting
-
-- Change logo, and favicon
 
 - Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
   `hostmaster`, `root`, `info`.
+
+- Add explanation of lat/lon format, improve location and datetime forms CSS
+
+- Bigger logo
+
+- Implement filters and sort
+
+- Improve GoTo, right now you lose the position where you were on the list
+
+- Check the tr references on DSOs, they are not going to work with filters
+
+- Fix notes CSS
 
 ## Tutorials
 

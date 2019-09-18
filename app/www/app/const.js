@@ -13,7 +13,6 @@ export const watchlist_columns = [
     { name: "mag", string: "Mag" },
     { name: "type", string: "Type" },
     { name: "ra-dec", string: "RA/DEC" },
-    { name: "alt-az", string: "ALT/AZ" },
     { name: "style", string: "Style" },
     { name: "controls", string: "Controls" },
     { name: "notes", string: "Notes" },
@@ -28,7 +27,6 @@ export const catalog_columns = [
     { name: "mag", string: "Mag" },
     { name: "type", string: "Type" },
     { name: "ra-dec", string: "RA/DEC" },
-    { name: "alt-az", string: "ALT/AZ" },
     { name: "controls", string: "Controls" },
     { name: "appears_on", string: "Appears on" },
 ];

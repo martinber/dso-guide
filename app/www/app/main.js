@@ -9,7 +9,7 @@ import {
     status_text
 } from "./status.js";
 import { object_styles } from "./const.js";
-import { DsoManager } from "./dso.js";
+import { DsoManager, sort } from "./dso.js";
 import {
     watchlist_create_header,
     watchlist_create_row,
@@ -181,6 +181,12 @@ function main(ctx) {
         ui_celestial_location_update(data.lat, data.lon);
     });
 
+    $("#watchlist-filter").submit(e => {
+        e.preventDefault(); // Disable built-in HTML action
+
+        ui_watchlist_filter(ctx);
+    });
+
     // Reloading the page logs out
     $("#login-logout").click(e => {
         window.location.reload(false); // Reload from cache
@@ -238,16 +244,14 @@ function main(ctx) {
 
     catalog_create_header($("#catalog-table thead tr"));
 
-    for (let i = 0; i < ctx.manager.catalog.length; i++) {
-        if (i >= 99) { break; }
+    // ctx.manager.catalog_set_sort(sort.name);
+    // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
+    // ctx.manager.catalog_set_filter(dso => dso.mag < 2);
 
-        let dso = ctx.manager.catalog[i]
-        catalog_create_row(
-            dso,
-            dso => server_watchlist_add(ctx, dso.id),
-            dso => ui_aladin_goto(ctx, dso),
-        ).appendTo("#catalog-table tbody");
+    for (let dso of ctx.manager.get_catalog_view()) {
+        ui_catalog_table_insert(ctx, dso);
     }
+
 }
 
 /**
@@ -299,7 +303,7 @@ function ui_markers_update(ctx) {
 
     // Format the array elements to what Celestial expects
     let objs = [];
-    for (let watch_dso of ctx.manager.watchlist) {
+    for (let watch_dso of ctx.manager.get_watchlist()) {
 
         let dim = watch_dso.dso.dimensions;
 
@@ -445,6 +449,9 @@ function ui_notes_change_callback(watch_dso) {
     // Enable the save button
     let tr = watch_dso.get_watchlist_tr();
     tr.find(".objects-save").prop("disabled", false);
+
+    // Update the watchlist object
+    watch_dso.notes = tr.find(".objects-notes textarea").val();
 }
 
 /**
@@ -621,26 +628,74 @@ function server_watchlist_save(ctx, watch_dso) {
 }
 
 /**
+ * Filter, sort and show watchlist
+ */
+function ui_watchlist_filter(ctx) {
+
+    watchlist_delete_row_all();
+
+    // ctx.manager.get_watchlist().sort((a, b) => a.dso.id - b.dso.id);
+
+    for (let watch_dso of ctx.manager.get_watchlist()) {
+
+        ui_watchlist_table_insert(ctx, watch_dso);
+    }
+}
+
+/**
+ * Insert row on catalog table
+ */
+function ui_catalog_table_insert(ctx, dso) {
+
+    let tbody = $("#catalog-table tbody");
+
+    if (tbody.children().length <= 100) {
+
+        let tr = catalog_create_row(
+            dso,
+            dso => server_watchlist_add(ctx, dso.id),
+            dso => ui_aladin_goto(ctx, dso),
+        );
+
+        dso.set_catalog_tr(tr);
+        tbody.append(tr);
+
+    } else {
+        // TODO
+        console.log("Too many catalog entries");
+    }
+}
+
+/**
  * Insert row on watchlist table
  */
 function ui_watchlist_table_insert(ctx, watch_dso) {
 
-    let tr = watchlist_create_row(
-        watch_dso,
-        watch_dso => server_watchlist_delete(ctx, watch_dso),
-        watch_dso => server_watchlist_save(ctx, watch_dso),
-        watch_dso => ui_aladin_goto(ctx, watch_dso.dso),
-        (watch_dso, style) => ui_style_change_callback(ctx, watch_dso, style),
-        watch_dso => ui_notes_change_callback(watch_dso)
-    );
+    let tbody = $("#watchlist-table tbody");
 
-    if (!logged_in(ctx)) {
-        // Hide the save buttons
-        tr.find(".objects-save").css("display", "none");
+    if (tbody.children().length <= 100) {
+
+        let tr = watchlist_create_row(
+            watch_dso,
+            watch_dso => server_watchlist_delete(ctx, watch_dso),
+            watch_dso => server_watchlist_save(ctx, watch_dso),
+            watch_dso => ui_aladin_goto(ctx, watch_dso.dso),
+            (watch_dso, style) => ui_style_change_callback(ctx, watch_dso, style),
+            watch_dso => ui_notes_change_callback(watch_dso)
+        );
+
+        if (!logged_in(ctx)) {
+            // Hide the save buttons
+            tr.find(".objects-save").css("display", "none");
+        }
+
+        watch_dso.set_watchlist_tr(tr);
+        tbody.append(tr);
+
+    } else {
+        // TODO
+        console.log("Too many watchlist entries");
     }
-
-    watch_dso.set_watchlist_tr(tr);
-    tr.appendTo("#watchlist-table tbody");
 }
 
 /**

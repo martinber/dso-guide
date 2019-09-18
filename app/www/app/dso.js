@@ -2,6 +2,22 @@
  * Things related to the watchlist or catalog
  */
 
+/**
+ * Definitions of available sorting functions, they receive two Dsos and are
+ * used on Array.sort()
+ */
+export let sort = {
+    name: (a, b) => a.name.localeCompare(b.name, undefined, { numeric: "true" }),
+    mag: (a, b) => a.mag - b.mag,
+    type: (a, b) => a.type.long_name.localeCompare(b.type.long_name),
+    ra: (a, b) => a.coords[0] - b.coords[0],
+    dec: (a, b) => a.coords[0] - b.coords[0],
+    appears_on: (a, b) => a.appears_on.length - b.appears_on.length,
+};
+
+/**
+ * Definitions of possible DSO types
+ */
 function Type(short_name) {
     this.short_name = short_name;
 
@@ -38,7 +54,7 @@ export function Dso(dsos_data, id, appears_on) {
     this.id = id;
 
     // Original ID from data, similar to name but without spaces
-    this.data_id = dsos_data.features[id].id;
+    this._data_id = dsos_data.features[id].id;
 
     this.name = dsos_data.features[id].properties.name;
     this.coords = dsos_data.features[id].geometry.coordinates;
@@ -47,7 +63,7 @@ export function Dso(dsos_data, id, appears_on) {
 
     this.appears_on = appears_on;
 
-    this.catalog_tr = null; // Reference to JQuery table row
+    this._catalog_tr = null; // Reference to JQuery table row
 
     // Get dimensions
     {
@@ -74,7 +90,7 @@ export function Dso(dsos_data, id, appears_on) {
      */
     this.set_catalog_tr = function(tr) {
 
-        this.catalog_tr = tr;
+        this._catalog_tr = tr;
     }
 
     /**
@@ -84,7 +100,7 @@ export function Dso(dsos_data, id, appears_on) {
      */
     this.get_catalog_tr = function() {
 
-        return this.catalog_tr;
+        return this._catalog_tr;
     }
 }
 
@@ -96,7 +112,7 @@ export function WatchDso(dso, notes, style) {
     this.notes = notes;
     this.style = style;
 
-    this.watchlist_tr = null; // Reference to JQuery table row
+    this._watchlist_tr = null; // Reference to JQuery table row
 
     /**
      * Set reference to the JQuery tr where this object is being shown
@@ -123,8 +139,19 @@ export function WatchDso(dso, notes, style) {
  * Manages the Watchlist and Catalog
  */
 export function DsoManager(dsos_data, catalogs_data) {
-    this.catalog = [];
-    this.watchlist = [];
+
+    this._catalog = [];
+    this._watchlist = [];
+
+    // Catalog sorting and filtering function being used on Dsos
+    // For now they do nothing
+    this._catalog_sort = (a, b) => 0;
+    this._catalog_filter = dso => true;
+
+    // Watchlist sorting and filtering function being used on Dsos (not WatchDsos)
+    // For now they do nothing
+    this._watchlist_sort = (a, b) => 0;
+    this._watchlist_filter = dso => true;
 
     // Create the catalog
     for (let id = 0; id < dsos_data.features.length; id++) {
@@ -141,9 +168,8 @@ export function DsoManager(dsos_data, catalogs_data) {
             appears_on = element.appears_on;
         }
 
-        this.catalog.push(new Dso(dsos_data, id, appears_on));
+        this._catalog.push(new Dso(dsos_data, id, appears_on));
     }
-
 
     /**
      * Add object to watchlist
@@ -157,7 +183,7 @@ export function DsoManager(dsos_data, catalogs_data) {
     this.watchlist_add = function(id, notes, style) {
 
         // Check if the object already exists
-        let index = this.watchlist.findIndex(watch_dso => watch_dso.dso.id == id);
+        let index = this._watchlist.findIndex(watch_dso => watch_dso.dso.id == id);
 
         if (index > -1) {
             console.error("Element already exists id:", id);
@@ -167,8 +193,8 @@ export function DsoManager(dsos_data, catalogs_data) {
         if (notes == null) { notes = "" }
         if (style == null) { style = 0 }
 
-        let watch_dso = new WatchDso(this.catalog[id], notes, style);
-        this.watchlist.push(watch_dso);
+        let watch_dso = new WatchDso(this._catalog[id], notes, style);
+        this._watchlist.push(watch_dso);
 
         return watch_dso;
     }
@@ -178,14 +204,62 @@ export function DsoManager(dsos_data, catalogs_data) {
      */
     this.watchlist_remove = function(watch_dso) {
 
-        let index = this.watchlist.findIndex(e => watch_dso.dso.id == e.dso.id);
+        let index = this._watchlist.findIndex(e => watch_dso.dso.id == e.dso.id);
         if (index > -1) {
-            this.watchlist.splice(index, 1);
+            this._watchlist.splice(index, 1);
             return;
         } else {
             console.error("Tried to remove unexistent id:", watch_dso.dso.id);
         }
 
+    }
+
+    this.catalog_set_sort = function(f) {
+        this._catalog_sort = f;
+    }
+
+    this.catalog_set_filter = function(f) {
+        this._catalog_filter = f;
+    }
+
+    this.watchlist_set_sort = function(f) {
+        this._watchlist_sort = f;
+    }
+
+    this.watchlist_set_filter = function(f) {
+        this._watchlist_filter = f;
+    }
+
+    /**
+     * Get entire catalog
+     */
+    this.get_catalog = function() {
+        return this._catalog;
+    }
+
+    /**
+     * Get entire watchlist
+     */
+    this.get_watchlist = function() {
+        return this._watchlist;
+    }
+
+    /**
+     * Get sorted and filtered catalog
+     */
+    this.get_catalog_view = function() {
+        return this._catalog
+            .filter(this._catalog_filter)
+            .sort(this._catalog_sort);
+    }
+
+    /**
+     * Get sorted and filtered watchlist
+     */
+    this.get_watchlist_view = function() {
+        return this._watchlist
+            .filter(this._watchlist_filter)
+            .sort(watch_dso => this._watchlist_sort(watch_dso.dso));
     }
 }
 
