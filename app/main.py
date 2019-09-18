@@ -20,8 +20,9 @@ def dict_factory(cursor, row):
 
 def login(user, password, cursor):
     """ Devuelve true o false """
+    user = user.lower()
     if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)).fetchone():
-
+        
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
         salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
         salt = salt['salt']
