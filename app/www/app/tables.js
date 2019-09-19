@@ -229,6 +229,13 @@ export function watchlist_delete_row_all() {
 }
 
 /**
+ * Delete every row on watchlist table
+ */
+export function catalog_delete_row_all() {
+    $("#catalog-table tbody").empty();
+}
+
+/**
  * Create watchlist table row
  *
  * Args:

@@ -15,7 +15,8 @@ import {
     watchlist_create_row,
     catalog_create_header,
     catalog_create_row,
-    watchlist_delete_row_all
+    watchlist_delete_row_all,
+    catalog_delete_row_all
 } from "./tables.js";
 
 $(document).ready(() => {
@@ -187,6 +188,96 @@ function main(ctx) {
         ui_watchlist_filter(ctx);
     });
 
+    // TODO: Move
+    {
+        let fieldset = $("#catalog-filter-appears-on-fieldset");
+
+        let catalogs = [];
+        for (let dso of ctx.manager.get_catalog()) {
+            for (let catalog of dso.appears_on) {
+                if (!catalogs.includes(catalog)) {
+                    catalogs.push(catalog);
+                }
+            }
+        }
+        for (let catalog of catalogs) {
+            fieldset.append(
+                $("<div>").append(
+                    $("<input>", {
+                        type: "checkbox",
+                        checked: true,
+                        name: catalog,
+                        id: `catalog-filter-catalog-${catalog}`
+                    }),
+                    $("<label>", {
+                        for: `catalog-filter-catalog-${catalog}`,
+                        text: `${catalog}`,
+                    })
+                )
+            );
+        }
+        fieldset.append(
+            $("<div>").append(
+                $("<input>", {
+                    type: "checkbox",
+                    checked: false,
+                    name: "Unlisted",
+                    id: `catalog-filter-catalog-unlisted`
+                }),
+                $("<label>", {
+                    for: `catalog-filter-catalog-unlisted`,
+                    text: "Unlisted (unpopular DSOs)",
+                })
+            )
+        );
+    }
+
+    $("#catalog-filter").submit(e => {
+        e.preventDefault(); // Disable built-in HTML action
+
+        // ctx.manager.catalog_set_sort(sort.name);
+        // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
+        // ctx.manager.catalog_set_filter(dso => dso.mag < 2);
+        let search_string = $("#catalog-filter-search").val();
+
+        let selected_catalogs = [];
+        $("#catalog-filter-appears-on-fieldset input").each(function() {
+            if (this.checked) {
+                selected_catalogs.push(this.name);
+            }
+        });
+
+        // True or false if we are filtering or not
+        let filtering_catalogs = selected_catalogs.length > 0 && !selected_catalogs.includes("Unlisted");
+        let filtering_search = search_string.length > 0
+
+        console.log(filtering_catalogs, filtering_search, selected_catalogs, search_string);
+
+        ctx.manager.catalog_set_filter(dso => {
+            if (filtering_catalogs) {
+                if (!selected_catalogs.some(
+                        catalog => dso.appears_on.includes(catalog))) {
+                    // The dso does not appear on any of the selected catalogs
+                    return false;
+                }
+            }
+
+            if (filtering_search) {
+                if (!dso.name.includes(search_string)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        catalog_delete_row_all();
+
+        for (let dso of ctx.manager.get_catalog_view()) {
+            ui_catalog_table_insert(ctx, dso);
+        }
+
+    });
+
     // Reloading the page logs out
     $("#login-logout").click(e => {
         window.location.reload(false); // Reload from cache
@@ -240,7 +331,6 @@ function main(ctx) {
     watchlist_create_header($("#watchlist-table thead tr"));
 
     // Create catalog table
-    // TODO: Add filters
 
     catalog_create_header($("#catalog-table thead tr"));
 

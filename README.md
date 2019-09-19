@@ -37,7 +37,7 @@ star chart
 
 - Disable "add" buttons of objects already on the watchlist.
 
-- Rebuild database, rename `star_id` to `dso_id`
+- Rebuild database, rename `star_id` to `dso_id` or `obj_id`
 
 - Flask logging, remove the debug setting
 
