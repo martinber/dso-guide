@@ -22,6 +22,11 @@ a
 	color: #AAAAFF;
 }
 
+a:hover
+{
+	text-decoration: none;
+}
+
 *, *:before, *:after {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -57,6 +62,7 @@ button
 	padding: 0.4em;
 	margin: 0.2em;
 	height: 2em;
+	cursor: pointer;
 }
 
 button:active
@@ -65,9 +71,11 @@ button:active
 	background-color: #555555;
 }
 
-button[disabled=disabled], button:disabled {
+button[disabled=disabled], button:disabled
+{
 	background-color: #555555;
 	color: #999999;
+	cursor: auto;
 }
 
 /* HEADER ------------------------------------------------------------- */
@@ -468,7 +476,7 @@ fieldset
 }
 
 fieldset p {
-    margin-top: 0;
+	margin-top: 0;
 
 }
 
@@ -510,7 +518,6 @@ legend {
 
 .objects-table
 {
-	margin: 1em 0;
 	width: 100%;
 	border-collapse: collapse;
 }
@@ -520,6 +527,7 @@ legend {
 	height: 1.5em;
 	padding: 0.4em;
 	position: relative;
+	cursor: pointer;
 
 	/* Leave space for the icon */
 	text-align: left;
@@ -532,6 +540,7 @@ legend {
 	position: absolute;
 	left: 0em;
 	top: 0em;
+	visibility: hidden;
 
 	content: "";
 	width: 1em;
@@ -660,4 +669,47 @@ legend {
 		background-color: #333333;
 	}
 
+}
+
+.table-pagination
+{
+	margin: 0;
+	margin-top: 1em;
+	padding: 0.5em;
+	width: 100%;
+	background-color: #282828;
+	overflow: auto;
+}
+
+.table-pagination button
+{
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+	color: #AAAAFF;
+	text-decoration: underline;
+	box-shadow: none;
+	height: auto;
+}
+
+.table-pagination button[disabled=disabled], .table-pagination button:disabled
+{
+	color: #AAA;
+	text-decoration: none;
+	cursor: default;
+}
+
+.table-pagination button:hover
+{
+	text-decoration: none;
+}
+
+.table-pagination .table-stats
+{
+	float: left;
+}
+
+.table-pagination .table-controls
+{
+	float: right;
 }

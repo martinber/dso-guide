@@ -272,10 +272,23 @@ function main(ctx) {
 
         catalog_delete_row_all();
 
-        for (let dso of ctx.manager.get_catalog_view()) {
-            ui_catalog_table_insert(ctx, dso);
-        }
+        let results = ctx.manager.get_catalog_view();
 
+        if (results.length != 0) {
+            for (let dso of ctx.manager.get_catalog_view()) {
+                ui_catalog_table_insert(ctx, dso);
+            }
+        } else {
+            $("#catalog-table tbody").append(
+                $("<tr>").append(
+                    $("<td>", {
+                        colspan: "99",
+                        text: `Your search gave no results, check your filter \
+                               settings too`
+                    })
+                )
+            );
+        }
     });
 
     // Reloading the page logs out
@@ -329,6 +342,16 @@ function main(ctx) {
     });
 
     watchlist_create_header($("#watchlist-table thead tr"));
+
+    $("#watchlist-table tbody").append(
+        $("<tr>").append(
+            $("<td>", {
+                colspan: "99",
+                text: `Nothing here, add some objects from the catalog below \
+                       or check your filters above.`
+            })
+        )
+    );
 
     // Create catalog table
 
