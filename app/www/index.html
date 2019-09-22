@@ -68,7 +68,7 @@
 					</form>
 					<a id="register-link" href="/register.html">Register</a>
 					<span id="login-welcome">Welcome!</span>
-                    <button id="login-logout">Logout</button>
+					<button id="login-logout">Logout</button>
 				</div>
 			</div>
 		</header>
@@ -136,51 +136,56 @@
 
 						<h2 id="watchlist">Watchlist</h2>
 
-						<button class="filter-toggle" id="watchlist-filter-toggle">
-							Advanced
-						</button>
+						<div class="table-advanced" id="watchlist-advanced">
 
-						<div class="filter-collapse" id="watchlist-filter-collapse">
-							<form class="filter-form" id="watchlist-filter" action="">
+							<button class="toggle">
+								Advanced
+							</button>
+
+							<form class="collapse table-form" id="watchlist-advanced-form" action="">
+
 								<fieldset>
 									<legend>Visible columns</legend>
 
 									<div>
-										<input type="checkbox" id="watchlist-filter-mag"
+										<input type="checkbox" id="watchlist-visible-col-mag"
 												name="mag" checked \>
-										<label for="watchlist-filter-mag">Magnitude</label>
+										<label for="watchlist-visible-col-mag">Magnitude</label>
 									</div>
 
 									<div>
-										<input type="checkbox" id="watchlist-filter-ra-dec"
+										<input type="checkbox" id="watchlist-visible-col-ra-dec"
 												name="ra-dec" checked \>
-										<label for="watchlist-filter-ra-dec">RA/DEC</label>
+										<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
 									</div>
 
 									<div>
-										<input type="checkbox" id="watchlist-filter-alt-az"
+										<input type="checkbox" id="watchlist-visible-col-alt-az"
 												name="alt-az" checked \>
-										<label for="watchlist-filter-alt-az">ALT/AZ</label>
+										<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
 									</div>
 
 									<div>
-										<input type="checkbox" id="watchlist-notes"
+										<input type="checkbox" id="watchlist-visible-col-notes"
 												name="notes" checked \>
-										<label for="watchlist-filter-notes">Notes</label>
+										<label for="watchlist-visible-col-notes">Notes</label>
 									</div>
 
 								</fieldset>
 
-								<div class="filter-form-search-div">
-									<label for="watchlist-filter-search">Filter by name:</label>
-									<input type="search" id="watchlist-filter-search"
-											name="search" \>
-								</div>
-
-								<button class="filter-submit">Apply</button>
+								<button class="submit">Apply</button>
 
 							</form>
 						</div>
+
+						<form class="table-form" id="watchlist-filter-form">
+							<div>
+								<label for="watchlist-search">Filter by name:</label>
+								<input type="search" id="watchlist-search"
+										name="search" \>
+							</div>
+							<button class="submit">Apply</button>
+						</form>
 
 						<div class="table-pagination" id="watchlist-pagination">
 							<span class="table-stats">Showing objects
@@ -207,55 +212,60 @@
 
 						<h2 id="catalog">Catalog</h2>
 
-						<button class="filter-toggle" id="catalog-filter-toggle">
-							Advanced
-						</button>
+						<div class="table-advanced" id="catalog-advanced">
 
-						<div class="filter-collapse" id="catalog-filter-collapse">
-							<form class="filter-form" id="catalog-filter" action="">
+							<button class="toggle">
+								Advanced
+							</button>
+
+							<form class="collapse table-form" id="catalog-advanced-form" action="">
+
 								<fieldset>
 									<legend>Visible columns</legend>
 
 									<div>
-										<input type="checkbox" id="catalog-filter-mag"
+										<input type="checkbox" id="watchlist-visible-col-mag"
 												name="mag" checked \>
-										<label for="catalog-filter-mag">Magnitude</label>
+										<label for="watchlist-visible-col-mag">Magnitude</label>
 									</div>
 
 									<div>
-										<input type="checkbox" id="catalog-filter-ra-dec"
+										<input type="checkbox" id="watchlist-visible-col-ra-dec"
 												name="ra-dec" checked \>
-										<label for="catalog-filter-ra-dec">RA/DEC</label>
+										<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
 									</div>
 
 									<div>
-										<input type="checkbox" id="catalog-filter-alt-az"
+										<input type="checkbox" id="watchlist-visible-col-alt-az"
 												name="alt-az" checked \>
-										<label for="catalog-filter-alt-az">ALT/AZ</label>
+										<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
 									</div>
 
 									<div>
-										<input type="checkbox" id="catalog-filter-appears-on"
-												name="appears-on" checked \>
-										<label for="catalog-filter-appears-on">Appears on</label>
+										<input type="checkbox" id="watchlist-visible-col-notes"
+												name="notes" checked \>
+										<label for="watchlist-visible-col-notes">Notes</label>
 									</div>
 
 								</fieldset>
 
-								<fieldset id="catalog-filter-appears-on-fieldset">
-									<legend>Enabled catalogs</legend>
-								</fieldset>
-
-								<div class="filter-form-search-div">
-									<label for="catalog-filter-search">Filter by name:</label>
-									<input type="search" id="catalog-filter-search"
-											name="search" \>
-								</div>
-
-								<button class="filter-submit">Apply</button>
+								<button class="submit">Apply</button>
 
 							</form>
 						</div>
+
+						<form class="table-form" id="catalog-filter-form">
+							<fieldset id="catalog-select-fieldset">
+								<legend>Enabled catalogs</legend>
+							</fieldset>
+
+							<div>
+								<label for="catalog-search">Filter by name:</label>
+								<input type="search" id="catalog-search"
+										name="search" \>
+							</div>
+							<button class="submit">Apply</button>
+						</form>
 
 						<div class="table-pagination" id="catalog-pagination">
 							<span class="table-stats">Showing objects

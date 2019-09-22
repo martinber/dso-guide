@@ -420,7 +420,7 @@ main .inner {
 
 /* FILTER --------------------------------------------------------------*/
 
-.filter-toggle
+.table-advanced .toggle
 {
 	margin: 0;
 	position: relative;
@@ -431,7 +431,7 @@ main .inner {
 }
 
 /* Used to add a icon to the button */
-.filter-toggle:before
+.table-advanced .toggle:before
 {
 	position: absolute;
 	left: 0em;
@@ -450,21 +450,21 @@ main .inner {
 	background-size: contain;
 }
 
-.filter-collapse
+.table-advanced .collapse
 {
+	margin-top: 0 !important;
 	display: none;
 	visibility: hidden;
 	overflow: hidden;
-	background-color: #333333;
 }
 
-.filter-form
+.table-form
 {
-	margin: 0.7em;
-	overflow: auto; /* Otherwise the .filter-submit float escapes the container */
+	padding: 0.5em;
+	margin: 1em 0;
 }
 
-.filter-form fieldset div
+fieldset div
 {
 	display: inline-block;
 	margin: 0 0.7em;
@@ -477,41 +477,37 @@ fieldset
 
 fieldset p {
 	margin-top: 0;
-
 }
 
 legend {
 	padding: 0.2em 0.5em;
 }
 
-.filter-form-search-div
+.table-form
 {
-	margin-top: 1em;
+	background-color: #333333;
+}
+
+.table-search-form
+{
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 }
 
-.filter-form-search-div label
+.table-search-form label
 {
 	flex-grow: 0;
 	flex-shrink: 0;
 	margin: 0.2em 0.4em;
 }
 
-.filter-form-search-div input[type="search"]
+.table-search-form input[type="search"]
 {
 	flex-grow: 1;
 	flex-shrink: 1;
 	max-width: 30em;
 	min-width: 3em;
-}
-
-.filter-submit
-{
-	float: right;
-	margin: 0;
-	margin-top: 0.7em;
 }
 
 /* TABLE -------------------------------------------------------------- */
