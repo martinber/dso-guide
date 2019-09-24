@@ -64,6 +64,7 @@ export function Dso(dsos_data, id, appears_on) {
     this.appears_on = appears_on;
 
     this._catalog_tr = null; // Reference to JQuery table row
+    this.on_watchlist = false;
 
     // Get dimensions
     {
@@ -142,6 +143,7 @@ export function DsoManager(dsos_data, catalogs_data) {
 
     this._catalog = [];
     this._watchlist = [];
+    this._change_callback = () => {};
 
     // Catalog sorting and filtering function being used on Dsos
     // For now they do nothing
@@ -194,7 +196,10 @@ export function DsoManager(dsos_data, catalogs_data) {
         if (style == null) { style = 0 }
 
         let watch_dso = new WatchDso(this._catalog[id], notes, style);
+        this._catalog[id].on_watchlist = true;
         this._watchlist.push(watch_dso);
+
+        this._change_callback(watch_dso, true);
 
         return watch_dso;
     }
@@ -207,6 +212,9 @@ export function DsoManager(dsos_data, catalogs_data) {
         let index = this._watchlist.findIndex(e => watch_dso.dso.id == e.dso.id);
         if (index > -1) {
             this._watchlist.splice(index, 1);
+            watch_dso.dso.on_watchlist = false;
+            this._change_callback(watch_dso, false);
+
             return;
         } else {
             console.error("Tried to remove unexistent id:", watch_dso.dso.id);
@@ -260,6 +268,19 @@ export function DsoManager(dsos_data, catalogs_data) {
         return this._watchlist
             .filter(this._watchlist_filter)
             .sort(watch_dso => this._watchlist_sort(watch_dso.dso));
+    }
+
+    /**
+     * Set a function to call when a dso is added or removed from the watchlist.
+     *
+     * Used by the TableManager to get notified and disable the add button
+     * accordingly.
+     *
+     * Gives as argument the WatchDso that was added or removed and a boolean
+     * that is true when added and false when removed
+     */
+    this.set_watchlist_change_callback = function(f) {
+        this._change_callback = f;
     }
 }
 

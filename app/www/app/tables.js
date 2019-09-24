@@ -33,6 +33,7 @@ export function TableManager(
 ) {
 
     this._dso_manager = dso_manager;
+    this._dso_manager.set_watchlist_change_callback(watchlist_change_callback);
 
     // Table filters toggle
 
@@ -56,13 +57,12 @@ export function TableManager(
 
     // Watchlist filters
 
-    /*
-    $("#watchlist-filter").submit(e => {
+    $("#watchlist-filter-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
-        ui_watchlist_filter(ctx);
+        // TODO
+        // catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
     });
-    */
 
     // Catalog filters
 
@@ -108,14 +108,6 @@ export function TableManager(
             )
         );
     }
-
-    $("#watchlist-filter-form").submit(e => {
-        e.preventDefault(); // Disable built-in HTML action
-
-        // TODO
-        // catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
-    });
-
 
     $("#catalog-filter-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
@@ -193,6 +185,13 @@ export function TableManager(
     }
 }
 
+function watchlist_change_callback(watch_dso, added) {
+    let tr = watch_dso.dso.get_catalog_tr();
+    if (tr != null) {
+        tr.find(".objects-add").prop("disabled", added);
+    }
+}
+
 function watchlist_update(
     watchlist_view,
     delete_callback,
@@ -255,8 +254,6 @@ function catalog_filter_and_update(dso_manager, add_callback, goto_callback) {
     let filtering_catalogs = selected_catalogs.length > 0 && !selected_catalogs.includes("Unlisted");
     let filtering_search = search_string.length > 0
 
-    console.log(filtering_catalogs, filtering_search, selected_catalogs, search_string);
-
     dso_manager.catalog_set_filter(dso => {
         if (filtering_catalogs) {
             if (!selected_catalogs.some(
@@ -288,7 +285,8 @@ function catalog_update(catalog_view, add_callback, goto_callback) {
     for (let i = start; i < end; i++) {
         let dso = catalog_view[i];
 
-        let tr = catalog_create_row(dso, add_callback, goto_callback);
+        let added = dso.on_watchlist;
+        let tr = catalog_create_row(dso, added, add_callback, goto_callback);
 
         dso.set_catalog_tr(tr);
         tbody.append(tr);
@@ -614,6 +612,8 @@ function watchlist_create_row(
  *
  * Args:
  * - dso: Dso object
+ * - added: Whether the object is already on the watchlist, in that case the add
+ *   button is disabled
  * - add_callback(dso): Called when user clicks the add button, gives dso as
  *   argument
  * - goto_callback(dso): Called when user clicks the goto button, gives dso as
@@ -621,6 +621,7 @@ function watchlist_create_row(
  */
 function catalog_create_row(
     dso,
+    added,
     add_callback,
     goto_callback,
 ) {
@@ -657,15 +658,14 @@ function catalog_create_row(
                 }).append(
                     $("<button>", {
                         text: `Add`,
-                        click: () => {
-                            add_callback(dso);
-                        }
+                        disabled: added,
+                        class: "objects-add",
+                        click: () => add_callback(dso)
                     }),
                     $("<button>", {
                         text: "GoTo",
-                        click: () => {
-                            goto_callback(dso);
-                        },
+                        class: "objects-goto",
+                        click: () => goto_callback(dso)
                     })
                 ));
                 break;

@@ -35,8 +35,6 @@ star chart
 
 ## TODO
 
-- Disable "add" buttons of objects already on the watchlist.
-
 - Rebuild database, rename `star_id` to `dso_id` or `obj_id`
 
 - Flask logging, remove the debug setting
@@ -44,7 +42,7 @@ star chart
 - Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
   `hostmaster`, `root`, `info`.
 
-- Add explanation of lat/lon format, improve location and datetime forms CSS
+- Add explanation of lat/lon format
 
 - Bigger logo
 
