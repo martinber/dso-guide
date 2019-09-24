@@ -63,7 +63,7 @@
 							<input id="login-password" name="password" type="password" required />
 						</div>
 						<div>
-							<button id="login-submit">Login</button>
+							<input id="login-submit" type="submit" value="Login"></input>
 						</div>
 					</form>
 					<a id="register-link" href="/register.html">Register</a>
@@ -104,7 +104,7 @@
 								<input id="location-long" name="long" step="0.00000001"
 										type="number" min="-180" max="180" value="0.0" required />
 							</div>
-							<button id="location-submit">Update</button>
+							<input id="location-submit" type="submit" value="Update"></input>
 						</form>
 
 						<form class="observation-form" id="datetime-form" action="">
@@ -116,7 +116,7 @@
 								<label for="datetime-time">Time:</label>
 								<input id="datetime-time" name="time" type="time" required />
 							</div>
-							<button id="datetime-submit">Update</button>
+							<input id="datetime-submit" type="submit" value="Update"></input>
 						</form>
 
 					</section>
@@ -173,7 +173,7 @@
 
 								</fieldset>
 
-								<button class="submit">Apply</button>
+								<input type="submit" value="Apply"></input>
 
 							</form>
 						</div>
@@ -182,9 +182,9 @@
 							<div>
 								<label for="watchlist-search">Filter by name:</label>
 								<input type="search" id="watchlist-search"
-										name="search" \>
+										name="search" autocomplete="off" \>
 							</div>
-							<button class="submit">Apply</button>
+							<input type="submit" value="Apply"></input>
 						</form>
 
 						<div class="table-pagination" id="watchlist-pagination">
@@ -249,7 +249,7 @@
 
 								</fieldset>
 
-								<button class="submit">Apply</button>
+								<input type="submit" value="Apply"></input>
 
 							</form>
 						</div>
@@ -262,9 +262,9 @@
 							<div>
 								<label for="catalog-search">Filter by name:</label>
 								<input type="search" id="catalog-search"
-										name="search" \>
+										name="search" autocomplete="off" \>
 							</div>
-							<button class="submit">Apply</button>
+							<input type="submit" value="Apply"></input>
 						</form>
 
 						<div class="table-pagination" id="catalog-pagination">

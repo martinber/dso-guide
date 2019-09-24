@@ -109,6 +109,14 @@ export function TableManager(
         );
     }
 
+    $("#watchlist-filter-form").submit(e => {
+        e.preventDefault(); // Disable built-in HTML action
+
+        // TODO
+        // catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
+    });
+
+
     $("#catalog-filter-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 

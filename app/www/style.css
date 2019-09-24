@@ -51,7 +51,7 @@ textarea:focus, input[type="text"]:focus, input[type="date"]:focus,
 	background-color: #555555;
 }
 
-button
+button, input[type="submit"]
 {
 	border: none;
 	background-color: #333;
@@ -65,13 +65,13 @@ button
 	cursor: pointer;
 }
 
-button:active
+button:active, input[type="submit"]:active
 {
 	box-shadow: none;
 	background-color: #555555;
 }
 
-button[disabled=disabled], button:disabled
+button[disabled=disabled], button:disabled, input[type="submit"]:disabled
 {
 	background-color: #555555;
 	color: #999999;
@@ -161,7 +161,7 @@ header #user-controls
 	margin: 0.2em;
 }
 
-#login-form div input
+#login-form div input[type="text"], #login-form div input[type="password"]
 {
 	width: 8em;
 	display: block;
@@ -483,7 +483,7 @@ legend {
 	padding: 0.2em 0.5em;
 }
 
-.table-form button {
+.table-form input[type="submit"] {
 	margin-top: 0.7em;
 }
 
