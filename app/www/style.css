@@ -601,7 +601,7 @@ legend {
 {
 	width: 100%;
 	resize: vertical;
-	min-height: 2em;
+	min-height: 2.5em;
 	background-color: transparent;
 	border: 1px solid #555555;
 }
