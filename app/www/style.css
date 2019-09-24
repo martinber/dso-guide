@@ -265,6 +265,7 @@ body
 }
 
 /* CHANGE PASSWORD ---------------------------------------------------- */
+
 #password-controls {
 	margin: 1em auto;
 }
@@ -309,6 +310,7 @@ main .inner {
 {
 	padding: 1em;
 	flex-grow: 2;
+	width: 100%;
 	max-width: 70em;
 }
 
@@ -460,8 +462,9 @@ main .inner {
 
 .table-form
 {
-	padding: 0.5em;
+	padding: 0.7em;
 	margin: 1em 0;
+	background-color: #333333;
 }
 
 fieldset div
@@ -473,39 +476,20 @@ fieldset div
 fieldset
 {
 	border: 1px solid #555555;
-}
-
-fieldset p {
-	margin-top: 0;
+	margin-bottom: 0.7em;
 }
 
 legend {
 	padding: 0.2em 0.5em;
 }
 
-.table-form
-{
-	background-color: #333333;
+.table-form button {
+	margin-top: 0.7em;
 }
 
-.table-search-form
+.table-form input[type="search"]
 {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-}
-
-.table-search-form label
-{
-	flex-grow: 0;
-	flex-shrink: 0;
-	margin: 0.2em 0.4em;
-}
-
-.table-search-form input[type="search"]
-{
-	flex-grow: 1;
-	flex-shrink: 1;
+	width: 100%;
 	max-width: 30em;
 	min-width: 3em;
 }
@@ -563,6 +547,7 @@ legend {
 .objects-table td
 {
 	padding: 0.4em;
+	white-space: pre-wrap;
 }
 
 .objects-table thead
@@ -629,6 +614,7 @@ legend {
 	padding: 0;
 	margin: 0;
 	list-style: none;
+	white-space: pre-wrap;
 }
 
 .objects-table td.objects-appears-on li {

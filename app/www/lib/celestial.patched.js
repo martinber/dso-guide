@@ -42,7 +42,8 @@ Celestial.display = function(config) {
    
   var margin = [16, 16],
       width = getWidth(),
-      pixelRatio = window.devicePixelRatio || 1,
+      // pixelRatio = window.devicePixelRatio || 1,
+			pixelRatio = 1,
       proj = getProjection(cfg.projection);
   if (cfg.lines.graticule.lat && cfg.lines.graticule.lat.pos[0] === "outline") proj.scale -= 2;
   

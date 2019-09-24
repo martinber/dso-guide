@@ -112,42 +112,7 @@ export function TableManager(
     $("#catalog-filter-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
-        // ctx.manager.catalog_set_sort(sort.name);
-        // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
-        // ctx.manager.catalog_set_filter(dso => dso.mag < 2);
-        let search_string = $("#catalog-search").val();
-
-        let selected_catalogs = [];
-        $("#catalog-select-fieldset input").each(function() {
-            if (this.checked) {
-                selected_catalogs.push(this.name);
-            }
-        });
-
-        // True or false if we are filtering or not
-        let filtering_catalogs = selected_catalogs.length > 0 && !selected_catalogs.includes("Unlisted");
-        let filtering_search = search_string.length > 0
-
-        console.log(filtering_catalogs, filtering_search, selected_catalogs, search_string);
-
-        this._dso_manager.catalog_set_filter(dso => {
-            if (filtering_catalogs) {
-                if (!selected_catalogs.some(
-                        catalog => dso.appears_on.includes(catalog))) {
-                    // The dso does not appear on any of the selected catalogs
-                    return false;
-                }
-            }
-
-            if (filtering_search) {
-                if (!dso.name.includes(search_string)) {
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        catalog_update(this._dso_manager.get_catalog_view(), add_callback, goto_callback);
+        catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
     });
 
     // Initialize tables
@@ -166,11 +131,7 @@ export function TableManager(
 
     catalog_create_header($("#catalog-table thead tr"));
 
-    // ctx.manager.catalog_set_sort(sort.name);
-    // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
-    // ctx.manager.catalog_set_filter(dso => dso.mag < 2);
-
-    catalog_update(this._dso_manager.get_catalog_view(), add_callback, goto_callback);
+    catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
 
     /**
      * Add object to watchlist table
@@ -265,6 +226,47 @@ function watchlist_update(
                 )
             );
             */
+}
+
+
+function catalog_filter_and_update(dso_manager, add_callback, goto_callback) {
+
+    // ctx.manager.catalog_set_sort(sort.name);
+    // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
+    // ctx.manager.catalog_set_filter(dso => dso.mag < 2);
+    let search_string = $("#catalog-search").val();
+
+    let selected_catalogs = [];
+    $("#catalog-select-fieldset input").each(function() {
+        if (this.checked) {
+            selected_catalogs.push(this.name);
+        }
+    });
+
+    // True or false if we are filtering or not
+    let filtering_catalogs = selected_catalogs.length > 0 && !selected_catalogs.includes("Unlisted");
+    let filtering_search = search_string.length > 0
+
+    console.log(filtering_catalogs, filtering_search, selected_catalogs, search_string);
+
+    dso_manager.catalog_set_filter(dso => {
+        if (filtering_catalogs) {
+            if (!selected_catalogs.some(
+                    catalog => dso.appears_on.includes(catalog))) {
+                // The dso does not appear on any of the selected catalogs
+                return false;
+            }
+        }
+
+        if (filtering_search) {
+            if (!dso.name.includes(search_string)) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    catalog_update(dso_manager.get_catalog_view(), add_callback, goto_callback);
 }
 
 function catalog_update(catalog_view, add_callback, goto_callback) {
