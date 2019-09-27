@@ -3,12 +3,16 @@
  */
 
 import { watchlist_columns, catalog_columns, object_styles } from "./const.js";
+import { format_eq, format_hor } from "./dso.js";
 
 let MAX_ROWS = 100;
 
 /**
  * Manages the Watchlist and Catalog tables
  *
+ * - dso_manager: A DsoManager
+ * - date: A Date() to use on ALT/AZ calculations
+ * - location: latitude and longitude to use on ALT/AZ calculations
  * - add_callback(dso): Called when user clicks the add button, gives dso as
  *   argument
  * - delete_callback(watch_dso): Called when user clicks the delete button,
@@ -24,6 +28,8 @@ let MAX_ROWS = 100;
  */
 export function TableManager(
     dso_manager,
+    date,
+    location,
     add_callback,
     delete_callback,
     save_callback,
@@ -34,6 +40,8 @@ export function TableManager(
 
     this._dso_manager = dso_manager;
     this._dso_manager.set_watchlist_change_callback(watchlist_change_callback);
+    this._date = date;
+    this._location = location;
 
     // Table filters toggle
 
@@ -112,7 +120,13 @@ export function TableManager(
     $("#catalog-filter-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
-        catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
+        catalog_filter_and_update(
+            this._dso_manager,
+            this._date,
+            this._location,
+            add_callback,
+            goto_callback
+        )
     });
 
     // Initialize tables
@@ -131,7 +145,13 @@ export function TableManager(
 
     catalog_create_header($("#catalog-table thead tr"));
 
-    catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
+    catalog_filter_and_update(
+        this._dso_manager,
+        this._date,
+        this._location,
+        add_callback,
+        goto_callback
+    )
 
     /**
      * Add object to watchlist table
@@ -150,7 +170,7 @@ export function TableManager(
     }
 
     /**
-     * Update the watchlist table
+     * Update the watchlist table completely from the DsoManager list
      */
     this.watchlist_update = function() {
 
@@ -158,12 +178,52 @@ export function TableManager(
 
         watchlist_update(
             this._dso_manager.get_watchlist_view(),
+            this._date,
+            this._location,
             delete_callback,
             save_callback,
             goto_callback,
             style_change_callback,
             notes_change_callback
         );
+    }
+
+    /**
+     * Update ALT/AZ calculations for the catalog and watchlist
+     *
+     * Give as argument a Date() and [lat, long]. If one of the arguments is
+     * null it will keep the previous value
+     */
+    this.update_datetime_location = function(date, location) {
+        if (date != null) {
+            this._date = date;
+        }
+        if (location != null) {
+            this._location = location;
+        }
+
+        // TODO improve performance
+        // for each in watchlist update
+        watchlist_update(
+            this._dso_manager.get_watchlist_view(),
+            this._date,
+            this._location,
+            delete_callback,
+            save_callback,
+            goto_callback,
+            style_change_callback,
+            notes_change_callback
+        );
+
+        // TODO I'm filtering here, this is wrong
+        // for each in catalog update
+        catalog_filter_and_update(
+            this._dso_manager,
+            this._date,
+            this._location,
+            add_callback,
+            goto_callback
+        )
     }
 
     /**
@@ -194,6 +254,8 @@ function watchlist_change_callback(watch_dso, added) {
 
 function watchlist_update(
     watchlist_view,
+    date,
+    location,
     delete_callback,
     save_callback,
     goto_callback,
@@ -212,6 +274,8 @@ function watchlist_update(
 
         let tr = watchlist_create_row(
             watch_dso,
+            date,
+            location,
             delete_callback,
             save_callback,
             goto_callback,
@@ -236,7 +300,13 @@ function watchlist_update(
 }
 
 
-function catalog_filter_and_update(dso_manager, add_callback, goto_callback) {
+function catalog_filter_and_update(
+    dso_manager,
+    date,
+    location,
+    add_callback,
+    goto_callback
+) {
 
     // ctx.manager.catalog_set_sort(sort.name);
     // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
@@ -271,10 +341,10 @@ function catalog_filter_and_update(dso_manager, add_callback, goto_callback) {
         return true;
     });
 
-    catalog_update(dso_manager.get_catalog_view(), add_callback, goto_callback);
+    catalog_update(dso_manager.get_catalog_view(), date, location, add_callback, goto_callback);
 }
 
-function catalog_update(catalog_view, add_callback, goto_callback) {
+function catalog_update(catalog_view, date, location, add_callback, goto_callback) {
     let page = 1;
     let start = (page - 1) * MAX_ROWS;
     let end = Math.min(page * MAX_ROWS, catalog_view.length);
@@ -286,7 +356,7 @@ function catalog_update(catalog_view, add_callback, goto_callback) {
         let dso = catalog_view[i];
 
         let added = dso.on_watchlist;
-        let tr = catalog_create_row(dso, added, add_callback, goto_callback);
+        let tr = catalog_create_row(dso, date, location, added, add_callback, goto_callback);
 
         dso.set_catalog_tr(tr);
         tbody.append(tr);
@@ -353,7 +423,7 @@ function create_type_cell(type) {
 }
 
 /**
- * Create table cell with object RA and DEC
+ * Create table cell with object RA and DEC as strings
  */
 function create_ra_dec_cell(ra_dec) {
 
@@ -366,7 +436,7 @@ function create_ra_dec_cell(ra_dec) {
                 text: "RA:",
             }),
             $("<span>", {
-                text: String(ra_dec[0]),
+                text: ra_dec[0],
             })
         ),
         $("<span>").append(
@@ -375,14 +445,14 @@ function create_ra_dec_cell(ra_dec) {
                 text: "DEC:",
             }),
             $("<span>", {
-                text: String(ra_dec[1]),
+                text: ra_dec[1],
             })
         )
     );
 }
 
 /**
- * Create table cell with object ALT and AZ
+ * Create table cell with object ALT and AZ as strings
  */
 function create_alt_az_cell(alt_az) {
 
@@ -395,7 +465,7 @@ function create_alt_az_cell(alt_az) {
                 text: "ALT:",
             }),
             $("<span>", {
-                text: String(alt_az[0]),
+                text: alt_az[0],
             })
         ),
         $("<span>").append(
@@ -404,7 +474,7 @@ function create_alt_az_cell(alt_az) {
                 text: "AZ:",
             }),
             $("<span>", {
-                text: String(alt_az[1]),
+                text: alt_az[1],
             })
         )
     );
@@ -525,6 +595,8 @@ function catalog_create_header(tr) {
  *
  * Args:
  * - watch_dso: WatchDso object
+ * - date: A Date() to use on ALT/AZ calculations
+ * - location: latitude and longitude to use on ALT/AZ calculations
  * - delete_callback(watch_dso): Called when user clicks the delete button,
  *   gives watch_dso as argument
  * - save_callback(watch_dso): Called when user clicks the save button, gives
@@ -538,6 +610,8 @@ function catalog_create_header(tr) {
  */
 function watchlist_create_row(
     watch_dso,
+    date,
+    location,
     delete_callback,
     save_callback,
     goto_callback,
@@ -564,11 +638,12 @@ function watchlist_create_row(
                 break;
 
             case "ra-dec":
-                tr.append(create_ra_dec_cell(watch_dso.dso.coords));
+                tr.append(create_ra_dec_cell(format_eq(watch_dso.dso.coords)));
                 break;
 
             case "alt-az":
-                tr.append(create_alt_az_cell([0, 0]));
+                let alt_az = format_hor(watch_dso.dso.get_alt_az(date, location));
+                tr.append(create_alt_az_cell(alt_az));
                 break;
 
             case "notes":
@@ -612,6 +687,8 @@ function watchlist_create_row(
  *
  * Args:
  * - dso: Dso object
+ * - date: A Date() to use on ALT/AZ calculations
+ * - location: latitude and longitude to use on ALT/AZ calculations
  * - added: Whether the object is already on the watchlist, in that case the add
  *   button is disabled
  * - add_callback(dso): Called when user clicks the add button, gives dso as
@@ -621,6 +698,8 @@ function watchlist_create_row(
  */
 function catalog_create_row(
     dso,
+    date,
+    location,
     added,
     add_callback,
     goto_callback,
@@ -645,11 +724,12 @@ function catalog_create_row(
                 break;
 
             case "ra-dec":
-                tr.append(create_ra_dec_cell(dso.coords));
+                tr.append(create_ra_dec_cell(format_eq(dso.coords)));
                 break;
 
             case "alt-az":
-                tr.append(create_alt_az_cell([0, 0]));
+                let alt_az = format_hor(dso.get_alt_az(date, location));
+                tr.append(create_alt_az_cell(alt_az));
                 break;
 
             case "controls":

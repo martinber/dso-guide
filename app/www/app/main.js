@@ -12,6 +12,7 @@ import { object_styles } from "./const.js";
 import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
 import { aladin_catalogs_init, ui_markers_update } from "./sky.js";
+import { eq_to_geo } from "./dso.js";
 
 $(document).ready(() => {
 
@@ -49,6 +50,8 @@ $(document).ready(() => {
         ctx.manager = new DsoManager(dsos_data, catalogs_data);
         ctx.table_manager = new TableManager(
             ctx.manager,
+            new Date(),
+            [0, 0], // location
             dso => server_watchlist_add(ctx, dso.id),
             watch_dso => server_watchlist_delete(ctx, watch_dso),
             watch_dso => server_watchlist_save(ctx, watch_dso),
@@ -126,6 +129,7 @@ function main(ctx) {
         let [hour, min] = $("#datetime-time").val().split(":");
         let date = new Date(year, month - 1, day, hour, min);
         ui_celestial_datetime_update(date);
+        ctx.table_manager.update_datetime_location(date, null);
     });
 
     // Location form
@@ -161,6 +165,7 @@ function main(ctx) {
         }
 
         ui_celestial_location_update(data.lat, data.lon);
+        ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
     });
 
     // Login buttons
@@ -229,9 +234,10 @@ function logged_in(ctx) {
  */
 function ui_aladin_goto(ctx, dso) {
 
+    let geo_coords = eq_to_geo(dso.coords)
     ctx.aladin.gotoRaDec(
-        dso.coords[0],
-        dso.coords[1],
+        geo_coords[0],
+        geo_coords[1],
     );
 
     // Set FOV to the biggest of width,height of object, convert dimensions from

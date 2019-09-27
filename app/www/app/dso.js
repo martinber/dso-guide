@@ -57,7 +57,10 @@ export function Dso(dsos_data, id, appears_on) {
     this._data_id = dsos_data.features[id].id;
 
     this.name = dsos_data.features[id].properties.name;
-    this.coords = dsos_data.features[id].geometry.coordinates;
+
+    // Equatorial coordinates
+    this.coords = geo_to_eq(dsos_data.features[id].geometry.coordinates);
+
     this.type = new Type(dsos_data.features[id].properties.type);
     this.mag = dsos_data.features[id].properties.mag;
 
@@ -90,7 +93,6 @@ export function Dso(dsos_data, id, appears_on) {
      * Set reference to the JQuery tr where this object is being shown
      */
     this.set_catalog_tr = function(tr) {
-
         this._catalog_tr = tr;
     }
 
@@ -100,8 +102,20 @@ export function Dso(dsos_data, id, appears_on) {
      * Can return null
      */
     this.get_catalog_tr = function() {
-
         return this._catalog_tr;
+    }
+
+    /**
+     * Calculate altitude and azimut on a given date and location
+     *
+     * Returns on horizontal coordinate system
+     * - Altitude: -90 to 90
+     * - Azimuth: 0 to 360
+     *
+     * Give as argument a Date() and [lat, long]
+     */
+    this.get_alt_az = function(date, location) {
+        return Celestial.horizontal(date, eq_to_geo(this.coords), location);
     }
 }
 
@@ -284,3 +298,112 @@ export function DsoManager(dsos_data, catalogs_data) {
     }
 }
 
+/**
+ * Convert equatorial to geographic coordinates for RA/DEC.
+ *
+ * Actually the coordinates are not geographical, they are stored that way by
+ * celestial so d3 thinks it's drawing the earth instead of the sky.
+ *
+ * Equatorial:
+ * - Right ascension: 0 to 24
+ * - Declination: -90 to 90
+ *
+ * Geographic:
+ * - Right ascension: -180 to 180
+ * - Declination: -90 to 90
+ */
+export function eq_to_geo(ra_dec) {
+    if (ra_dec[0] > 12) {
+        return [(ra_dec[0] - 24) * 15, ra_dec[1]];
+    } else {
+        return [ra_dec[0] * 15, ra_dec[1]];
+    }
+}
+
+/**
+ * Convert geographic to equatorial coordinates for RA/DEC.
+ *
+ * Actually the coordinates are not geographical, they are stored that way by
+ * celestial so d3 thinks it's drawing the earth instead of the sky.
+ *
+ * Equatorial:
+ * - Right ascension: 0 to 24
+ * - Declination: -90 to 90
+ *
+ * Geographic coordinate system:
+ * - Right ascension: -180 to 180
+ * - Declination: -90 to 90
+ */
+export function geo_to_eq(ra_dec) {
+    if (ra_dec[0] < 0) {
+        return [ra_dec[0] / 15 + 24, ra_dec[1]];
+    } else {
+        return [ra_dec[0] / 15, ra_dec[1]];
+    }
+}
+
+/**
+ * Return equatorial coordinates as an array of strings.
+ *
+ * Equatorial coordinate system:
+ * - Right ascension: 0 to 24
+ * - Declination: -90 to 90
+ */
+export function format_eq(ra_dec) {
+    let ra = deg_to_hms(ra_dec[0])
+    let dec = deg_to_hms(ra_dec[1])
+
+    return [`${ra[0]}h${ra[1]}'${ra[2]}"`, `${dec[0]}°${dec[1]}'${dec[2]}"`];
+}
+
+/**
+ * Return horizontal coordinates as an array of strings.
+ *
+ * Ignore minutes and seconds because a little difference in time changes them
+ * anyway.
+ *
+ * Horizontal coordinate system:
+ * - Altitude: -90 to 90
+ * - Azimuth: 0 to 360
+ */
+export function format_hor(alt_az) {
+    let alt = deg_to_hms(alt_az[0])
+    let az = deg_to_hms(alt_az[1])
+
+
+    let cardinal = "";
+    {
+        // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words/25867068#25867068
+        var val = Math.floor((az[0] / 22.5) + 0.5);
+        var points = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+        cardinal = points[(val % 16)];
+    }
+
+    return [`${alt[0]}°`, `${az[0]}°/${cardinal}`];
+}
+
+/**
+ * Convert from degrees to hours, minutes, seconds.
+ *
+ * Supports negative angles, no decimal places on seconds.
+ */
+function deg_to_hms(deg) {
+
+    let total_s = deg * 3600; // Total amount of seconds
+
+    let negative = false;
+    if (deg < 0) {
+        negative = true;
+        total_s = total_s * -1;
+    }
+
+    let hs = Math.floor(total_s / 3600);
+    let min = Math.floor((total_s - hs * 3600) / 60);
+    let s = Math.round(total_s - (hs * 3600) - (min * 60));
+
+    if (negative) {
+        return [-hs, min, s];
+    } else {
+        return [hs, min, s];
+    }
+}

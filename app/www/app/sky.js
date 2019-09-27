@@ -4,6 +4,7 @@
 
 import { object_styles } from "./const.js";
 import { celestial_config } from "./config.js";
+import { eq_to_geo } from "./dso.js";
 
 /**
  * Create an Aladin catalog for each style available for watchlist objects.
@@ -79,7 +80,7 @@ export function ui_markers_update(ctx) {
             },
             "geometry":{
                 "type": "Point",
-                "coordinates": watch_dso.dso.coords,
+                "coordinates": eq_to_geo(watch_dso.dso.coords),
             }
         });
     }
