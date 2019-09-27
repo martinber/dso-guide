@@ -104,6 +104,8 @@ function main(ctx) {
     $("#datetime-date").val(`${year}-${month}-${day}`);
     $("#datetime-time").val(`${hour}:${min}`);
 
+    ui_celestial_datetime_update(now);
+
     // Status bar
 
     $("#info-toggle").click(e => {
@@ -122,7 +124,7 @@ function main(ctx) {
         e.preventDefault(); // Disable built-in HTML action
         let [year, month, day] = $("#datetime-date").val().split("-");
         let [hour, min] = $("#datetime-time").val().split(":");
-        let date = new Date(year, month, day, hour, min);
+        let date = new Date(year, month - 1, day, hour, min);
         ui_celestial_datetime_update(date);
     });
 
@@ -245,16 +247,14 @@ function ui_aladin_goto(ctx, dso) {
  * Set the observing time for the Celestial map
  */
 function ui_celestial_datetime_update(datetime) {
-    Celestial.date(datetime);
-    Celestial._go();
+    Celestial.skyview({date: datetime});
 }
 
 /**
  * Set the observing location for the Celestial map
  */
 function ui_celestial_location_update(lat, long) {
-    Celestial._location(lat, long);
-    Celestial._go();
+    Celestial.skyview({location: [lat, long]});
 }
 
 /**

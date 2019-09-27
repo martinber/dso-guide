@@ -1,7 +1,7 @@
-// Copyright 2015 Olaf Frohn https://github.com/ofrohn, see LICENSE
+// Copyright 2015-2019 Olaf Frohn https://github.com/ofrohn, see LICENSE
 !(function() {
 var Celestial = {
-  version: '0.6.13',
+  version: '0.6.15',
   container: null,
   data: []
 };
@@ -98,11 +98,13 @@ Celestial.display = function(config) {
     d3.select(par).append("input").attr("type", "button").attr("id", "celestial-zoomout").attr("value", "\u2212").on("click", function () { zoomBy(0.8); return false; });
   }
   
+  circle = d3.geo.circle().angle([90]);  
+  container.append("path").datum(circle).attr("class", "horizon");
+  if ($("loc") === null) geo(cfg);
+  else if (cfg.location === true && cfg.follow === "zenith") rotate({center: Celestial.zenith()});
+
   if (cfg.location === true) {
-    circle = d3.geo.circle().angle([90]);  
-    container.append("path").datum(circle).attr("class", "horizon");
-    if ($("loc") === null) geo(cfg);
-    else if (cfg.follow === "zenith") rotate({center: Celestial.zenith()});
+    d3.select("#location").style("display", "inline-block");
     fldEnable("horizon-show", proj.clip);
   }
   
@@ -441,7 +443,8 @@ Celestial.display = function(config) {
     if (cfg.mw.show) { 
       container.selectAll(".mw").each(function(d) { setStyle(cfg.mw.style); map(d); context.fill(); });
       // paint mw-outside in background color
-      container.selectAll(".mwbg").each(function(d) { setStyle(cfg.background); map(d); context.fill(); });
+      if (cfg.transform !== "supergalactic")
+        container.selectAll(".mwbg").each(function(d) { setStyle(cfg.background); map(d); context.fill(); });
     }
     
     for (var key in cfg.lines) {
@@ -793,7 +796,7 @@ Celestial.display = function(config) {
   this.mapProjection = prjMap;
   this.context = context;
   this.metrics = function() {
-    return {"width": width, "height": height};
+    return {"width": width, "height": height, "margin": margin};
   };
   this.setStyle = setStyle;
   this.setTextStyle = setTextStyle;
@@ -855,7 +858,6 @@ if (typeof module === "object" && module.exports) {
     "d3.geo.projection": function() { return d3_geo_projection; }
   };
 }
-
 //Flipped projection generated on the fly
 Celestial.projection = function(projection) {
   var p, raw, forward;
@@ -931,7 +933,6 @@ var poles = {
 
 Celestial.eulerAngles = function () { return eulerAngles; };
 Celestial.poles = function () { return poles; };
-
 
 var τ = Math.PI*2,
     halfπ = Math.PI/2,
@@ -1015,7 +1016,6 @@ var euler = {
 euler.init();
 Celestial.euler = function () { return euler; };
 
-
 var horizontal = function(dt, pos, loc) {
   //dt: datetime, pos: celestial coordinates [lat,lng], loc: location [lat,lng]  
   var ha = getMST(dt, loc[1]) - pos[0];
@@ -1089,7 +1089,6 @@ function getMST(dt, lng)
 }
 
 Celestial.horizontal = horizontal;
-
 //Add more JSON data to the map
 
 Celestial.add = function(dat) {
@@ -1118,7 +1117,6 @@ Celestial.remove = function(i) {
 Celestial.clear = function() {
   Celestial.data = [];
 };
-
 
 //load data and transform coordinates
 
@@ -1303,7 +1301,6 @@ function transMultiLine(c, leo) {
 
 Celestial.getData = getData;
 Celestial.getPoint = getPoint;
-
 //Defaults
 var settings = { 
   width: 0,     // Default width; height is determined by projection
@@ -1346,7 +1343,7 @@ var settings = {
   dsos: {
     show: true,    // Show Deep Space Objects 
     limit: 6,      // Show only DSOs brighter than limit magnitude
-    colors: true,  // Show DSOs in symbol colors, if not use fill-style
+    colors: true,  // Show DSOs in symbol colors if true, use style setting below if false
     style: { fill: "#cccccc", stroke: "#cccccc", width: 2, opacity: 1 }, // Default style for dsos
     names: true,   // Show DSO names
     desig: true,   // Show short DSO names
@@ -1412,7 +1409,7 @@ var settings = {
   }, 
   horizon: {  //Show horizon marker, if geo-position and date-time is set
     show: false, 
-    stroke: "#000099", // Line
+    stroke: "#cccccc", // Line
     width: 1.0, 
     fill: "#000000", // Area below horizon
     opacity: 0.5
@@ -1558,7 +1555,6 @@ var projections = {
 };
 
 Celestial.projections = function () { return projections; };
-
 
 
 var Canvas = {}; 
@@ -1816,7 +1812,6 @@ canvas.text = function () {
   
 
 */
-
 function $(id) { return document.getElementById(id); }
 function px(n) { return n + "px"; } 
 function Round(x, dg) { return(Math.round(Math.pow(10,dg)*x)/Math.pow(10,dg)); }
@@ -1830,6 +1825,7 @@ function isNumber(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
 function isArray(o) { return Object.prototype.toString.call(o) === "[object Array]"; }
 function isObject(o) { var type = typeof o;  return type === 'function' || type === 'object' && !!o; }
 function isFunction(o) { return typeof o == 'function' || false; }
+function isValidDate(d) { return d instanceof Date && !isNaN(d); }
 
 function findPos(o) {
   var l = 0, t = 0;
@@ -1921,7 +1917,6 @@ var Trig = {
     return Math.acos(Math.sin(p1[1])*Math.sin(p2[1]) + Math.cos(p1[1])*Math.cos(p2[1])*Math.cos(p1[0]-p2[0]));
   }
 };
-
 
 
 //display settings form in div with id "celestial-form"
@@ -2139,7 +2134,7 @@ function form(cfg) {
         cx = setUnit(trans, config.transform); 
     if (cx !== null) config.center[0] = cx; 
     config.transform = trans;
-    Celestial.reload({transform:trans});
+    Celestial.reload(config);
   }  
   
   function reproject() {
@@ -2403,7 +2398,6 @@ function setLimits() {
 }
 
 
-
 function geo(cfg) {
   var frm = d3.select("#celestial-form").append("div").attr("id", "loc"),
       dtFormat = d3.time.format("%Y-%m-%d %H:%M:%S"),
@@ -2419,7 +2413,7 @@ function geo(cfg) {
   });
   
   if (has(cfg, "geopos") && cfg.geopos !== null && cfg.geopos.length === 2) geopos = cfg.geopos;
-  var col = frm.append("div").attr("class", "col").attr("id", "location");
+  var col = frm.append("div").attr("class", "col").attr("id", "location").style("display", "none");
   //Latitude & longitude fields
   col.append("label").attr("title", "Location coordinates long/lat").attr("for", "lat").html("Location");
   col.append("input").attr("type", "number").attr("id", "lat").attr("title", "Latitude").attr("placeholder", "Latitude").attr("max", "90").attr("min", "-90").attr("step", "0.0001").attr("value", geopos[0]).on("change",  function () {
@@ -2496,6 +2490,15 @@ function geo(cfg) {
     return dtFormat(dt) + tzs;
   }  
   
+
+  function isValidLocation(loc) {
+    //[lat, lon] expected
+    if (!loc || !isArray(loc) || loc.length < 2) return false;
+    if (!isNumber(loc[0]) || loc[0] < -90 || loc[0] > 90)  return false;
+    if (!isNumber(loc[1]) || loc[1] < -180 || loc[1] > 180)  return false;
+    return true;
+  }
+
   function go() {
     var lon = $("lon").value,
         lat = $("lat").value;
@@ -2520,18 +2523,55 @@ function geo(cfg) {
     }
   }
 
+  Celestial._location = function (lat, lon) {
+    $("lat").value = lat;
+    $("lon").value = lon;
+  };
+
+  Celestial._go = function () {
+    go();
+  };
+
   Celestial.getPosition = function (p) {
     
   };
 
   Celestial.date = function (dt) { 
     if (!dt) return date;  
-    if (dtpick.isVisible()) return;
+    if (dtpick.isVisible()) dtpick.hide();
     date.setTime(dt.valueOf());
     $("datetime").value = dateFormat(dt, zone); 
     Celestial.redraw();
   };
   Celestial.position = function () { return geopos; };
+  Celestial.location = function (loc) {
+    if (!loc || loc.length < 2) return geopos;
+    if (isValidLocation(cfg.location)) {
+      geopos = cfg.location.slice();
+      $("lat").value = geopos[0];
+      $("lon").value = geopos[1];
+      go();
+    }
+  };
+  //{"date":dt, "location":loc}
+  Celestial.skyview = function (cfg) {
+    var valid = false;
+    if (dtpick.isVisible()) dtpick.hide();
+    if (isValidDate(cfg.date)) {
+      date.setTime(cfg.date.valueOf());
+      $("datetime").value = dateFormat(cfg.date, zone); 
+      valid = true;
+    }
+    if (isValidLocation(cfg.location)) {
+      geopos = cfg.location.slice();
+      $("lat").value = geopos[0];
+      $("lon").value = geopos[1];
+      valid = true;
+    }
+    if (valid === true) go();
+    else return {"date": date, "location": geopos};
+  };  
+  Celestial.dtLoc = Celestial.skyview;
   Celestial.zenith = function () { return zenith; };
   Celestial.nadir = function () {
     var b = -zenith[1],
@@ -2543,7 +2583,6 @@ function geo(cfg) {
   setTimeout(go, 1000); 
  
 }
-
 ﻿
 var gmdat = {
   "sol": 0.0002959122082855911025,  // AU^3/d^2
@@ -2984,8 +3023,7 @@ var Kepler = function () {
   }
 
   return kepler;  
-};
-﻿
+};﻿
 var Moon = {
   elements: function(dat) {
     var t = (dat.jd - 2451545) / 36525,
@@ -3524,7 +3562,6 @@ var Moon = {
   }
 
 };
-
 var datetimepicker = function(cfg, callback) {
   var date = new Date(), 
       tzFormat = d3.time.format("%Z"),
@@ -3712,7 +3749,7 @@ var datetimepicker = function(cfg, callback) {
   };
   
   this.isVisible = function () {
-    return $("celestial-date").offsetTop !== -9999;
+    return d3.select("#datepick").classed("active") === true;
   };
 
   this.hide = function () {
@@ -3741,8 +3778,7 @@ var datetimepicker = function(cfg, callback) {
     callback(date, tz);
   } 
   
-};
-// Copyright 2014, Jason Davies, http://www.jasondavies.com
+};// Copyright 2014, Jason Davies, http://www.jasondavies.com
 // See LICENSE.txt for details.
 (function() {
 
