@@ -387,7 +387,7 @@ export function format_hor(alt_az) {
  *
  * Supports negative angles, no decimal places on seconds.
  */
-function deg_to_hms(deg) {
+export function deg_to_hms(deg) {
 
     let total_s = deg * 3600; // Total amount of seconds
 

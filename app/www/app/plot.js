@@ -2,7 +2,7 @@
  * Things related to the time vs height plots
  */
 
-import { eq_to_geo } from "./dso.js";
+import { eq_to_geo, deg_to_hms } from "./dso.js";
 
 export function draw_day_plot(canvas, dso) {
     let ctx = canvas.getContext("2d", { alpha: false} );
@@ -109,7 +109,7 @@ export function draw_visibility_plot(canvas, dso) {
             // let alt = Celestial.horizontal(date, ra_dec, lat_lon)[0];
 
 
-            calculate_rise_set(20, ra_dec, date, lat_lon);
+            calculate_rise_set(0, ra_dec, date, lat_lon);
 
         // }
     }
@@ -143,9 +143,8 @@ function alt_to_px(alt, canvas_height) {
 function calculate_rise_set(alt, ra_dec, date, lat_lon) {
 
     // TODO
-    date = new Date(2006, 11, 1);
-    lat_lon = [20, 5];
-    let tz = 1;
+    // date = new Date(2006, 11, 1);
+    // lat_lon = [20, 5];
 
     function deg_to_rad(deg) {
         return deg / 180 * Math.PI;
@@ -157,13 +156,14 @@ function calculate_rise_set(alt, ra_dec, date, lat_lon) {
 
     // console.log(lat_lon[0]);
 
-    // Everything in radiasn
+    // Everything in radians
     let ra = deg_to_rad(ra_dec[0]);
     let dec = deg_to_rad(ra_dec[1]);
     alt = deg_to_rad(alt)
     let lat = deg_to_rad(lat_lon[0])
     let lon_deg = lat_lon[1];
     let lon = deg_to_rad(lat_lon[1])
+    let tz = -date.getTimezoneOffset() / 60;
 
     let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
                 / (Math.cos(lat) * Math.cos(dec));
@@ -174,7 +174,8 @@ function calculate_rise_set(alt, ra_dec, date, lat_lon) {
     let lst2 = -lha + ra;
 
     // TODO
-    lst = deg_to_rad(45);
+    // lst = deg_to_rad(45);
+    // tz = 1;
 
     // let = lst - (0.06571 * (day = () - 6.622;
 //
@@ -232,6 +233,6 @@ function calculate_rise_set(alt, ra_dec, date, lat_lon) {
         time += sidereal_day;
     }
 
-    console.log("time", time);
-    console.log("lst", lst);
+    console.log("time", deg_to_hms(time));
+    console.log("lst", deg_to_hms(rad_to_deg(lst)/15));
 }
