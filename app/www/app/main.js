@@ -13,7 +13,7 @@ import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
 import { aladin_catalogs_init, ui_markers_update } from "./sky.js";
 import { eq_to_geo } from "./dso.js";
-import { draw_day_plot } from "./plot.js";
+import { draw_visibility_plot } from "./plot.js";
 
 $(document).ready(() => {
 
@@ -167,12 +167,10 @@ function main(ctx) {
         ui_celestial_location_update(data.lat, data.lon);
         ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
 
-        let dso_list = ctx.manager.get_catalog();
-        for (let i = 0; i < 1000; i+=10) {
-            let canvas = $("<canvas>", { class: "test-canvas" });
-            canvas.appendTo("#user-data");
-            draw_day_plot(canvas.get(0), dso_list[i]);
-        }
+        let dso = ctx.manager.get_catalog()[0];
+        let canvas = $("<canvas>", { class: "test-canvas" });
+        canvas.appendTo("#user-data");
+        draw_visibility_plot(canvas.get(0), dso);
     });
 
     // Login buttons
