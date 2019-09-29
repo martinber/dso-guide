@@ -106,8 +106,9 @@ export function draw_visibility_plot(canvas, dso) {
             let ra_dec = sun(date)
                 .equatorial(Celestial.origin(date).spherical())
                 .pos;
-            // let alt = Celestial.horizontal(date, ra_dec, lat_lon)[0];
 
+            let timezone = -(new Date()).getTimezoneOffset() / 60;
+            // calculate_rise_set(0, ra_dec, delta_jd, lat_lon, timezone);
 
             calculate_rise_set(0, ra_dec, date, lat_lon);
 
@@ -128,111 +129,165 @@ function alt_to_px(alt, canvas_height) {
     return canvas_height - (alt / 90 * canvas_height);
 }
 
+function deg_to_rad(deg) {
+    return deg / 180 * Math.PI;
+}
+
+function rad_to_deg(rad) {
+    return rad * 180 / Math.PI;
+}
+
 /**
  * Calculate rise and set times for a given RA/DEC on a given day.
  *
- * I only use the day from the Date object given.
+ * The rise and set is calculated according a given altitude in degrees.
  *
  * Give ra_dec on degrees (e.g. using eq_to_geo()).
  *
+ * The date object given is used to determine the day. Hours, minutes and
+ * seconds are not used.
+ *
+ * Based on:
  * https://astronomy.stackexchange.com/questions/10904/calculate-time-when-star-is-above-altitude-30
+ *
+ * Also helped:
  * https://astronomy.stackexchange.com/questions/14492/need-simple-equation-for-rise-transit-and-set-time
  * https://gist.github.com/Tafkas/4742250
  * https://www.aa.quae.nl/en/reken/sterrentijd.html
  */
 function calculate_rise_set(alt, ra_dec, date, lat_lon) {
 
-    // TODO
-    // date = new Date(2006, 11, 1);
-    // lat_lon = [20, 5];
-
-    function deg_to_rad(deg) {
-        return deg / 180 * Math.PI;
-    }
-
-    function rad_to_deg(rad) {
-        return rad * 180 / Math.PI;
-    }
-
-    // console.log(lat_lon[0]);
-
-    // Everything in radians
+    // Make calculations in radians
+    alt = deg_to_rad(alt)
     let ra = deg_to_rad(ra_dec[0]);
     let dec = deg_to_rad(ra_dec[1]);
-    alt = deg_to_rad(alt)
     let lat = deg_to_rad(lat_lon[0])
-    let lon_deg = lat_lon[1];
-    let lon = deg_to_rad(lat_lon[1])
-    let tz = -date.getTimezoneOffset() / 60;
 
     let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
                 / (Math.cos(lat) * Math.cos(dec));
 
     let lha = Math.acos(cos_lha);
 
-    let lst = lha + ra;
-    let lst2 = -lha + ra;
+    // Sidereal times of sunset and sunrise
+    let sunset = lha + ra;
+    let sunrise = -lha + ra;
 
-    // TODO
-    // lst = deg_to_rad(45);
-    // tz = 1;
+    // Convert sidereal times to local times, returns a Date()
+    sunset = sidereal_to_time(rad_to_deg(sunset), date, lat_lon[1]);
+    sunrise = sidereal_to_time(rad_to_deg(sunrise), date, lat_lon[1]);
+}
 
-    // let = lst - (0.06571 * (day = () - 6.622;
-//
-    // let ut_obj_in_south = (
-    
-    // let t = 4.894961212735792 + 6.30038809898489 d + ψ
-    // let days = (lst - 4.894961212735792 - lon) / 6.30038809898489;
-    // fractional days from 2000-01-01 12:00:00 UTC
-    
-    // let milliseconds = days * 24 * 60 * 60 * 1000;
+/**
+ * Local sidereal time to local time.
+ *
+ * Times are interpreted and given as degrees. 0hs = 0°, 12hs = 180°, 24hs =
+ * 360°. Give longitude as degrees too.
+ *
+ * The date object given is used to determine the day. Hours, minutes and
+ * seconds are not used.
+ *
+ * Returns a Date();
+ */
+function sidereal_to_time(lst, date, longitude) {
 
-    // let unix = milliseconds + new Date.getUTCDate("2000-01-01 12:00:00 UTC")
-    // let unix = milliseconds + Date.UTC(2000, 0, 1, 12);
-    // console.log(lha);
-    // console.log(ra_dec);
-    // console.log(lst / Math.PI * 180 / 15);
-    // console.log(days);
+    let delta_julian_day = days_since_j2000(date);
 
-    var jd;
-    {
-        var yr = date.getUTCFullYear();
-        var mo = date.getUTCMonth() + 1;
-        var dy = date.getUTCDate();
+    let c = sidereal_constants(delta_julian_day, longitude);
+    let theta_1 = c[0];
+    let theta_p = c[1];
 
-        if ((mo == 1)||(mo == 2)) {
-            yr  = yr - 1;
-            mo = mo + 12;
-        }
+    let theta_0 = 99.967794687 + 0.98564736628603 * delta_julian_day + theta_p;
+    theta_0 = theta_0 % 360;
 
-        var a = Math.floor(yr / 100);
-        var b = 2 - a + Math.floor(a / 4);
-        var c = Math.floor(365.25 * yr);
-        var d = Math.floor(30.6001 * (mo + 1));
+    // Fractional hours in a sidereal day
+    let sidereal_day_hs = 360 / theta_1;
 
-        // days since J2000.0
-        jd = b + c + d - 730550 + dy;
-    }
-    console.log("jd", jd);
-
-    let tita_1 = 15.04106864026192 + 2.423233e-14 * jd + -6.628e-23 * jd**2;
-    console.log("tita_1", tita_1);
-    console.log("lon_deg", lon_deg);
-    console.log("tz", tz);
-    let tita_p = 2.907879e-13 * jd**2 - 5.302e-22 * jd**3 + lon_deg - tita_1 * tz;
-    console.log("tita_p", tita_p);
-    let tita_0 = 99.967794687 + 0.98564736628603 * jd + tita_p;
-    console.log("tita_0", tita_0);
-    tita_0 = tita_0 % 360;
-    console.log("tita_0", tita_0);
-
-    let sidereal_day = 360 / tita_1;
-    let time = (rad_to_deg(lst) - tita_0) / tita_1;
-    time = time % sidereal_day;
+    let time = (lst - theta_0) / theta_1;
+    time = time % sidereal_day_hs;
     if (time < 0) {
-        time += sidereal_day;
+        time += sidereal_day_hs;
     }
 
-    console.log("time", deg_to_hms(time));
-    console.log("lst", deg_to_hms(rad_to_deg(lst)/15));
+    // Convert from degrees to hours, minutes and seconds
+    time = deg_to_hms(time)
+    console.log("time", new Date(Date.UTC(2019, 4, 5, time[0], time[1], time[2])).toString());
+    console.log("lst", deg_to_hms(lst/15));
+}
+
+/**
+ * Calculate constants used for sidereal day calculations
+ *
+ * Taken from: https://www.aa.quae.nl/en/reken/sterrentijd.html
+ *
+ * The first argument is "Delta Julian Day", integer of days since J2000 (1 Jan
+ * 2000).
+ *
+ * Give longitude as degrees.
+ *
+ * Returns theta_1 and theta_p.
+ */
+function sidereal_constants(delta_julian_day, longitude) {
+    let theta_1 = 15.04106864026192
+                + 2.423233e-14 * delta_julian_day
+                + -6.628e-23 * delta_julian_day**2;
+
+    let theta_p = 2.907879e-13 * delta_julian_day**2
+                - 5.302e-22 * delta_julian_day**3
+                + longitude;
+
+    return [theta_1, theta_p];
+}
+
+/**
+ * Calculate days since J2000 (1 Jan 2000) as an integer.
+ *
+ * Taken from d3-celestial
+ *
+ * I only use the year, month and day from the Date object given.
+ *
+ * Copyright (c) 2015, Olaf Frohn
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+function days_since_j2000(date) {
+    var yr = date.getUTCFullYear();
+    var mo = date.getUTCMonth() + 1;
+    var dy = date.getUTCDate();
+
+    if ((mo == 1)||(mo == 2)) {
+        yr  = yr - 1;
+        mo = mo + 12;
+    }
+
+    var a = Math.floor(yr / 100);
+    var b = 2 - a + Math.floor(a / 4);
+    var c = Math.floor(365.25 * yr);
+    var d = Math.floor(30.6001 * (mo + 1));
+
+    return b + c + d - 730550 + dy;
 }
