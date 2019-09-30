@@ -307,19 +307,20 @@ export function calculate_rise_set(alt, ra_dec, date, lat_lon) {
     let dec = deg_to_rad(ra_dec[1]);
     let lat = deg_to_rad(lat_lon[0])
 
+    let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
+                / (Math.cos(lat) * Math.cos(dec));
+
     // Always above altitude
-    if (Math.abs(dec + lat) > Math.PI / 2) {
+    if (cos_lha < -1) {
         result.type = "above";
         return result;
     }
+
     // Always below altitude
-    if (Math.abs(dec - lat) > Math.PI / 2) {
+    if (cos_lha > 1) {
         result.type = "below";
         return result;
     }
-
-    let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
-                / (Math.cos(lat) * Math.cos(dec));
 
     let lha = Math.acos(cos_lha);
 
