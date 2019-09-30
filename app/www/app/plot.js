@@ -133,49 +133,112 @@ export function draw_visibility_plot(
     ctx.fillStyle = color_day;
     for (let i = 0; i < sun_times.length; i++) {
         let sun_time = sun_times[i];
+        let rise_hs;
+        let rise_min;
+        let set_hs;
+        let set_min;
         switch (sun_time.type) {
             case "normal":
-                sun_time.rise_hs = sun_time.rise.getHours();
-                sun_time.rise_min = sun_time.rise.getMinutes();
-                sun_time.set_hs = sun_time.set.getHours();
-                sun_time.set_min = sun_time.set.getMinutes();
+                rise_hs = sun_time.rise.getHours();
+                rise_min = sun_time.rise.getMinutes();
+                set_hs = sun_time.set.getHours();
+                set_min = sun_time.set.getMinutes();
                 break;
 
             case "above":
-                sun_time.rise_hs = 0;
-                sun_time.rise_min = 0;
-                sun_time.set_hs = 23;
-                sun_time.set_min = 60;
+                rise_hs = 0;
+                rise_min = 0;
+                set_hs = 23;
+                set_min = 60;
                 break;
 
             case "below":
-                sun_time.rise_hs = 23;
-                sun_time.rise_min = 60;
-                sun_time.set_hs = 0;
-                sun_time.set_min = 0;
+                rise_hs = 23;
+                rise_min = 60;
+                set_hs = 0;
+                set_min = 0;
                 break;
         }
-        console.log(min_time, max_time, sun_time);
-        console.log(w, (i + 1) * px_per_month);
-        if (sun_time.rise_hs * 60 + sun_time.rise_min
-            < sun_time.set_hs * 60 + sun_time.set_min) {
+        if (rise_hs * 60 + rise_min
+            < set_hs * 60 + set_min) {
 
-            let y = ((sun_time.rise_hs) * 60 + sun_time.rise_min) * px_per_min;
-            let height = ((sun_time.set_hs) * 60 + sun_time.set_min) * px_per_min - y;
+            let y = ((rise_hs) * 60 + rise_min) * px_per_min;
+            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+            ctx.beginPath();
             ctx.rect(i * px_per_month, y, px_per_month, height);
             ctx.fill();
 
 
         } else {
             let y = 0;
-            let height = ((sun_time.set_hs) * 60 + sun_time.set_min) * px_per_min - y;
+            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+            ctx.beginPath();
             ctx.rect(i * px_per_month, y, px_per_month, height);
             ctx.fill();
 
-            y = ((sun_time.rise_hs) * 60 + sun_time.rise_min) * px_per_min;
+            y = ((rise_hs) * 60 + rise_min) * px_per_min;
             height = h - y;
 
+            ctx.beginPath();
             ctx.rect(i * px_per_month, y, px_per_month, height);
+            ctx.fill();
+        }
+
+    }
+
+    // Draw dso
+
+    ctx.fillStyle = color_visible;
+    for (let i = 0; i < dso_times.length; i++) {
+        let dso_time = dso_times[i];
+        let rise_hs;
+        let rise_min;
+        let set_hs;
+        let set_min;
+        switch (dso_time.type) {
+            case "normal":
+                rise_hs = dso_time.rise.getHours();
+                rise_min = dso_time.rise.getMinutes();
+                set_hs = dso_time.set.getHours();
+                set_min = dso_time.set.getMinutes();
+                break;
+
+            case "above":
+                rise_hs = 0;
+                rise_min = 0;
+                set_hs = 23;
+                set_min = 60;
+                break;
+
+            case "below":
+                rise_hs = 23;
+                rise_min = 60;
+                set_hs = 0;
+                set_min = 0;
+                break;
+        }
+        if (rise_hs * 60 + rise_min
+            < set_hs * 60 + set_min) {
+
+            let y = ((rise_hs) * 60 + rise_min) * px_per_min;
+            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+            ctx.beginPath();
+            ctx.rect(i * px_per_month, y, px_per_month/2, height);
+            ctx.fill();
+
+
+        } else {
+            let y = 0;
+            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+            ctx.beginPath();
+            ctx.rect(i * px_per_month, y, px_per_month/2, height);
+            ctx.fill();
+
+            y = ((rise_hs) * 60 + rise_min) * px_per_min;
+            height = h - y;
+
+            ctx.beginPath();
+            ctx.rect(i * px_per_month, y, px_per_month/2, height);
             ctx.fill();
         }
 

@@ -167,11 +167,12 @@ function main(ctx) {
         ui_celestial_location_update(data.lat, data.lon);
         ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
 
-        let dso = ctx.manager.get_catalog()[0];
-        let canvas = $("<canvas>", { class: "test-canvas" });
-        canvas.appendTo("#user-data");
+        // let dso = ctx.manager.get_catalog()[40];
 
+        for (let dso of ctx.manager.get_catalog().slice(0, 200))
         {
+            let canvas = $("<canvas>", { class: "test-canvas" });
+            canvas.appendTo("#user-data");
             let sun_threshold_alt = -10;
             let dso_threshold_alt = 15;
 
