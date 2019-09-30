@@ -13,7 +13,7 @@ import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
 import { aladin_catalogs_init, ui_markers_update } from "./sky.js";
 import { eq_to_geo } from "./dso.js";
-import { draw_visibility_plot } from "./plot.js";
+import { draw_visibility_plot, calculate_rise_set } from "./plot.js";
 
 $(document).ready(() => {
 
@@ -170,7 +170,38 @@ function main(ctx) {
         let dso = ctx.manager.get_catalog()[0];
         let canvas = $("<canvas>", { class: "test-canvas" });
         canvas.appendTo("#user-data");
-        draw_visibility_plot(canvas.get(0), dso);
+
+        {
+            let sun_threshold_alt = -10;
+            let dso_threshold_alt = 15;
+
+            let sun_times = [];
+
+            let sun = Celestial.Kepler().id("sol");
+            for (let month = 0; month < 12; month++) {
+
+                let date = new Date(2019, month, 1);
+
+                let ra_dec = sun(date)
+                    .equatorial(Celestial.origin(date).spherical())
+                    .pos;
+
+                sun_times.push(calculate_rise_set(
+                    sun_threshold_alt,
+                    ra_dec,
+                    date,
+                    [data.lat, data.lon]
+                ));
+            }
+
+            draw_visibility_plot(
+                canvas.get(0),
+                dso,
+                [data.lat, data.lon],
+                sun_times,
+                dso_threshold_alt
+            );
+        }
     });
 
     // Login buttons

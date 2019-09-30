@@ -374,6 +374,7 @@ main .inner {
 	height: 20em;
 	width: 60em;
 	margin: 1em;
+    border: 1px solid white;
 }
 
 /* SIDEBAR ------------------------------------------------------------ */

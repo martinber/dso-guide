@@ -27,7 +27,7 @@ export function draw_day_plot(canvas, dso) {
 
     ctx.strokeStyle = color_grid;
     ctx.lineCap = "butt";
-    ctx.lineCap = "miter";
+    ctx.lineJoin = "miter";
     ctx.lineWidth = 1;
     for (let alt of [22.5, 45, 67.5]) { // Lines for 22.5°, 45° and 67.5°
         // Plus 0.5 to have crisp lines of width 1
@@ -41,7 +41,7 @@ export function draw_day_plot(canvas, dso) {
 
     ctx.strokeStyle = color_alt_line;
     ctx.lineCap = "butt";
-    ctx.lineCap = "miter";
+    ctx.lineJoin = "miter";
     ctx.lineWidth = 1;
     let height_px = Math.round(alt_to_px(threshold_alt, h) - 0.5) + 0.5;
 
@@ -54,7 +54,7 @@ export function draw_day_plot(canvas, dso) {
 
     ctx.strokeStyle = color_plot;
     ctx.lineCap = "round";
-    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     ctx.lineWidth = 3;
 
     ctx.beginPath();
@@ -66,17 +66,19 @@ export function draw_day_plot(canvas, dso) {
     ctx.stroke();
 }
 
-export function draw_visibility_plot(canvas, dso) {
+export function draw_visibility_plot(
+    canvas,
+    dso,
+    lat_lon,
+    sun_times,
+    threshold_alt
+) {
     let ctx = canvas.getContext("2d", { alpha: false} );
 
     let w = canvas.scrollWidth;
     let h = canvas.scrollHeight;
     canvas.width = w;
     canvas.height = h;
-
-    let dso_threshold_alt = 15; // Degrees
-    let sun_threshold_alt = -10; // Degrees
-    let lat_lon = [-33, -63];
 
     let color_day = "#2b3840";
     let color_night = "#222222";
@@ -86,34 +88,100 @@ export function draw_visibility_plot(canvas, dso) {
     let width_grid = 2;
 
     // Draw background
-    {
-        ctx.fillStyle = color_day;
-        ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = color_night;
+    ctx.fillRect(0, 0, w, h);
+
+    // Clone arrays and add January again to draw it on the far side of the plot
+    // too
+    sun_times = sun_times.slice();
+    sun_times.push(sun_times[0]);
+
+    // Calculate span of the plot
+
+    let min_time = 24; // Minimum time to show, just before the earliest sunset
+    let max_time = 0; // Minimum time to show, just after the latest sunset
+    for (let i = 0; i < sun_times.length; i++) {
+        if (sun_times[i].type != "normal") {
+            // The sun is always over or below the horizon
+            min_time = 0;
+            max_time = 24;
+        } else {
+            min_time = Math.min(min_time, sun_times[i].set.getHours());
+            max_time = Math.max(max_time, sun_times[i].rise.getHours());
+        }
+    }
+    min_time = Math.max(0, min_time - 1); // Add a margin if possible
+    max_time = Math.min(24, max_time + 1);
+    min_time = 0;
+    max_time = 24;
+    // let hour_span = 24 - min_time + max_time;
+    let hour_span = 24;
+    let px_per_min = (h / hour_span) / 60;
+    let px_per_month = w / 12;
+
+    // Calculate DSO rise and set times for each day on the sunrises array
+
+    let dso_times = [] // Times when DSO rises and sets
+    for (let i = 0; i < sun_times.length; i++) {
+        let date = sun_times[i].day;
+        dso_times.push(calculate_rise_set(threshold_alt, eq_to_geo(dso.coords), date, lat_lon));
     }
 
-    // Draw night
-    {
-        let sun = Celestial.Kepler().id("sol");
+    // Draw day
 
-        // Horizontally we iterate over each month, the calculations are made
-        // for the first day of each month. On the far right side of the graph
-        // the 1st of January is drawn again.
-        let months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1];
-        // for (let month of months) {
+    ctx.fillStyle = color_day;
+    for (let i = 0; i < sun_times.length; i++) {
+        let sun_time = sun_times[i];
+        switch (sun_time.type) {
+            case "normal":
+                sun_time.rise_hs = sun_time.rise.getHours();
+                sun_time.rise_min = sun_time.rise.getMinutes();
+                sun_time.set_hs = sun_time.set.getHours();
+                sun_time.set_min = sun_time.set.getMinutes();
+                break;
 
-            let date = new Date();
+            case "above":
+                sun_time.rise_hs = 0;
+                sun_time.rise_min = 0;
+                sun_time.set_hs = 23;
+                sun_time.set_min = 60;
+                break;
 
-            let ra_dec = sun(date)
-                .equatorial(Celestial.origin(date).spherical())
-                .pos;
+            case "below":
+                sun_time.rise_hs = 23;
+                sun_time.rise_min = 60;
+                sun_time.set_hs = 0;
+                sun_time.set_min = 0;
+                break;
+        }
+        console.log(min_time, max_time, sun_time);
+        console.log(w, (i + 1) * px_per_month);
+        if (sun_time.rise_hs * 60 + sun_time.rise_min
+            < sun_time.set_hs * 60 + sun_time.set_min) {
 
-            let timezone = -(new Date()).getTimezoneOffset() / 60;
-            // calculate_rise_set(0, ra_dec, delta_jd, lat_lon, timezone);
+            let y = ((sun_time.rise_hs) * 60 + sun_time.rise_min) * px_per_min;
+            let height = ((sun_time.set_hs) * 60 + sun_time.set_min) * px_per_min - y;
+            ctx.rect(i * px_per_month, y, px_per_month, height);
+            ctx.fill();
 
-            calculate_rise_set(0, ra_dec, date, lat_lon);
 
-        // }
+        } else {
+            let y = 0;
+            let height = ((sun_time.set_hs) * 60 + sun_time.set_min) * px_per_min - y;
+            ctx.rect(i * px_per_month, y, px_per_month, height);
+            ctx.fill();
+
+            y = ((sun_time.rise_hs) * 60 + sun_time.rise_min) * px_per_min;
+            height = h - y;
+
+            ctx.rect(i * px_per_month, y, px_per_month, height);
+            ctx.fill();
+        }
+
     }
+
+
 }
 
 function deg_to_fraction(deg) {
@@ -147,6 +215,18 @@ function rad_to_deg(rad) {
  * The date object given is used to determine the day. Hours, minutes and
  * seconds are not used.
  *
+ * Returns an object with:
+ *
+ * {
+ *     type: "normal" || "below" || "above"
+ *     day: Date() object indicating the day (ignore hours, minutes and seconds)
+ *     rise: Date() object indicating rise time or null
+ *     set: Date() object indicating set time or null
+ * }
+ *
+ * This is because some objects are always above the given altitude or always
+ * below the given altitude.
+ *
  * Based on:
  * https://astronomy.stackexchange.com/questions/10904/calculate-time-when-star-is-above-altitude-30
  *
@@ -155,7 +235,14 @@ function rad_to_deg(rad) {
  * https://gist.github.com/Tafkas/4742250
  * https://www.aa.quae.nl/en/reken/sterrentijd.html
  */
-function calculate_rise_set(alt, ra_dec, date, lat_lon) {
+export function calculate_rise_set(alt, ra_dec, date, lat_lon) {
+
+    let result = {
+        type: "normal",
+        day: date,
+        rise: null,
+        set: null
+    };
 
     // Make calculations in radians
     alt = deg_to_rad(alt)
@@ -163,18 +250,31 @@ function calculate_rise_set(alt, ra_dec, date, lat_lon) {
     let dec = deg_to_rad(ra_dec[1]);
     let lat = deg_to_rad(lat_lon[0])
 
+    // Always above altitude
+    if (Math.abs(dec + lat) > Math.PI / 2) {
+        result.type = "above";
+        return result;
+    }
+    // Always below altitude
+    if (Math.abs(dec - lat) > Math.PI / 2) {
+        result.type = "below";
+        return result;
+    }
+
     let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
                 / (Math.cos(lat) * Math.cos(dec));
 
     let lha = Math.acos(cos_lha);
 
     // Sidereal times of sunset and sunrise
-    let sunset = lha + ra;
-    let sunrise = -lha + ra;
+    let set = lha + ra;
+    let rise = -lha + ra;
 
-    // Convert sidereal times to local times, returns a Date()
-    sunset = sidereal_to_time(rad_to_deg(sunset), date, lat_lon[1]);
-    sunrise = sidereal_to_time(rad_to_deg(sunrise), date, lat_lon[1]);
+    // Convert sidereal times to local times
+    result.set = sidereal_to_time(rad_to_deg(set), date, lat_lon[1]);
+    result.rise = sidereal_to_time(rad_to_deg(rise), date, lat_lon[1]);
+
+    return result;
 }
 
 /**
@@ -210,8 +310,11 @@ function sidereal_to_time(lst, date, longitude) {
 
     // Convert from degrees to hours, minutes and seconds
     time = deg_to_hms(time)
-    console.log("time", new Date(Date.UTC(2019, 4, 5, time[0], time[1], time[2])).toString());
-    console.log("lst", deg_to_hms(lst/15));
+
+    // Return a Date() with the same day given but correct time;
+    let result = new Date(date.getTime()); // Clone Date()
+    result.setUTCHours(time[0], time[1], time[2])
+    return result;
 }
 
 /**
