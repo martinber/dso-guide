@@ -120,14 +120,6 @@ export function draw_visibility_plot(
     let px_per_min = (h / hour_span) / 60;
     let px_per_month = w / 12;
 
-    // Calculate DSO rise and set times for each day on the sunrises array
-
-    let dso_times = [] // Times when DSO rises and sets
-    for (let i = 0; i < sun_times.length; i++) {
-        let date = sun_times[i].day;
-        dso_times.push(calculate_rise_set(threshold_alt, eq_to_geo(dso.coords), date, lat_lon));
-    }
-
     // Draw day
 
     ctx.fillStyle = color_day;
@@ -159,92 +151,94 @@ export function draw_visibility_plot(
                 set_min = 0;
                 break;
         }
-        if (rise_hs * 60 + rise_min
-            < set_hs * 60 + set_min) {
+        if (rise_hs * 60 + rise_min < set_hs * 60 + set_min) {
 
             let y = ((rise_hs) * 60 + rise_min) * px_per_min;
             let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.beginPath();
-            ctx.rect(i * px_per_month, y, px_per_month, height);
-            ctx.fill();
+            ctx.fillRect(i * px_per_month, y, px_per_month, height);
 
 
         } else {
             let y = 0;
             let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.beginPath();
-            ctx.rect(i * px_per_month, y, px_per_month, height);
-            ctx.fill();
+            ctx.fillRect(i * px_per_month, y, px_per_month, height);
 
             y = ((rise_hs) * 60 + rise_min) * px_per_min;
             height = h - y;
 
-            ctx.beginPath();
-            ctx.rect(i * px_per_month, y, px_per_month, height);
-            ctx.fill();
+            ctx.fillRect(i * px_per_month, y, px_per_month, height);
         }
 
     }
 
     // Draw dso
 
-    ctx.fillStyle = color_visible;
-    for (let i = 0; i < dso_times.length; i++) {
-        let dso_time = dso_times[i];
-        let rise_hs;
-        let rise_min;
-        let set_hs;
-        let set_min;
-        switch (dso_time.type) {
+    {
+        // Calculate for January and interpolate until January next year
+        let dso_jan_times = calculate_rise_set(
+            threshold_alt, eq_to_geo(dso.coords), sun_times[0].day, lat_lon);
+
+        ctx.fillStyle = color_visible;
+
+        switch (dso_jan_times.type) {
             case "normal":
-                rise_hs = dso_time.rise.getHours();
-                rise_min = dso_time.rise.getMinutes();
-                set_hs = dso_time.set.getHours();
-                set_min = dso_time.set.getMinutes();
+                let rise_hs = dso_jan_times.rise.getHours();
+                let rise_min = dso_jan_times.rise.getMinutes();
+                let set_hs = dso_jan_times.set.getHours();
+                let set_min = dso_jan_times.set.getMinutes();
+
+                if (rise_hs * 60 + rise_min > set_hs * 60 + set_min) {
+                    set_hs += 24;
+                }
+
+                let y = ((rise_hs) * 60 + rise_min) * px_per_min;
+                let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y - 24 * 60 * px_per_min);
+                ctx.lineTo(w, y - 24 * 60 * px_per_min + height);
+                ctx.lineTo(0, y + height);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(0, y - 24 * 60 * px_per_min);
+                ctx.lineTo(w, y - 2 * 24 * 60 * px_per_min);
+                ctx.lineTo(w, y - 2 * 24 * 60 * px_per_min + height);
+                ctx.lineTo(0, y - 24 * 60 * px_per_min + height);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(0, y + 24 * 60 * px_per_min);
+                ctx.lineTo(w, y);
+                ctx.lineTo(w, y + height);
+                ctx.lineTo(0, y + 24 * 60 * px_per_min + height);
+                ctx.closePath();
+                ctx.fill();
                 break;
 
             case "above":
-                rise_hs = 0;
-                rise_min = 0;
-                set_hs = 23;
-                set_min = 60;
+                ctx.fillRect(0, 0, w, h);
                 break;
 
             case "below":
-                rise_hs = 23;
-                rise_min = 60;
-                set_hs = 0;
-                set_min = 0;
                 break;
         }
-        if (rise_hs * 60 + rise_min
-            < set_hs * 60 + set_min) {
 
-            let y = ((rise_hs) * 60 + rise_min) * px_per_min;
-            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.beginPath();
-            ctx.rect(i * px_per_month, y, px_per_month/2, height);
-            ctx.fill();
-
-
-        } else {
-            let y = 0;
-            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.beginPath();
-            ctx.rect(i * px_per_month, y, px_per_month/2, height);
-            ctx.fill();
-
-            y = ((rise_hs) * 60 + rise_min) * px_per_min;
-            height = h - y;
-
-            ctx.beginPath();
-            ctx.rect(i * px_per_month, y, px_per_month/2, height);
-            ctx.fill();
-        }
 
     }
 
+    return;
 
+    // Calculate DSO rise and set times for each day on the sunrises array
+
+    let dso_times = [] // Times when DSO rises and sets
+    for (let i = 0; i < sun_times.length; i++) {
+        let date = sun_times[i].day;
+        dso_times.push(calculate_rise_set(threshold_alt, eq_to_geo(dso.coords), date, lat_lon));
+    }
 }
 
 function deg_to_fraction(deg) {
