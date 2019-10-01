@@ -172,7 +172,7 @@ function main(ctx) {
         let sun_threshold_alt = -10;
         let canvases = draw_day_night_plots(
             [data.lat, data.lon],
-            [[400, 200]],
+            [[800, 500]],
             sun_threshold_alt,
             2019
         );

@@ -85,8 +85,6 @@ export function draw_visibility_plot(
     canvas.width = w;
     canvas.height = h;
 
-    let color_day = "#2b3840";
-    let color_night = "#222222";
     let color_visible = "#88666694";
     let color_grid = "#00000085";
 
@@ -94,90 +92,11 @@ export function draw_visibility_plot(
 
     // Draw background
 
-    ctx.fillStyle = color_night;
-    ctx.fillRect(0, 0, w, h);
-
-    // Clone arrays and add January again to draw it on the far side of the plot
-    // too
-    sun_times = sun_times.slice();
-    sun_times.push(sun_times[0]);
-
-    // Calculate span of the plot
-
-    let min_time = 24; // Minimum time to show, just before the earliest sunset
-    let max_time = 0; // Minimum time to show, just after the latest sunset
-    for (let i = 0; i < sun_times.length; i++) {
-        if (sun_times[i].type != "normal") {
-            // The sun is always over or below the horizon
-            min_time = 0;
-            max_time = 24;
-        } else {
-            min_time = Math.min(min_time, sun_times[i].set.getHours());
-            max_time = Math.max(max_time, sun_times[i].rise.getHours());
-        }
-    }
-    min_time = Math.max(0, min_time - 1); // Add a margin if possible
-    max_time = Math.min(24, max_time + 1);
-    min_time = 0;
-    max_time = 24;
-    // let hour_span = 24 - min_time + max_time;
-    let hour_span = 24;
-    let px_per_min = (h / hour_span) / 60;
-    let px_per_month = w / 12;
-
-    // Draw day
-
-    ctx.fillStyle = color_day;
-    for (let i = 0; i < sun_times.length; i++) {
-        let sun_time = sun_times[i];
-        let rise_hs;
-        let rise_min;
-        let set_hs;
-        let set_min;
-        switch (sun_time.type) {
-            case "normal":
-                rise_hs = sun_time.rise.getHours();
-                rise_min = sun_time.rise.getMinutes();
-                set_hs = sun_time.set.getHours();
-                set_min = sun_time.set.getMinutes();
-                break;
-
-            case "above":
-                rise_hs = 0;
-                rise_min = 0;
-                set_hs = 23;
-                set_min = 60;
-                break;
-
-            case "below":
-                rise_hs = 23;
-                rise_min = 60;
-                set_hs = 0;
-                set_min = 0;
-                break;
-        }
-        if (rise_hs * 60 + rise_min < set_hs * 60 + set_min) {
-
-            let y = ((rise_hs) * 60 + rise_min) * px_per_min;
-            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.fillRect(i * px_per_month, y, px_per_month, height);
-
-
-        } else {
-            let y = 0;
-            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.fillRect(i * px_per_month, y, px_per_month, height);
-
-            y = ((rise_hs) * 60 + rise_min) * px_per_min;
-            height = h - y;
-
-            ctx.fillRect(i * px_per_month, y, px_per_month, height);
-        }
-
-    }
+    // TODO
 
     // Draw dso
 
+    // TODO
     {
         // Calculate for January and interpolate until January next year
         let dso_jan_times = calculate_rise_set(
@@ -235,15 +154,7 @@ export function draw_visibility_plot(
 
     }
 
-    return;
-
-    // Calculate DSO rise and set times for each day on the sunrises array
-
-    let dso_times = [] // Times when DSO rises and sets
-    for (let i = 0; i < sun_times.length; i++) {
-        let date = sun_times[i].day;
-        dso_times.push(calculate_rise_set(threshold_alt, eq_to_geo(dso.coords), date, lat_lon));
-    }
+    return canvas;
 }
 
 function deg_to_fraction(deg) {
@@ -288,23 +199,18 @@ export function draw_day_night_plots(
     let color_day = "#2b3840";
     let color_night = "#222222";
 
-    // Create canvases
-
-    let canvases = [];
-    for (let size of sizes) {
-        canvases.push(
-            $("<canvas>", { width: size[0], height: size[1] })[0]
-        );
-    }
-
     // Calculate sunsets and sunrises
 
     let sun_times = [];
 
     let sun = Celestial.Kepler().id("sol");
-    for (let month = 0; month < 12; month++) {
 
-        let date = new Date(year, month, 1);
+
+    let end = new Date(year, 11, 31); // 31 Dec
+
+    for (let date = new Date(year, 0, 1);
+         date <= end;
+         date.setDate(date.getDate() + 1)) {
 
         let ra_dec = sun(date)
             .equatorial(Celestial.origin(date).spherical())
@@ -372,24 +278,22 @@ export function draw_day_night_plots(
 
     // Start to actually draw the plots for each given size
 
-    for (let canvas of canvases) {
+    let canvases = [];
+    for (let size of sizes) {
+        let canvas = $("<canvas>")[0];
+        canvases.push(canvas);
         let ctx = canvas.getContext("2d", { alpha: false} );
 
-        let canvas_w = canvas.width;
-        let canvas_h = canvas.height;
+        let canvas_w = size[0];
+        let canvas_h = size[1];
+        canvas.width = canvas_w;
+        canvas.height = canvas_h;
 
         /**
          * Get y position for given fractional hours
          */
         function hs_to_y(hs) {
-            return ((hs - min_hs) / span_hs) * canvas_h;
-        }
-
-        /**
-         * Get h position for given date. Depends on month and day of date.
-         */
-        function date_to_x(date) {
-            return (date.getMonth() / 12) * canvas_w;
+            return Math.floor(((hs - min_hs) / span_hs) * canvas_h);
         }
 
         // Draw background
@@ -403,7 +307,7 @@ export function draw_day_night_plots(
         // iterate over each element on sun_times and I give each one the same
         // width.
 
-        let bar_width = canvas_w / sun_times.length;
+        let bar_width = Math.ceil(canvas_w / sun_times.length);
 
         ctx.fillStyle = color_night;
         for (let i = 0; i < sun_times.length; i++) {
@@ -416,8 +320,10 @@ export function draw_day_night_plots(
                 case "below":
                     // Fill from top to bottom
                     ctx.fillRect(
-                        date_to_x(sun_time.day), 0,
-                        bar_width, canvas_h
+                        Math.floor(i / sun_times.length * canvas_w),
+                        0,
+                        bar_width,
+                        canvas_h
                     );
                     break;
 
@@ -432,8 +338,10 @@ export function draw_day_night_plots(
                         set_hs -= 24;
                     }
                     ctx.fillRect(
-                        date_to_x(sun_time.day), hs_to_y(set_hs),
-                        bar_width, hs_to_y(rise_hs) - hs_to_y(set_hs)
+                        Math.floor(i / sun_times.length * canvas_w),
+                        hs_to_y(set_hs),
+                        bar_width,
+                        Math.ceil(hs_to_y(rise_hs) - hs_to_y(set_hs))
                     );
                     break;
             }
