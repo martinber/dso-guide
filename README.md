@@ -54,6 +54,9 @@ star chart
 
 - Fix notes CSS
 
+- Add note saying that times are always e.g. UTC-6. Including future times, even
+  if in the future DST is applied
+
 ## Tutorials
 
 - https://realpython.com/handling-email-confirmation-in-flask/

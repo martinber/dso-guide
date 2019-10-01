@@ -2,7 +2,12 @@
  * Things related to the time vs height plots
  */
 
-import { eq_to_geo, deg_to_hms, calculate_rise_set } from "./tools.js";
+import {
+    eq_to_geo,
+    deg_to_hms,
+    fractional_hours,
+    calculate_rise_set
+} from "./tools.js";
 
 export function draw_day_plot(canvas, dso) {
     let ctx = canvas.getContext("2d", { alpha: false} );
@@ -286,8 +291,8 @@ export function draw_day_night_plots(
     // Create canvases
 
     let canvases = [];
-    for (size of sizes) {
-        canvases.append(
+    for (let size of sizes) {
+        canvases.push(
             $("<canvas>", { width: size[0], height: size[1] })[0]
         );
     }
@@ -306,166 +311,134 @@ export function draw_day_night_plots(
             .pos;
 
         sun_times.push(calculate_rise_set(
-            sun_threshold_alt,
+            threshold_alt,
             ra_dec,
             date,
-            [data.lat, data.lon]
+            lat_lon
         ));
     }
 
-    for (canvas of canvases) {
+    // Calculate vertical span of the plot
+    //
+    // Vertically, the center of the plot corresponds to midnight. More
+    // specifically the time when the sun is at the lowest point on 1st of
+    // January. I calculate midnight time for 1st January, during the year this
+    // time changes slightly (rougly +/-20min) so I ignore that.
+    //
+    // The vertical span is the length of the longest day on the year plus 2hs
+    // to add a margin. Keep in mind that on big latitudes there are days when
+    // the sun never sets so in that case the vertical span is 24hs.
+    //
+    // Times in fractional hours, the plot goes from min_hs to max_hs
+    //
+    // As the plot is centered on midnight, quite probably min_hs < 0 or
+    // max_hs > 24
+
+    let midnight_hs = fractional_hours(sun_times[0].lowest);
+    let min_hs = midnight_hs;
+    let max_hs = midnight_hs;
+    for (let sun_time of sun_times) {
+        switch (sun_time.type) {
+            case "above":
+                // No night
+                break;
+
+            case "below":
+                // Always night
+                min_hs = midnight_hs - 12;
+                max_hs = midnight_hs + 12;
+                break;
+
+            case "normal":
+                // Starting from midnight, measure time to sunrise and multiply
+                // by two
+                let rise_hs = fractional_hours(sun_time.rise)
+                let set_hs = fractional_hours(sun_time.set)
+
+                if (rise_hs < midnight_hs) {
+                    rise_hs += 24;
+                }
+                if (set_hs > midnight_hs) {
+                    set_hs -= 24;
+                }
+                min_hs = Math.min(min_hs, set_hs);
+                max_hs = Math.max(max_hs, rise_hs);
+                break;
+        }
+    }
+    min_hs -= 1;
+    max_hs += 1;
+    let span_hs = max_hs - min_hs;
+
+    // Start to actually draw the plots for each given size
+
+    for (let canvas of canvases) {
         let ctx = canvas.getContext("2d", { alpha: false} );
 
         let canvas_w = canvas.width;
         let canvas_h = canvas.height;
 
+        /**
+         * Get y position for given fractional hours
+         */
+        function hs_to_y(hs) {
+            return ((hs - min_hs) / span_hs) * canvas_h;
+        }
+
+        /**
+         * Get h position for given date. Depends on month and day of date.
+         */
+        function date_to_x(date) {
+            return (date.getMonth() / 12) * canvas_w;
+        }
+
         // Draw background
 
+        ctx.fillStyle = color_day;
+        ctx.fillRect(0, 0, canvas_w, canvas_h);
+
+        // Draw night
+        //
+        // I ignore the fact that some months have more day than others, I just
+        // iterate over each element on sun_times and I give each one the same
+        // width.
+
+        let bar_width = canvas_w / sun_times.length;
+
         ctx.fillStyle = color_night;
-        ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < sun_times.length; i++) {
+            let sun_time = sun_times[i];
+            switch (sun_time.type) {
+                case "above":
+                    // Always daylight
+                    break;
 
-    }
+                case "below":
+                    // Fill from top to bottom
+                    ctx.fillRect(
+                        date_to_x(sun_time.day), 0,
+                        bar_width, canvas_h
+                    );
+                    break;
 
-    // Calculate span of the plot
-
-    let min_time = 24; // Minimum time to show, just before the earliest sunset
-    let max_time = 0; // Minimum time to show, just after the latest sunset
-    for (let i = 0; i < sun_times.length; i++) {
-        if (sun_times[i].type != "normal") {
-            // The sun is always over or below the horizon
-            min_time = 0;
-            max_time = 24;
-        } else {
-            min_time = Math.min(min_time, sun_times[i].set.getHours());
-            max_time = Math.max(max_time, sun_times[i].rise.getHours());
+                case "normal":
+                    // Check sunset and sunrise times
+                    let rise_hs = fractional_hours(sun_time.rise)
+                    let set_hs = fractional_hours(sun_time.set)
+                    if (rise_hs < midnight_hs) {
+                        rise_hs += 24;
+                    }
+                    if (set_hs > midnight_hs) {
+                        set_hs -= 24;
+                    }
+                    ctx.fillRect(
+                        date_to_x(sun_time.day), hs_to_y(set_hs),
+                        bar_width, hs_to_y(rise_hs) - hs_to_y(set_hs)
+                    );
+                    break;
+            }
         }
     }
-    min_time = Math.max(0, min_time - 1); // Add a margin if possible
-    max_time = Math.min(24, max_time + 1);
-    min_time = 0;
-    max_time = 24;
-    // let hour_span = 24 - min_time + max_time;
-    let hour_span = 24;
-    let px_per_min = (h / hour_span) / 60;
-    let px_per_month = w / 12;
 
-    // Draw day
-
-    ctx.fillStyle = color_day;
-    for (let i = 0; i < sun_times.length; i++) {
-        let sun_time = sun_times[i];
-        let rise_hs;
-        let rise_min;
-        let set_hs;
-        let set_min;
-        switch (sun_time.type) {
-            case "normal":
-                rise_hs = sun_time.rise.getHours();
-                rise_min = sun_time.rise.getMinutes();
-                set_hs = sun_time.set.getHours();
-                set_min = sun_time.set.getMinutes();
-                break;
-
-            case "above":
-                rise_hs = 0;
-                rise_min = 0;
-                set_hs = 23;
-                set_min = 60;
-                break;
-
-            case "below":
-                rise_hs = 23;
-                rise_min = 60;
-                set_hs = 0;
-                set_min = 0;
-                break;
-        }
-        if (rise_hs * 60 + rise_min < set_hs * 60 + set_min) {
-
-            let y = ((rise_hs) * 60 + rise_min) * px_per_min;
-            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.fillRect(i * px_per_month, y, px_per_month, height);
-
-
-        } else {
-            let y = 0;
-            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-            ctx.fillRect(i * px_per_month, y, px_per_month, height);
-
-            y = ((rise_hs) * 60 + rise_min) * px_per_min;
-            height = h - y;
-
-            ctx.fillRect(i * px_per_month, y, px_per_month, height);
-        }
-
-    }
-
-    // Draw dso
-
-    {
-        // Calculate for January and interpolate until January next year
-        let dso_jan_times = calculate_rise_set(
-            threshold_alt, eq_to_geo(dso.coords), sun_times[0].day, lat_lon);
-
-        ctx.fillStyle = color_visible;
-
-        switch (dso_jan_times.type) {
-            case "normal":
-                let rise_hs = dso_jan_times.rise.getHours();
-                let rise_min = dso_jan_times.rise.getMinutes();
-                let set_hs = dso_jan_times.set.getHours();
-                let set_min = dso_jan_times.set.getMinutes();
-
-                if (rise_hs * 60 + rise_min > set_hs * 60 + set_min) {
-                    set_hs += 24;
-                }
-
-                let y = ((rise_hs) * 60 + rise_min) * px_per_min;
-                let height = ((set_hs) * 60 + set_min) * px_per_min - y;
-
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(w, y - 24 * 60 * px_per_min);
-                ctx.lineTo(w, y - 24 * 60 * px_per_min + height);
-                ctx.lineTo(0, y + height);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.beginPath();
-                ctx.moveTo(0, y - 24 * 60 * px_per_min);
-                ctx.lineTo(w, y - 2 * 24 * 60 * px_per_min);
-                ctx.lineTo(w, y - 2 * 24 * 60 * px_per_min + height);
-                ctx.lineTo(0, y - 24 * 60 * px_per_min + height);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.beginPath();
-                ctx.moveTo(0, y + 24 * 60 * px_per_min);
-                ctx.lineTo(w, y);
-                ctx.lineTo(w, y + height);
-                ctx.lineTo(0, y + 24 * 60 * px_per_min + height);
-                ctx.closePath();
-                ctx.fill();
-                break;
-
-            case "above":
-                ctx.fillRect(0, 0, w, h);
-                break;
-
-            case "below":
-                break;
-        }
-
-
-    }
-
-    return;
-
-    // Calculate DSO rise and set times for each day on the sunrises array
-
-    let dso_times = [] // Times when DSO rises and sets
-    for (let i = 0; i < sun_times.length; i++) {
-        let date = sun_times[i].day;
-        dso_times.push(calculate_rise_set(threshold_alt, eq_to_geo(dso.coords), date, lat_lon));
-    }
+    return canvases;
 }

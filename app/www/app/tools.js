@@ -97,6 +97,15 @@ export function format_hor(alt_az) {
 }
 
 /**
+ * Return fractional hours since the start of the day from some Date().
+ *
+ * Ignores year, month and day.
+ */
+export function fractional_hours(date) {
+    return date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600;
+}
+
+/**
  * Convert from degrees to hours, minutes, seconds.
  *
  * Supports negative angles, no decimal places on seconds.
@@ -145,6 +154,10 @@ export function rad_to_deg(rad) {
  * {
  *     type: "normal" || "below" || "above"
  *     day: Date() object indicating the day (ignore hours, minutes and seconds)
+ *     transit: Date() object indicating transit time (highest point)
+ *     transit_alt: Altitude at highest point in degrees
+ *     lowest: Date() object indicating lowest point time
+ *     lowest_alt: Altitude at lowest point, generally negative but not always
  *     rise: Date() object indicating rise time or null
  *     set: Date() object indicating set time or null
  * }
@@ -154,9 +167,9 @@ export function rad_to_deg(rad) {
  *
  * Based on:
  * https://astronomy.stackexchange.com/questions/10904/calculate-time-when-star-is-above-altitude-30
+ * https://astronomy.stackexchange.com/questions/14492/need-simple-equation-for-rise-transit-and-set-time
  *
  * Also helped:
- * https://astronomy.stackexchange.com/questions/14492/need-simple-equation-for-rise-transit-and-set-time
  * https://gist.github.com/Tafkas/4742250
  * https://www.aa.quae.nl/en/reken/sterrentijd.html
  */
@@ -165,6 +178,10 @@ export function calculate_rise_set(alt, ra_dec, date, lat_lon) {
     let result = {
         type: "normal",
         day: date,
+        transit: null,
+        transit_alt: null,
+        lowest: null,
+        lowest_alt: null,
         rise: null,
         set: null
     };
@@ -174,6 +191,20 @@ export function calculate_rise_set(alt, ra_dec, date, lat_lon) {
     let ra = deg_to_rad(ra_dec[0]);
     let dec = deg_to_rad(ra_dec[1]);
     let lat = deg_to_rad(lat_lon[0])
+
+    // Higest and lowest altitude
+    result.transit_alt = rad_to_deg(Math.PI / 2 - Math.abs(dec - lat));
+    result.lowest_alt = rad_to_deg(Math.abs(dec + lat) - Math.PI / 2);
+
+    // Sidereal times of transit (maximum altitude) and lowest point
+    let transit = ra;
+    let lowest = (ra + Math.PI) % (2 * Math.PI);
+
+    // Convert sidereal times to local times
+    result.transit = sidereal_to_time(rad_to_deg(transit), date, lat_lon[1]);
+    result.lowest = sidereal_to_time(rad_to_deg(lowest), date, lat_lon[1]);
+
+    // Calculate local hour angle for set and rise
 
     let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
                 / (Math.cos(lat) * Math.cos(dec));
