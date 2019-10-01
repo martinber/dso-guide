@@ -170,49 +170,33 @@ function main(ctx) {
         ////////////
 
         let sun_threshold_alt = -10;
-        let canvases = draw_day_night_plots(
+        let result = draw_day_night_plots(
             [data.lat, data.lon],
-            [[800, 500]],
+            [800, 500],
             sun_threshold_alt,
             2019
         );
+        let back_canvas = result[0];
+        let min_hs = result[1];
+        let max_hs = result[2];
 
-        $(canvases[0]).appendTo("#user-data");
+        for (let dso of ctx.manager.get_catalog().slice(0, 200))
+        {
+            let canvas = $("<canvas>", { class: "test-canvas" });
+            canvas.appendTo("#user-data");
+            let dso_threshold_alt = 15;
 
-        // for (let dso of ctx.manager.get_catalog().slice(0, 200))
-        // {
-            // let canvas = $("<canvas>", { class: "test-canvas" });
-            // canvas.appendTo("#user-data");
-            // let sun_threshold_alt = -10;
-            // let dso_threshold_alt = 15;
-//
-            // let sun_times = [];
-//
-            // let sun = Celestial.Kepler().id("sol");
-            // for (let month = 0; month < 12; month++) {
-//
-                // let date = new Date(2019, month, 1);
-//
-                // let ra_dec = sun(date)
-                    // .equatorial(Celestial.origin(date).spherical())
-                    // .pos;
-//
-                // sun_times.push(calculate_rise_set(
-                    // sun_threshold_alt,
-                    // ra_dec,
-                    // date,
-                    // [data.lat, data.lon]
-                // ));
-            // }
-//
-            // draw_visibility_plot(
-                // canvas.get(0),
-                // dso,
-                // [data.lat, data.lon],
-                // sun_times,
-                // dso_threshold_alt
-            // );
-        // }
+            draw_visibility_plot(
+                canvas[0],
+                back_canvas,
+                dso,
+                [data.lat, data.lon],
+                dso_threshold_alt,
+                2019,
+                min_hs,
+                max_hs
+            );
+        }
     });
 
     // Login buttons

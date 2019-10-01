@@ -371,8 +371,8 @@ main .inner {
 }
 
 .test-canvas {
-	height: 20em;
-	width: 60em;
+	height: 10em;
+	width: 20em;
 	margin: 1em;
     border: 1px solid white;
 }
