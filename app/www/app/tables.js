@@ -3,7 +3,7 @@
  */
 
 import { watchlist_columns, catalog_columns, object_styles } from "./const.js";
-import { format_eq, format_hor } from "./dso.js";
+import { format_eq, format_hor } from "./tools.js";
 
 let MAX_ROWS = 100;
 

@@ -12,8 +12,8 @@ import { object_styles } from "./const.js";
 import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
 import { aladin_catalogs_init, ui_markers_update } from "./sky.js";
-import { eq_to_geo } from "./dso.js";
-import { draw_visibility_plot, calculate_rise_set } from "./plot.js";
+import { eq_to_geo, calculate_rise_set } from "./tools.js";
+import { draw_visibility_plot } from "./plot.js";
 
 $(document).ready(() => {
 

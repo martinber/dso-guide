@@ -4,7 +4,7 @@
 
 import { object_styles } from "./const.js";
 import { celestial_config } from "./config.js";
-import { eq_to_geo } from "./dso.js";
+import { eq_to_geo } from "./tools.js";
 
 /**
  * Create an Aladin catalog for each style available for watchlist objects.

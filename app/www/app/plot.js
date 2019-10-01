@@ -2,7 +2,7 @@
  * Things related to the time vs height plots
  */
 
-import { eq_to_geo, deg_to_hms } from "./dso.js";
+import { eq_to_geo, deg_to_hms, calculate_rise_set } from "./tools.js";
 
 export function draw_day_plot(canvas, dso) {
     let ctx = canvas.getContext("2d", { alpha: false} );
@@ -254,201 +254,218 @@ function alt_to_px(alt, canvas_height) {
     return canvas_height - (alt / 90 * canvas_height);
 }
 
-function deg_to_rad(deg) {
-    return deg / 180 * Math.PI;
-}
-
-function rad_to_deg(rad) {
-    return rad * 180 / Math.PI;
-}
-
 /**
- * Calculate rise and set times for a given RA/DEC on a given day.
+ * Draw day/night plots for a given year.
  *
- * The rise and set is calculated according a given altitude in degrees.
+ * This function returns off-screen canvas to be used as a background for
+ * subsequent visibility plots. Draws a canvas for each size given.
  *
- * Give ra_dec on degrees (e.g. using eq_to_geo()).
+ * Size is an array of arrays, e.g.: [[w1, h1], [w2, h2], ...]
  *
- * The date object given is used to determine the day. Hours, minutes and
- * seconds are not used.
+ * Off-screen does not mean a canvas with position -999999px, the canvas
+ * is only on memory and not added to the webpage.
  *
- * Returns an object with:
+ * Reference:
  *
- * {
- *     type: "normal" || "below" || "above"
- *     day: Date() object indicating the day (ignore hours, minutes and seconds)
- *     rise: Date() object indicating rise time or null
- *     set: Date() object indicating set time or null
- * }
+ * https://devbutze.blogspot.com/2014/02/html5-canvas-offscreen-rendering.html
  *
- * This is because some objects are always above the given altitude or always
- * below the given altitude.
+ * Debouncer:
  *
- * Based on:
- * https://astronomy.stackexchange.com/questions/10904/calculate-time-when-star-is-above-altitude-30
- *
- * Also helped:
- * https://astronomy.stackexchange.com/questions/14492/need-simple-equation-for-rise-transit-and-set-time
- * https://gist.github.com/Tafkas/4742250
- * https://www.aa.quae.nl/en/reken/sterrentijd.html
+ * https://stackoverflow.com/a/16128377
  */
-export function calculate_rise_set(alt, ra_dec, date, lat_lon) {
+export function draw_day_night_plots(
+    lat_lon,
+    sizes,
+    threshold_alt,
+    year
+) {
 
-    let result = {
-        type: "normal",
-        day: date,
-        rise: null,
-        set: null
-    };
+    let color_day = "#2b3840";
+    let color_night = "#222222";
 
-    // Make calculations in radians
-    alt = deg_to_rad(alt)
-    let ra = deg_to_rad(ra_dec[0]);
-    let dec = deg_to_rad(ra_dec[1]);
-    let lat = deg_to_rad(lat_lon[0])
+    // Create canvases
 
-    let cos_lha = (Math.sin(alt) - Math.sin(lat) * Math.sin(dec))
-                / (Math.cos(lat) * Math.cos(dec));
-
-    // Always above altitude
-    if (cos_lha < -1) {
-        result.type = "above";
-        return result;
+    let canvases = [];
+    for (size of sizes) {
+        canvases.append(
+            $("<canvas>", { width: size[0], height: size[1] })[0]
+        );
     }
 
-    // Always below altitude
-    if (cos_lha > 1) {
-        result.type = "below";
-        return result;
+    // Calculate sunsets and sunrises
+
+    let sun_times = [];
+
+    let sun = Celestial.Kepler().id("sol");
+    for (let month = 0; month < 12; month++) {
+
+        let date = new Date(year, month, 1);
+
+        let ra_dec = sun(date)
+            .equatorial(Celestial.origin(date).spherical())
+            .pos;
+
+        sun_times.push(calculate_rise_set(
+            sun_threshold_alt,
+            ra_dec,
+            date,
+            [data.lat, data.lon]
+        ));
     }
 
-    let lha = Math.acos(cos_lha);
+    for (canvas of canvases) {
+        let ctx = canvas.getContext("2d", { alpha: false} );
 
-    // Sidereal times of sunset and sunrise
-    let set = lha + ra;
-    let rise = -lha + ra;
+        let canvas_w = canvas.width;
+        let canvas_h = canvas.height;
 
-    // Convert sidereal times to local times
-    result.set = sidereal_to_time(rad_to_deg(set), date, lat_lon[1]);
-    result.rise = sidereal_to_time(rad_to_deg(rise), date, lat_lon[1]);
+        // Draw background
 
-    return result;
-}
+        ctx.fillStyle = color_night;
+        ctx.fillRect(0, 0, w, h);
 
-/**
- * Local sidereal time to local time.
- *
- * Times are interpreted and given as degrees. 0hs = 0°, 12hs = 180°, 24hs =
- * 360°. Give longitude as degrees too.
- *
- * The date object given is used to determine the day. Hours, minutes and
- * seconds are not used.
- *
- * Returns a Date();
- */
-function sidereal_to_time(lst, date, longitude) {
-
-    let delta_julian_day = days_since_j2000(date);
-
-    let c = sidereal_constants(delta_julian_day, longitude);
-    let theta_1 = c[0];
-    let theta_p = c[1];
-
-    let theta_0 = 99.967794687 + 0.98564736628603 * delta_julian_day + theta_p;
-    theta_0 = theta_0 % 360;
-
-    // Fractional hours in a sidereal day
-    let sidereal_day_hs = 360 / theta_1;
-
-    let time = (lst - theta_0) / theta_1;
-    time = time % sidereal_day_hs;
-    if (time < 0) {
-        time += sidereal_day_hs;
     }
 
-    // Convert from degrees to hours, minutes and seconds
-    time = deg_to_hms(time)
+    // Calculate span of the plot
 
-    // Return a Date() with the same day given but correct time;
-    let result = new Date(date.getTime()); // Clone Date()
-    result.setUTCHours(time[0], time[1], time[2])
-    return result;
-}
+    let min_time = 24; // Minimum time to show, just before the earliest sunset
+    let max_time = 0; // Minimum time to show, just after the latest sunset
+    for (let i = 0; i < sun_times.length; i++) {
+        if (sun_times[i].type != "normal") {
+            // The sun is always over or below the horizon
+            min_time = 0;
+            max_time = 24;
+        } else {
+            min_time = Math.min(min_time, sun_times[i].set.getHours());
+            max_time = Math.max(max_time, sun_times[i].rise.getHours());
+        }
+    }
+    min_time = Math.max(0, min_time - 1); // Add a margin if possible
+    max_time = Math.min(24, max_time + 1);
+    min_time = 0;
+    max_time = 24;
+    // let hour_span = 24 - min_time + max_time;
+    let hour_span = 24;
+    let px_per_min = (h / hour_span) / 60;
+    let px_per_month = w / 12;
 
-/**
- * Calculate constants used for sidereal day calculations
- *
- * Taken from: https://www.aa.quae.nl/en/reken/sterrentijd.html
- *
- * The first argument is "Delta Julian Day", integer of days since J2000 (1 Jan
- * 2000).
- *
- * Give longitude as degrees.
- *
- * Returns theta_1 and theta_p.
- */
-function sidereal_constants(delta_julian_day, longitude) {
-    let theta_1 = 15.04106864026192
-                + 2.423233e-14 * delta_julian_day
-                + -6.628e-23 * delta_julian_day**2;
+    // Draw day
 
-    let theta_p = 2.907879e-13 * delta_julian_day**2
-                - 5.302e-22 * delta_julian_day**3
-                + longitude;
+    ctx.fillStyle = color_day;
+    for (let i = 0; i < sun_times.length; i++) {
+        let sun_time = sun_times[i];
+        let rise_hs;
+        let rise_min;
+        let set_hs;
+        let set_min;
+        switch (sun_time.type) {
+            case "normal":
+                rise_hs = sun_time.rise.getHours();
+                rise_min = sun_time.rise.getMinutes();
+                set_hs = sun_time.set.getHours();
+                set_min = sun_time.set.getMinutes();
+                break;
 
-    return [theta_1, theta_p];
-}
+            case "above":
+                rise_hs = 0;
+                rise_min = 0;
+                set_hs = 23;
+                set_min = 60;
+                break;
 
-/**
- * Calculate days since J2000 (1 Jan 2000) as an integer.
- *
- * Taken from d3-celestial
- *
- * I only use the year, month and day from the Date object given.
- *
- * Copyright (c) 2015, Olaf Frohn
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-function days_since_j2000(date) {
-    var yr = date.getUTCFullYear();
-    var mo = date.getUTCMonth() + 1;
-    var dy = date.getUTCDate();
+            case "below":
+                rise_hs = 23;
+                rise_min = 60;
+                set_hs = 0;
+                set_min = 0;
+                break;
+        }
+        if (rise_hs * 60 + rise_min < set_hs * 60 + set_min) {
 
-    if ((mo == 1)||(mo == 2)) {
-        yr  = yr - 1;
-        mo = mo + 12;
+            let y = ((rise_hs) * 60 + rise_min) * px_per_min;
+            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+            ctx.fillRect(i * px_per_month, y, px_per_month, height);
+
+
+        } else {
+            let y = 0;
+            let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+            ctx.fillRect(i * px_per_month, y, px_per_month, height);
+
+            y = ((rise_hs) * 60 + rise_min) * px_per_min;
+            height = h - y;
+
+            ctx.fillRect(i * px_per_month, y, px_per_month, height);
+        }
+
     }
 
-    var a = Math.floor(yr / 100);
-    var b = 2 - a + Math.floor(a / 4);
-    var c = Math.floor(365.25 * yr);
-    var d = Math.floor(30.6001 * (mo + 1));
+    // Draw dso
 
-    return b + c + d - 730550 + dy;
+    {
+        // Calculate for January and interpolate until January next year
+        let dso_jan_times = calculate_rise_set(
+            threshold_alt, eq_to_geo(dso.coords), sun_times[0].day, lat_lon);
+
+        ctx.fillStyle = color_visible;
+
+        switch (dso_jan_times.type) {
+            case "normal":
+                let rise_hs = dso_jan_times.rise.getHours();
+                let rise_min = dso_jan_times.rise.getMinutes();
+                let set_hs = dso_jan_times.set.getHours();
+                let set_min = dso_jan_times.set.getMinutes();
+
+                if (rise_hs * 60 + rise_min > set_hs * 60 + set_min) {
+                    set_hs += 24;
+                }
+
+                let y = ((rise_hs) * 60 + rise_min) * px_per_min;
+                let height = ((set_hs) * 60 + set_min) * px_per_min - y;
+
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y - 24 * 60 * px_per_min);
+                ctx.lineTo(w, y - 24 * 60 * px_per_min + height);
+                ctx.lineTo(0, y + height);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(0, y - 24 * 60 * px_per_min);
+                ctx.lineTo(w, y - 2 * 24 * 60 * px_per_min);
+                ctx.lineTo(w, y - 2 * 24 * 60 * px_per_min + height);
+                ctx.lineTo(0, y - 24 * 60 * px_per_min + height);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(0, y + 24 * 60 * px_per_min);
+                ctx.lineTo(w, y);
+                ctx.lineTo(w, y + height);
+                ctx.lineTo(0, y + 24 * 60 * px_per_min + height);
+                ctx.closePath();
+                ctx.fill();
+                break;
+
+            case "above":
+                ctx.fillRect(0, 0, w, h);
+                break;
+
+            case "below":
+                break;
+        }
+
+
+    }
+
+    return;
+
+    // Calculate DSO rise and set times for each day on the sunrises array
+
+    let dso_times = [] // Times when DSO rises and sets
+    for (let i = 0; i < sun_times.length; i++) {
+        let date = sun_times[i].day;
+        dso_times.push(calculate_rise_set(threshold_alt, eq_to_geo(dso.coords), date, lat_lon));
+    }
 }
