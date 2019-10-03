@@ -10,8 +10,8 @@
   --red-3: #AF4242;
   --red-4: #FF6C6C;
 
-  --status-z-index: 20;
-  --header-z-index: 19;
+  --status-z-index: 30;
+  --header-z-index: 29;
 }
 
 
@@ -532,6 +532,13 @@ legend {
 	min-width: 3em;
 }
 
+.small-visibility-plot
+{
+	width: 5em;
+	height: 2em;
+	border: 1px solid var(--gray-25);
+}
+
 /* TABLE -------------------------------------------------------------- */
 
 .objects-table
@@ -683,12 +690,12 @@ legend {
 
 	.objects-table tbody tr:nth-child(even)
 	{
-		background-color: #282828; /* TODO */
+		background-color: var(--gray-1);
 	}
 
 	.objects-table tbody tr:nth-child(odd)
 	{
-		background-color: #333333; /* TODO */
+		background-color: var(--black);
 	}
 
 }

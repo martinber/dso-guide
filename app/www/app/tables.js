@@ -4,6 +4,7 @@
 
 import { watchlist_columns, catalog_columns, object_styles } from "./const.js";
 import { format_eq, format_hor } from "./tools.js";
+import { draw_visibility_plot } from "./plot.js";
 
 let MAX_ROWS = 100;
 
@@ -13,6 +14,7 @@ let MAX_ROWS = 100;
  * - dso_manager: A DsoManager
  * - date: A Date() to use on ALT/AZ calculations
  * - location: latitude and longitude to use on ALT/AZ calculations
+ * - plot: object with parameters of visibility plot
  * - add_callback(dso): Called when user clicks the add button, gives dso as
  *   argument
  * - delete_callback(watch_dso): Called when user clicks the delete button,
@@ -30,6 +32,7 @@ export function TableManager(
     dso_manager,
     date,
     location,
+    plot,
     add_callback,
     delete_callback,
     save_callback,
@@ -42,6 +45,7 @@ export function TableManager(
     this._dso_manager.set_watchlist_change_callback(watchlist_change_callback);
     this._date = date;
     this._location = location;
+    this._plot = plot;
 
     // Table filters toggle
 
@@ -180,6 +184,7 @@ export function TableManager(
             this._dso_manager.get_watchlist_view(),
             this._date,
             this._location,
+            this._plot,
             delete_callback,
             save_callback,
             goto_callback,
@@ -191,8 +196,8 @@ export function TableManager(
     /**
      * Update ALT/AZ calculations for the catalog and watchlist
      *
-     * Give as argument a Date() and [lat, long]. If one of the arguments is
-     * null it will keep the previous value
+     * Give as argument a Date(), [lat, long] and a plot parameters object. If
+     * one of the arguments is null it will keep the previous value
      */
     this.update_datetime_location = function(date, location) {
         if (date != null) {
@@ -208,6 +213,7 @@ export function TableManager(
             this._dso_manager.get_watchlist_view(),
             this._date,
             this._location,
+            this._plot,
             delete_callback,
             save_callback,
             goto_callback,
@@ -221,6 +227,7 @@ export function TableManager(
             this._dso_manager,
             this._date,
             this._location,
+            this._plot,
             add_callback,
             goto_callback
         )
@@ -256,6 +263,7 @@ function watchlist_update(
     watchlist_view,
     date,
     location,
+    plot,
     delete_callback,
     save_callback,
     goto_callback,
@@ -272,10 +280,25 @@ function watchlist_update(
     for (let i = start; i < end; i++) {
         let watch_dso = watchlist_view[i];
 
+        let plot_canvas = $("<canvas>", { class: "small-visibility-plot" })[0];
+        if (plot.back_canvas != null) {
+            draw_visibility_plot(
+                plot_canvas,
+                plot.back_canvas,
+                watch_dso.dso,
+                plot.lat_lon,
+                plot.dso_threshold_alt,
+                plot.year,
+                plot.min_hs,
+                plot.max_hs
+            );
+        }
+
         let tr = watchlist_create_row(
             watch_dso,
             date,
             location,
+            plot_canvas,
             delete_callback,
             save_callback,
             goto_callback,
@@ -304,6 +327,7 @@ function catalog_filter_and_update(
     dso_manager,
     date,
     location,
+    plot,
     add_callback,
     goto_callback
 ) {
@@ -341,10 +365,17 @@ function catalog_filter_and_update(
         return true;
     });
 
-    catalog_update(dso_manager.get_catalog_view(), date, location, add_callback, goto_callback);
+    catalog_update(dso_manager.get_catalog_view(), date, location, plot, add_callback, goto_callback);
 }
 
-function catalog_update(catalog_view, date, location, add_callback, goto_callback) {
+function catalog_update(
+    catalog_view,
+    date,
+    location,
+    plot,
+    add_callback,
+    goto_callback
+) {
     let page = 1;
     let start = (page - 1) * MAX_ROWS;
     let end = Math.min(page * MAX_ROWS, catalog_view.length);
@@ -355,11 +386,34 @@ function catalog_update(catalog_view, date, location, add_callback, goto_callbac
     for (let i = start; i < end; i++) {
         let dso = catalog_view[i];
 
+        let plot_canvas = $("<canvas>", { class: "small-visibility-plot" })[0];
         let added = dso.on_watchlist;
-        let tr = catalog_create_row(dso, date, location, added, add_callback, goto_callback);
+        let tr = catalog_create_row(
+            dso,
+            date,
+            location,
+            added,
+            plot_canvas,
+            add_callback,
+            goto_callback
+        );
 
         dso.set_catalog_tr(tr);
         tbody.append(tr);
+
+        if (plot.back_canvas != null) {
+            draw_visibility_plot(
+                plot_canvas,
+                plot.back_canvas,
+                dso,
+                plot.lat_lon,
+                plot.dso_threshold_alt,
+                plot.year,
+                plot.min_hs,
+                plot.max_hs
+            );
+            console.log(plot_canvas);
+        }
     }
 }
 
@@ -449,6 +503,16 @@ function create_ra_dec_cell(ra_dec) {
             })
         )
     );
+}
+
+/**
+ * Create table cell with visibility plot
+ */
+function create_plot_cell(canvas) {
+
+    return $("<td>", {
+        class: "objects-plot",
+    }).append(canvas);
 }
 
 /**
@@ -597,6 +661,7 @@ function catalog_create_header(tr) {
  * - watch_dso: WatchDso object
  * - date: A Date() to use on ALT/AZ calculations
  * - location: latitude and longitude to use on ALT/AZ calculations
+ * - plot_canvas: canvas of visibilty plot
  * - delete_callback(watch_dso): Called when user clicks the delete button,
  *   gives watch_dso as argument
  * - save_callback(watch_dso): Called when user clicks the save button, gives
@@ -612,6 +677,7 @@ function watchlist_create_row(
     watch_dso,
     date,
     location,
+    plot_canvas,
     delete_callback,
     save_callback,
     goto_callback,
@@ -644,6 +710,10 @@ function watchlist_create_row(
             case "alt-az":
                 let alt_az = format_hor(watch_dso.dso.get_alt_az(date, location));
                 tr.append(create_alt_az_cell(alt_az));
+                break;
+
+            case "plot":
+                tr.append(create_plot_cell(plot_canvas));
                 break;
 
             case "notes":
@@ -691,6 +761,7 @@ function watchlist_create_row(
  * - location: latitude and longitude to use on ALT/AZ calculations
  * - added: Whether the object is already on the watchlist, in that case the add
  *   button is disabled
+ * - plot_canvas: canvas of visibilty plot
  * - add_callback(dso): Called when user clicks the add button, gives dso as
  *   argument
  * - goto_callback(dso): Called when user clicks the goto button, gives dso as
@@ -701,6 +772,7 @@ function catalog_create_row(
     date,
     location,
     added,
+    plot_canvas,
     add_callback,
     goto_callback,
 ) {
@@ -730,6 +802,10 @@ function catalog_create_row(
             case "alt-az":
                 let alt_az = format_hor(dso.get_alt_az(date, location));
                 tr.append(create_alt_az_cell(alt_az));
+                break;
+
+            case "plot":
+                tr.append(create_plot_cell(plot_canvas));
                 break;
 
             case "controls":

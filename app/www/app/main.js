@@ -13,7 +13,7 @@ import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
 import { aladin_catalogs_init, ui_markers_update } from "./sky.js";
 import { eq_to_geo, calculate_rise_set } from "./tools.js";
-import { draw_visibility_plot, draw_day_night_plots } from "./plot.js";
+import { draw_day_night_plots } from "./plot.js";
 
 $(document).ready(() => {
 
@@ -36,7 +36,18 @@ $(document).ready(() => {
 
         // List of aladin catalogs (categories of markers, each one with a
         // different shape and color)
-        aladin_catalogs: aladin_catalogs_init()
+        aladin_catalogs: aladin_catalogs_init(),
+
+        // For plots
+        plot: {
+            sun_threshold_alt: -10,
+            dso_threshold_alt: 15,
+
+            year: null,
+            back_canvas: null, // Background image of daylight plot
+            min_hs: null, // Fractional hours at the top of the plot
+            max_hs: null // Fractional hours at the bottom of the plot
+        }
     };
 
     // Load JSON data of objects, then start on the main() function
@@ -53,6 +64,7 @@ $(document).ready(() => {
             ctx.manager,
             new Date(),
             [0, 0], // location
+            ctx.plot,
             dso => server_watchlist_add(ctx, dso.id),
             watch_dso => server_watchlist_delete(ctx, watch_dso),
             watch_dso => server_watchlist_save(ctx, watch_dso),
@@ -129,6 +141,7 @@ function main(ctx) {
         let [hour, min] = $("#datetime-time").val().split(":");
         let date = new Date(year, month - 1, day, hour, min);
         ui_celestial_datetime_update(date);
+        ui_plot_bg_update(ctx, new Date(), null);
         ctx.table_manager.update_datetime_location(date, null);
     });
 
@@ -165,38 +178,8 @@ function main(ctx) {
         }
 
         ui_celestial_location_update(data.lat, data.lon);
+        ui_plot_bg_update(ctx, null, [data.lat, data.lon]);
         ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
-
-        ////////////
-
-        let sun_threshold_alt = -10;
-        let result = draw_day_night_plots(
-            [data.lat, data.lon],
-            [800, 500],
-            sun_threshold_alt,
-            2019
-        );
-        let back_canvas = result[0];
-        let min_hs = result[1];
-        let max_hs = result[2];
-
-        for (let dso of ctx.manager.get_catalog().slice(0, 200))
-        {
-            let canvas = $("<canvas>", { class: "test-canvas" });
-            canvas.appendTo("#user-data");
-            let dso_threshold_alt = 15;
-
-            draw_visibility_plot(
-                canvas[0],
-                back_canvas,
-                dso,
-                [data.lat, data.lon],
-                dso_threshold_alt,
-                2019,
-                min_hs,
-                max_hs
-            );
-        }
     });
 
     // Login buttons
@@ -285,6 +268,44 @@ function ui_aladin_goto(ctx, dso) {
  */
 function ui_celestial_datetime_update(datetime) {
     Celestial.skyview({date: datetime});
+}
+
+/**
+ * Redraw the daylight plot if neccesary
+ *
+ * If unchanged, datetime and lat_lon arguments can be null. But if the plot was
+ * never drawn before, both arguments must be valid, otherwise nothing will
+ * happen
+ */
+function ui_plot_bg_update(ctx, datetime, lat_lon) {
+    let redraw = false;
+
+    if (ctx.plot.back_canvas == null) {
+        redraw = true;
+    }
+
+    if (datetime != null && ctx.plot.year != datetime.getYear()) {
+        ctx.plot.year = datetime.getYear();
+        redraw = true;
+    }
+
+    if (lat_lon != null && ctx.plot.lat_lon != lat_lon) {
+        ctx.plot.lat_lon = lat_lon;
+        redraw = true;
+    }
+
+
+    if (redraw && ctx.plot.year != null && ctx.plot.lat_lon != null) {
+        let result = draw_day_night_plots(
+            ctx.plot.lat_lon,
+            [800, 500],
+            ctx.plot.sun_threshold_alt,
+            ctx.plot.year
+        );
+        ctx.plot.back_canvas = result[0];
+        ctx.plot.min_hs = result[1];
+        ctx.plot.max_hs = result[2];
+    }
 }
 
 /**

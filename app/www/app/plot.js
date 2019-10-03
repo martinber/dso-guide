@@ -98,7 +98,7 @@ export function draw_visibility_plot(
     canvas.width = canvas_w;
     canvas.height = canvas_h;
 
-    let color_visible = "#88666694";
+    let color_visible = "#FF6C6C50";
     let color_grid = "#00000085";
 
     let width_grid = 2;
@@ -117,74 +117,66 @@ export function draw_visibility_plot(
         return Math.floor(((hs - min_hs) / span_hs) * canvas_h);
     }
 
-    {
-        // Calculate for January and interpolate until January next year
-        let dso_jan_times = calculate_rise_set(
-            threshold_alt, eq_to_geo(dso.coords), new Date(year, 0, 1), lat_lon);
+    // Calculate for January and interpolate until January next year
+    let dso_jan_times = calculate_rise_set(
+        threshold_alt, eq_to_geo(dso.coords), new Date(year, 0, 1), lat_lon);
 
-        ctx.fillStyle = color_visible;
+    ctx.fillStyle = color_visible;
 
-        switch (dso_jan_times.type) {
-            case "normal":
-                let rise_hs = fractional_hours(dso_jan_times.rise);
-                let set_hs = fractional_hours(dso_jan_times.set);
+    switch (dso_jan_times.type) {
+        case "normal":
+            let rise_hs = fractional_hours(dso_jan_times.rise);
+            let set_hs = fractional_hours(dso_jan_times.set);
 
-                while (rise_hs < min_hs) {
-                    rise_hs += 24;
-                }
-                while (set_hs < rise_hs) {
-                    set_hs += 24;
-                }
+            while (rise_hs < min_hs) {
+                rise_hs += 24;
+            }
+            while (set_hs < rise_hs) {
+                set_hs += 24;
+            }
 
-                let rise_y = hs_to_y(rise_hs);
-                let set_y = hs_to_y(set_hs);
-                let day_h = hs_to_y(24) - hs_to_y(0);
-                let pass_h = set_y - rise_y;
+            let rise_y = hs_to_y(rise_hs);
+            let set_y = hs_to_y(set_hs);
+            let day_h = hs_to_y(24) - hs_to_y(0);
+            let pass_h = set_y - rise_y;
 
-                // Draw pass polygon
-                ctx.beginPath();
-                ctx.moveTo(0, rise_y);
-                ctx.lineTo(canvas_w, rise_y - day_h);
-                ctx.lineTo(canvas_w, rise_y - day_h + pass_h);
-                ctx.lineTo(0, rise_y + pass_h);
-                ctx.closePath();
-                ctx.fill();
+            // Draw pass polygon
+            ctx.beginPath();
+            ctx.moveTo(0, rise_y);
+            ctx.lineTo(canvas_w, rise_y - day_h);
+            ctx.lineTo(canvas_w, rise_y - day_h + pass_h);
+            ctx.lineTo(0, rise_y + pass_h);
+            ctx.closePath();
+            ctx.fill();
 
-                // Draw pass polygon 24hs above
-                ctx.beginPath();
-                ctx.moveTo(0, rise_y - day_h);
-                ctx.lineTo(canvas_w, rise_y - 2 * day_h);
-                ctx.lineTo(canvas_w, rise_y - 2 * day_h + pass_h);
-                ctx.lineTo(0, rise_y + pass_h - day_h);
-                ctx.closePath();
-                ctx.fill();
+            // Draw pass polygon 24hs above
+            ctx.beginPath();
+            ctx.moveTo(0, rise_y - day_h);
+            ctx.lineTo(canvas_w, rise_y - 2 * day_h);
+            ctx.lineTo(canvas_w, rise_y - 2 * day_h + pass_h);
+            ctx.lineTo(0, rise_y + pass_h - day_h);
+            ctx.closePath();
+            ctx.fill();
 
-                // Draw pass polygon 24hs below
-                ctx.beginPath();
-                ctx.moveTo(0, rise_y + day_h);
-                ctx.lineTo(canvas_w, rise_y);
-                ctx.lineTo(canvas_w, rise_y + pass_h);
-                ctx.lineTo(0, rise_y + pass_h + day_h);
-                ctx.closePath();
-                ctx.fill();
-                break;
+            // Draw pass polygon 24hs below
+            ctx.beginPath();
+            ctx.moveTo(0, rise_y + day_h);
+            ctx.lineTo(canvas_w, rise_y);
+            ctx.lineTo(canvas_w, rise_y + pass_h);
+            ctx.lineTo(0, rise_y + pass_h + day_h);
+            ctx.closePath();
+            ctx.fill();
+            break;
 
-            case "above":
-                ctx.fillRect(0, 0, canvas_w, canvas_h);
-                break;
+        case "above":
+            ctx.fillRect(0, 0, canvas_w, canvas_h);
+            break;
 
-            case "below":
-                break;
-        }
-
-
+        case "below":
+            break;
     }
 
     return canvas;
-}
-
-function deg_to_fraction(deg) {
-    return deg / 90;
 }
 
 /**
@@ -214,8 +206,8 @@ export function draw_day_night_plots(
     year
 ) {
 
-    let color_day = "#2b3840";
-    let color_night = "#222222";
+    let color_day = "#212c31";
+    let color_night = "#000000";
 
     // Calculate sunsets and sunrises
 

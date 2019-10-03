@@ -17,6 +17,7 @@ export const watchlist_columns = [
     { name: "style", string: "Style" },
     { name: "controls", string: "Controls" },
     { name: "notes", string: "Notes" },
+    { name: "plot", string: "Plot" },
 ];
 
 /**
@@ -31,6 +32,7 @@ export const catalog_columns = [
     { name: "alt-az", string: "ALT/AZ" },
     { name: "controls", string: "Controls" },
     { name: "appears_on", string: "Appears on" },
+    { name: "plot", string: "Plot" },
 ];
 
 /**
