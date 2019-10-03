@@ -1,3 +1,20 @@
+:root {
+  --black: #000000;
+  --gray-1: #131313;
+  --gray-2: #252525;
+  --gray-25: #444444;
+  --gray-3: #999999;
+  --gray-4: #EEEEEE;
+  --red-1: #6C0404;
+  --red-2: #AF0404;
+  --red-3: #AF4242;
+  --red-4: #FF6C6C;
+
+  --status-z-index: 20;
+  --header-z-index: 19;
+}
+
+
 html
 {
 	scroll-behavior: smooth;
@@ -6,8 +23,8 @@ html
 body
 {
 	font-family: 'Saira Condensed', sans-serif;
-	background-color: #222222;
-	color: #EEEEEE;
+	background-color: var(--black);
+	color: var(--gray-4);
 }
 
 .inner
@@ -19,7 +36,7 @@ body
 
 a
 {
-	color: #AAAAFF;
+	color: var(--red-4);
 }
 
 a:hover
@@ -38,27 +55,26 @@ textarea, input[type="text"], input[type="date"], input[type="email"],
 	input[type="number"]
 {
 	border: none;
-	background-color: #444444;
-	color: #EEEEEE;
+	background-color: var(--gray-2);
+	color: var(--gray-4);
 	height: 2em;
 }
 
 textarea:focus, input[type="text"]:focus, input[type="date"]:focus,
 	input[type="email"]:focus, input[type="password"]:focus,
 	input[type="search"]:focus, input[type="time"]:focus,
-	input[type="number"]:focus,
+	input[type="number"]:focus
 {
-	background-color: #555555;
+    border: 1px solid var(--red-1);
 }
 
 button, input[type="submit"]
 {
 	border: none;
-	background-color: #333;
-	color: #EEEEEE;
+	background-color: var(--gray-2);
+	color: var(--gray-4);
 	box-shadow: 0px 0px 3px #00000055;
 	outline: none;
-	background-color: #444444;
 	padding: 0.4em;
 	margin: 0.2em;
 	height: 2em;
@@ -68,13 +84,15 @@ button, input[type="submit"]
 button:active, input[type="submit"]:active
 {
 	box-shadow: none;
-	background-color: #555555;
+	box-sizing: border-box;
+    background-color: var(--red-1);
 }
 
 button[disabled=disabled], button:disabled, input[type="submit"]:disabled
 {
-	background-color: #555555;
-	color: #999999;
+	background-color: transparent;
+	border: 1px solid var(--gray-2);
+	color: var(--gray-3);
 	cursor: auto;
 }
 
@@ -82,9 +100,10 @@ button[disabled=disabled], button:disabled, input[type="submit"]:disabled
 
 header
 {
-	background-color: #333333;
+	background-color: var(--gray-1);
 	padding: 0.5em;
 	overflow: auto; /* Otherwise the #user-controls float escapes the container */
+	border-bottom: 4px solid var(--red-2);
 }
 
 header h1
@@ -114,7 +133,7 @@ header nav ul li
 	display: inline-block;
 	padding: 0 0.5em;
 	margin: 0;
-	border-right: 1px solid #EEEEEE;
+	border-right: 1px solid var(--gray-4);
 }
 
 header nav ul li:last-child
@@ -124,7 +143,7 @@ header nav ul li:last-child
 
 header nav ul li a
 {
-	color: #EEEEEE;
+	color: var(--gray-4);
 	text-decoration: none;
 }
 
@@ -135,7 +154,7 @@ header nav ul li a:hover
 
 a
 {
-	color: #AAAAFF;
+	color: var(--red-4);
 }
 
 *, *:before, *:after {
@@ -144,7 +163,7 @@ a
 	box-sizing: border-box;
 }
 
-header nav ul li:last
+header nav ul li:last-child
 {
 	border-right: none;
 }
@@ -183,9 +202,10 @@ header #user-controls
 	left: 0;
 	width: 100%;
 
-	z-index: 999; /* Otherwise the aladin map is on top */
+	z-index: var(--status-z-index); /* Otherwise the aladin map is on top */
 	padding: 0.7em;
-	background-color: #664444;
+	background-color: var(--red-2);
+	color: var(--gray-4);
 	box-shadow: 0px 0px 3px #00000055;
 	transition: all ease-in-out 0.1s;
 }
@@ -204,7 +224,8 @@ body
 
 	height: 2em;
 	margin: 0;
-	background-color: #664444;
+	background-color: var(--red-2);
+	color: var(--gray-4);
 	box-shadow: 0px 0px 3px #00000055;
 	visibility: visible; /* So this is shown even of the parent is hidden */
 
@@ -234,7 +255,7 @@ body
 
 #info-toggle:active
 {
-	background-color: #775555;
+	background-color: var(--red-1);
 }
 
 /* REGISTER -------------------------------------------------------------- */
@@ -252,7 +273,7 @@ body
 	max-width: 20em;
 	display: block;
 	margin: 0 auto;
-	background-color: #333333;
+	background-color: var(--gray-1);
 	padding: 1em;
 }
 
@@ -274,7 +295,7 @@ body
 	max-width: 20em;
 	display: block;
 	margin: 1em auto;
-	background-color: #333333;
+	background-color: var(--gray-1);
 	padding: 1em;
 }
 
@@ -295,8 +316,9 @@ body
 
 footer
 {
-	background-color: #333333;
+	background-color: var(--gray-1);
 	padding: 0.5em;
+	border-top: 4px solid var(--red-2);
 }
 
 /* CONTENT ------------------------------------------------------------ */
@@ -316,8 +338,17 @@ main .inner {
 
 #content h2
 {
-	border-bottom: 3px solid #777777;
 	font-size: 30px;
+	border-bottom: 4px solid var(--red-2);
+    background-color: var(--black);
+    position: sticky;
+    top: 0px;
+    z-index: var(--header-z-index);
+    margin-top: 0;
+}
+
+.hidden-anchor {
+    margin-top: 1em;
 }
 
 #celestial-container
@@ -371,10 +402,10 @@ main .inner {
 }
 
 .test-canvas {
-	height: 10em;
-	width: 20em;
+	height: 2em;
+	width: 4em;
 	margin: 1em;
-    border: 1px solid white;
+  border: 1px solid white;
 }
 
 /* SIDEBAR ------------------------------------------------------------ */
@@ -391,7 +422,7 @@ main .inner {
 
 #sidebar span
 {
-	color: #AAAAAA;
+	color: var(--gray-3);
 }
 
 #sidebar nav ol
@@ -408,7 +439,7 @@ main .inner {
 
 #sidebar nav a
 {
-	color: #EEEEEE;
+	color: var(--gray-4);
 	text-decoration: underline;
 }
 
@@ -471,7 +502,7 @@ main .inner {
 {
 	padding: 0.7em;
 	margin: 1em 0;
-	background-color: #333333;
+	background-color: var(--gray-1);
 }
 
 fieldset div
@@ -482,7 +513,7 @@ fieldset div
 
 fieldset
 {
-	border: 1px solid #555555;
+	border: 1px solid var(--gray-2);
 	margin-bottom: 0.7em;
 }
 
@@ -543,12 +574,12 @@ legend {
 
 .objects-table th:hover
 {
-	background-color: #555555;
+	background-color: var(--red-1);
 }
 
 .objects-table th:active
 {
-	background-color: #777777;
+	background-color: var(--red-2);
 }
 
 .objects-table td
@@ -559,22 +590,23 @@ legend {
 
 .objects-table thead
 {
-	background-color: #444444;
+	background-color: var(--gray-2);
+	color: var(--gray-4);
 }
 
 .objects-table tbody tr:nth-child(odd)
 {
-	background-color: #282828;
+	background-color: var(--gray-1);
 }
 
 .objects-table tbody tr:nth-child(even)
 {
-	background-color: #333333;
+	background-color: var(--black);
 }
 
 .objects-label
 {
-	color: #555555;
+	color: #555555; /* TODO */
 	display: none;
 }
 
@@ -610,11 +642,12 @@ legend {
 	resize: vertical;
 	min-height: 2.5em;
 	background-color: transparent;
-	border: 1px solid #555555;
+	border: 1px solid var(--gray-2);
 }
 
 .objects-table td.objects-notes textarea:focus {
-	background-color: #444444;
+	background-color: var(--gray-2);
+	border: 1px solid var(--red-1);
 }
 
 .objects-table td.objects-appears-on ul {
@@ -628,7 +661,7 @@ legend {
 	display: inline-block;
 	margin: 0 0.2em;
 	padding: 0.2em;
-	border: 1px solid #555555;
+	border: 1px solid var(--gray-25);
 }
 
 @media screen and (max-width: 750px) {
@@ -650,12 +683,12 @@ legend {
 
 	.objects-table tbody tr:nth-child(even)
 	{
-		background-color: #282828;
+		background-color: #282828; /* TODO */
 	}
 
 	.objects-table tbody tr:nth-child(odd)
 	{
-		background-color: #333333;
+		background-color: #333333; /* TODO */
 	}
 
 }
@@ -666,7 +699,7 @@ legend {
 	margin-top: 1em;
 	padding: 0.5em;
 	width: 100%;
-	background-color: #282828;
+	background-color: var(--gray-1);
 	overflow: auto;
 }
 
@@ -675,7 +708,7 @@ legend {
 	margin: 0;
 	padding: 0;
 	background-color: transparent;
-	color: #AAAAFF;
+	color: var(--red-4);
 	text-decoration: underline;
 	box-shadow: none;
 	height: auto;
@@ -683,7 +716,7 @@ legend {
 
 .table-pagination button[disabled=disabled], .table-pagination button:disabled
 {
-	color: #AAA;
+	color: var(--gray-3);
 	text-decoration: none;
 	cursor: default;
 }

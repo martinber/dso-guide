@@ -121,176 +121,172 @@
 
 					</section>
 
-					<h2 id="sky-chart">Sky chart</h2>
+					<div id="sky-chart" class="hidden-anchor"></div><h2>Sky chart</h2>
 					<section id="celestial-container">
 						<div id="celestial-map"></div>
 						<div id="celestial-form"></div>
 					</section>
 
-					<h2 id="sky-surveys">Sky surveys</h2>
+					<div id="sky-surveys" class="hidden-anchor"></div><h2>Sky surveys</h2>
 					<section id="aladin-container">
 						<div id='aladin-map'></div>
 					</section>
 
-					<section id="lists">
+					<div id="watchlist" class="hidden-anchor"></div><h2>Watchlist</h2>
 
-						<h2 id="watchlist">Watchlist</h2>
+					<div class="table-advanced" id="watchlist-advanced">
 
-						<div class="table-advanced" id="watchlist-advanced">
+						<button class="toggle">
+							Advanced
+						</button>
 
-							<button class="toggle">
-								Advanced
-							</button>
+						<form class="collapse table-form" id="watchlist-advanced-form" action="">
 
-							<form class="collapse table-form" id="watchlist-advanced-form" action="">
+							<fieldset>
+								<legend>Visible columns</legend>
 
-								<fieldset>
-									<legend>Visible columns</legend>
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-mag"
+											name="mag" checked \>
+									<label for="watchlist-visible-col-mag">Magnitude</label>
+								</div>
 
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-mag"
-												name="mag" checked \>
-										<label for="watchlist-visible-col-mag">Magnitude</label>
-									</div>
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-ra-dec"
+											name="ra-dec" checked \>
+									<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
+								</div>
 
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-ra-dec"
-												name="ra-dec" checked \>
-										<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
-									</div>
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-alt-az"
+											name="alt-az" checked \>
+									<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
+								</div>
 
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-alt-az"
-												name="alt-az" checked \>
-										<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
-									</div>
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-notes"
+											name="notes" checked \>
+									<label for="watchlist-visible-col-notes">Notes</label>
+								</div>
 
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-notes"
-												name="notes" checked \>
-										<label for="watchlist-visible-col-notes">Notes</label>
-									</div>
-
-								</fieldset>
-
-								<input type="submit" value="Apply"></input>
-
-							</form>
-						</div>
-
-						<form class="table-form" id="watchlist-filter-form">
-							<div>
-								<label for="watchlist-search">Filter by name:</label>
-								<input type="search" id="watchlist-search"
-										name="search" autocomplete="off" \>
-							</div>
-							<input type="submit" value="Apply"></input>
-						</form>
-
-						<div class="table-pagination" id="watchlist-pagination">
-							<span class="table-stats">Showing objects
-								<strong class="table-from">0</strong>
-								-
-								<strong class="table-to">0</strong>
-								of
-								<strong class="table-total">0</strong></span>
-							<span class="table-controls">
-								<button class="table-prev">Previous</button>
-								-
-								<button class="table-next">Next</button>
-							</span>
-						</div>
-
-						<table class="objects-table" id="watchlist-table">
-							<thead>
-								<tr>
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
-
-						<h2 id="catalog">Catalog</h2>
-
-						<div class="table-advanced" id="catalog-advanced">
-
-							<button class="toggle">
-								Advanced
-							</button>
-
-							<form class="collapse table-form" id="catalog-advanced-form" action="">
-
-								<fieldset>
-									<legend>Visible columns</legend>
-
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-mag"
-												name="mag" checked \>
-										<label for="watchlist-visible-col-mag">Magnitude</label>
-									</div>
-
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-ra-dec"
-												name="ra-dec" checked \>
-										<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
-									</div>
-
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-alt-az"
-												name="alt-az" checked \>
-										<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
-									</div>
-
-									<div>
-										<input type="checkbox" id="watchlist-visible-col-notes"
-												name="notes" checked \>
-										<label for="watchlist-visible-col-notes">Notes</label>
-									</div>
-
-								</fieldset>
-
-								<input type="submit" value="Apply"></input>
-
-							</form>
-						</div>
-
-						<form class="table-form" id="catalog-filter-form">
-							<fieldset id="catalog-select-fieldset">
-								<legend>Enabled catalogs</legend>
 							</fieldset>
 
-							<div>
-								<label for="catalog-search">Filter by name:</label>
-								<input type="search" id="catalog-search"
-										name="search" autocomplete="off" \>
-							</div>
 							<input type="submit" value="Apply"></input>
+
 						</form>
+					</div>
 
-						<div class="table-pagination" id="catalog-pagination">
-							<span class="table-stats">Showing objects
-								<strong class="table-from">0</strong>
-								-
-								<strong class="table-to">0</strong>
-								of
-								<strong class="table-total">0</strong></span>
-							<span class="table-controls">
-								<button class="table-prev">Previous</button>
-								-
-								<button class="table-next">Next</button>
-							</span>
+					<form class="table-form" id="watchlist-filter-form">
+						<div>
+							<label for="watchlist-search">Filter by name:</label>
+							<input type="search" id="watchlist-search"
+									name="search" autocomplete="off" \>
 						</div>
+						<input type="submit" value="Apply"></input>
+					</form>
 
-						<table class="objects-table" id="catalog-table">
-							<thead>
-								<tr>
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
+					<div class="table-pagination" id="watchlist-pagination">
+						<span class="table-stats">Showing objects
+							<strong class="table-from">0</strong>
+							-
+							<strong class="table-to">0</strong>
+							of
+							<strong class="table-total">0</strong></span>
+						<span class="table-controls">
+							<button class="table-prev">Previous</button>
+							-
+							<button class="table-next">Next</button>
+						</span>
+					</div>
 
-					</section>
+					<table class="objects-table" id="watchlist-table">
+						<thead>
+							<tr>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+
+					<div id="catalog" class="hidden-anchor"></div><h2>Catalog</h2>
+
+					<div class="table-advanced" id="catalog-advanced">
+
+						<button class="toggle">
+							Advanced
+						</button>
+
+						<form class="collapse table-form" id="catalog-advanced-form" action="">
+
+							<fieldset>
+								<legend>Visible columns</legend>
+
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-mag"
+											name="mag" checked \>
+									<label for="watchlist-visible-col-mag">Magnitude</label>
+								</div>
+
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-ra-dec"
+											name="ra-dec" checked \>
+									<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
+								</div>
+
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-alt-az"
+											name="alt-az" checked \>
+									<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
+								</div>
+
+								<div>
+									<input type="checkbox" id="watchlist-visible-col-notes"
+											name="notes" checked \>
+									<label for="watchlist-visible-col-notes">Notes</label>
+								</div>
+
+							</fieldset>
+
+							<input type="submit" value="Apply"></input>
+
+						</form>
+					</div>
+
+					<form class="table-form" id="catalog-filter-form">
+						<fieldset id="catalog-select-fieldset">
+							<legend>Enabled catalogs</legend>
+						</fieldset>
+
+						<div>
+							<label for="catalog-search">Filter by name:</label>
+							<input type="search" id="catalog-search"
+									name="search" autocomplete="off" \>
+						</div>
+						<input type="submit" value="Apply"></input>
+					</form>
+
+					<div class="table-pagination" id="catalog-pagination">
+						<span class="table-stats">Showing objects
+							<strong class="table-from">0</strong>
+							-
+							<strong class="table-to">0</strong>
+							of
+							<strong class="table-total">0</strong></span>
+						<span class="table-controls">
+							<button class="table-prev">Previous</button>
+							-
+							<button class="table-next">Next</button>
+						</span>
+					</div>
+
+					<table class="objects-table" id="catalog-table">
+						<thead>
+							<tr>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
 
 				</div>
 

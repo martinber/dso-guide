@@ -57,6 +57,23 @@ star chart
 - Add note saying that times are always e.g. UTC-6. Including future times, even
   if in the future DST is applied
 
+## Color palettes
+
+https://colorhunt.co/palette/24652
+
+- #000000
+- #3E3636
+- #D72323
+- #F5EDED
+
+https://colorhunt.co/palette/152965
+
+- #000000
+- #252525
+- #FF0000
+- #AF0404
+- #414141
+
 ## Tutorials
 
 - https://realpython.com/handling-email-confirmation-in-flask/
