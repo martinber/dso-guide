@@ -38,13 +38,15 @@ $(document).ready(() => {
         // different shape and color)
         aladin_catalogs: aladin_catalogs_init(),
 
-        // For plots
-        plot: {
-            sun_threshold_alt: -10,
-            dso_threshold_alt: 15,
-
+        // For plots. Redrawing the background takes time because we are doing
+        // calculations of the sunrise and sunset for every day on the year, so
+        // I keep the background and the parameters used to generate it here
+        plot_bg: {
+            sun_threshold_alt: -10, // Sunrise and sunset happens 10° below the
+                                    // horizon
             year: null,
-            back_canvas: null, // Background image of daylight plot
+            location: null,
+            bg_canvas: null, // Background image of daylight plot
             min_hs: null, // Fractional hours at the top of the plot
             max_hs: null // Fractional hours at the bottom of the plot
         }
@@ -62,9 +64,10 @@ $(document).ready(() => {
         ctx.manager = new DsoManager(dsos_data, catalogs_data);
         ctx.table_manager = new TableManager(
             ctx.manager,
-            new Date(),
-            [0, 0], // location
-            ctx.plot,
+            null, // date
+            null, // location
+            15, // dso_threshold_alt
+            ctx.plot_bg,
             dso => server_watchlist_add(ctx, dso.id),
             watch_dso => server_watchlist_delete(ctx, watch_dso),
             watch_dso => server_watchlist_save(ctx, watch_dso),
@@ -273,38 +276,38 @@ function ui_celestial_datetime_update(datetime) {
 /**
  * Redraw the daylight plot if neccesary
  *
- * If unchanged, datetime and lat_lon arguments can be null. But if the plot was
+ * If unchanged, datetime and location arguments can be null. But if the plot was
  * never drawn before, both arguments must be valid, otherwise nothing will
  * happen
  */
-function ui_plot_bg_update(ctx, datetime, lat_lon) {
+function ui_plot_bg_update(ctx, datetime, location) {
     let redraw = false;
 
-    if (ctx.plot.back_canvas == null) {
+    if (ctx.plot_bg.bg_canvas == null) {
         redraw = true;
     }
 
-    if (datetime != null && ctx.plot.year != datetime.getYear()) {
-        ctx.plot.year = datetime.getYear();
+    if (datetime != null && ctx.plot_bg.year != datetime.getYear()) {
+        ctx.plot_bg.year = datetime.getYear();
         redraw = true;
     }
 
-    if (lat_lon != null && ctx.plot.lat_lon != lat_lon) {
-        ctx.plot.lat_lon = lat_lon;
+    if (location != null && ctx.plot_bg.location != location) {
+        ctx.plot_bg.location = location;
         redraw = true;
     }
 
 
-    if (redraw && ctx.plot.year != null && ctx.plot.lat_lon != null) {
+    if (redraw && ctx.plot_bg.year != null && ctx.plot_bg.location != null) {
         let result = draw_day_night_plots(
-            ctx.plot.lat_lon,
+            ctx.plot_bg.location,
             [800, 500],
-            ctx.plot.sun_threshold_alt,
-            ctx.plot.year
+            ctx.plot_bg.sun_threshold_alt,
+            ctx.plot_bg.year
         );
-        ctx.plot.back_canvas = result[0];
-        ctx.plot.min_hs = result[1];
-        ctx.plot.max_hs = result[2];
+        ctx.plot_bg.bg_canvas = result[0];
+        ctx.plot_bg.min_hs = result[1];
+        ctx.plot_bg.max_hs = result[2];
     }
 }
 
@@ -356,6 +359,7 @@ function server_location_get(ctx) {
         $("#location-lat").val(`${json.lat}`);
         $("#location-long").val(`${json.lon}`);
         ui_celestial_datetime_update(json.lat, json.lon);
+        ctx.table_manager.update_datetime_location(date, );
 
     }).fail((xhr, status, error) => {
         console.error("server_location_get() failed", xhr, status, error);
