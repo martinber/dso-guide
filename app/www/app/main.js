@@ -149,6 +149,8 @@ function main(ctx) {
     $("#datetime-time").val(`${hour}:${min}`);
 
     ui_celestial_datetime_update(now);
+    ui_plot_bg_update(ctx, now, null);
+    ctx.table_manager.update_datetime_location(now, null);
 
     // Status bar
 
@@ -170,7 +172,7 @@ function main(ctx) {
         let [hour, min] = $("#datetime-time").val().split(":");
         let date = new Date(year, month - 1, day, hour, min);
         ui_celestial_datetime_update(date);
-        ui_plot_bg_update(ctx, new Date(), null);
+        ui_plot_bg_update(ctx, date, null);
         ctx.table_manager.update_datetime_location(date, null);
     });
 
@@ -404,7 +406,8 @@ function server_location_get(ctx) {
         $("#location-lat").val(`${json.lat}`);
         $("#location-long").val(`${json.lon}`);
         ui_celestial_datetime_update(json.lat, json.lon);
-        ctx.table_manager.update_datetime_location(date, );
+        ui_plot_bg_update(ctx, null, [json.lat, json.lon]);
+        ctx.table_manager.update_datetime_location(null, [json.lat, json.lon]);
 
     }).fail((xhr, status, error) => {
         console.error("server_location_get() failed", xhr, status, error);
