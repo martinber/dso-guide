@@ -97,12 +97,38 @@ $(document).ready(() => {
     });
 });
 
+function init_map() {
+    let new_map = L.map('mapid');
+    // Add OSM tile leayer to the Leaflet map.
+    let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+    let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}); // change max zoom TODO
+
+    new_map.setView(new L.LatLng($("#location-lat").val(), $("#location-long").val()),9);
+    new_map.addLayer(osm);
+
+    function on_map_click(e) {
+        new_map.setView(e.latlng,9)
+    }
+
+    new_map.on('click', on_map_click);
+
+    return new_map;
+}
+
+function update_map_location(new_map) {
+    console.log(new_map)
+    new_map.setView(new L.LatLng(parseFloat($("#location-lat").val()), parseFloat($("#location-long").val())),9)
+}
+
 function main(ctx) {
 
     // Leave space so the banner is not shown above the footer
 
     let info_banner_height = $("#info-banner").css("height");
     $("body").css("margin-bottom", info_banner_height);
+
+    let new_map = init_map();
 
     // Set current time and date of forms
 
@@ -152,6 +178,7 @@ function main(ctx) {
 
     $("#location-submit").click(e => {
         e.preventDefault(); // Disable built-in HTML action
+        update_map_location(new_map)
 
         let data = {
             lat: parseFloat($("#location-lat").val()),
@@ -184,6 +211,23 @@ function main(ctx) {
         ui_plot_bg_update(ctx, null, [data.lat, data.lon]);
         ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
     });
+
+    let make_toggle = div => {
+        let button = div.find(".toggle");
+        let collapse = div.find(".collapse");
+
+        button.click(e => {
+            if (collapse.css("visibility") == "hidden") {
+                collapse.css("visibility", "visible");
+                collapse.css("display", "block");
+            } else {
+                collapse.css("visibility", "hidden");
+                collapse.css("display", "none");
+            }
+        });
+    }
+
+    make_toggle($("#map-wrapper"));
 
     // Login buttons
 
@@ -238,6 +282,7 @@ function main(ctx) {
     });
 
 }
+
 
 /**
  * Return true if we are logged in

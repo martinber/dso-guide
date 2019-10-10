@@ -95,6 +95,11 @@ button[disabled=disabled], button:disabled, input[type="submit"]:disabled
 	color: var(--gray-3);
 	cursor: auto;
 }
+/* MAP ---------------------------------------------------------------- */
+#mapid {
+    height: 50vh;
+    width: 80%;
+}
 
 /* HEADER ------------------------------------------------------------- */
 
@@ -460,7 +465,7 @@ main .inner {
 
 /* FILTER --------------------------------------------------------------*/
 
-.table-advanced .toggle
+.collapse-wrapper .toggle
 {
 	margin: 0;
 	position: relative;
@@ -471,7 +476,7 @@ main .inner {
 }
 
 /* Used to add a icon to the button */
-.table-advanced .toggle:before
+.collapse-wrapper .toggle:before
 {
 	position: absolute;
 	left: 0em;
@@ -490,7 +495,7 @@ main .inner {
 	background-size: contain;
 }
 
-.table-advanced .collapse
+.collapse-wrapper .collapse
 {
 	margin-top: 0 !important;
 	display: none;
