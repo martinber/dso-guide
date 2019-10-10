@@ -1,21 +1,26 @@
 "use strict";
 
-$(document).ready(() {
+$(document).ready(() => {
 
     $("#passchange-form").submit(e =>{
         e.preventDefault();
+
         refresh_error_text()
 
-        let user = $("#username").val()
-        let old_pass = $("#old-password").val()
-        let new_pass = $("#new-password").val()
-        let new_conf_pass = $("#confirm-new-password").val()
+        let user = $("#username").val();
+        let old_pass = $("#old-password").val();
+        let new_pass = $("#new-password").val();
+        let new_conf_pass = $("#confirm-new-password").val();
 
-        if (new_conf_pass == new_pass) {
+        if ( new_conf_pass == new_pass ) {
             $.ajax({
                 type: "PUT",
                 url: "/api/v1/password",
-                data: JSON.stringify({username: user, password: old_pass, new_password: new_conf_pass,}),
+                headers: {
+                    "Authorization": "Basic "
+                        + btoa(user + ":" + old_pass)
+                },
+                data: JSON.stringify({new_password: new_conf_pass,}),
                 contentType: "application/json"
             }).done(response => {
                 window.location.replace("/index.html") //TODO send username
@@ -33,9 +38,10 @@ $(document).ready(() {
 
 
 function refresh_error_text() {
-    if ( $("#error-text") != null || $("#password-error-text") != null ) {
-        $("#error-text").text("")
-        $("#password-error-text").text("")
+    if ( $("#user-error-text") != null || $("#new-password-error-text") != null || $("#old-password-error-text") != null) {
+        $("#user-error-text").text("")
+        $("#new-password-error-text").text("")
+        $("#old-password-error-text").text("")
     }
 }
 
