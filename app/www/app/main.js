@@ -104,11 +104,14 @@ function init_map() {
     let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
     let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}); // change max zoom TODO
 
-    new_map.setView(new L.LatLng($("#location-lat").val(), $("#location-long").val()),9);
+    new_map.setView(new L.LatLng($("#location-lat").val(), $("#location-long").val()),2);
     new_map.addLayer(osm);
 
     function on_map_click(e) {
-        new_map.setView(e.latlng,9)
+        let popup = L.popup()
+        	.setLatLng(e.latlng)
+        	.setContent(e.latlng.toString())
+        	.openOn(new_map);
     }
 
     new_map.on('click', on_map_click);
@@ -116,9 +119,11 @@ function init_map() {
     return new_map;
 }
 
+// Not used right now, idea is centering the map on someone's saved lon lat
+
 function update_map_location(new_map) {
     console.log(new_map)
-    new_map.setView(new L.LatLng(parseFloat($("#location-lat").val()), parseFloat($("#location-long").val())),9)
+    new_map.setView(new L.LatLng(parseFloat($("#location-lat").val()), parseFloat($("#location-long").val())),2)
 }
 
 function main(ctx) {
@@ -127,8 +132,6 @@ function main(ctx) {
 
     let info_banner_height = $("#info-banner").css("height");
     $("body").css("margin-bottom", info_banner_height);
-
-    let new_map = init_map();
 
     // Set current time and date of forms
 
@@ -180,7 +183,6 @@ function main(ctx) {
 
     $("#location-submit").click(e => {
         e.preventDefault(); // Disable built-in HTML action
-        update_map_location(new_map)
 
         let data = {
             lat: parseFloat($("#location-lat").val()),
@@ -222,6 +224,7 @@ function main(ctx) {
             if (collapse.css("visibility") == "hidden") {
                 collapse.css("visibility", "visible");
                 collapse.css("display", "block");
+                let new_map = init_map();
             } else {
                 collapse.css("visibility", "hidden");
                 collapse.css("display", "none");
