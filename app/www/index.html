@@ -23,6 +23,13 @@
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=47BKnLQyQq">
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=47BKnLQyQq">
 
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+		integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+		crossorigin=""/>
+		<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+		integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+		crossorigin=""></script>
+
 		<script type="text/javascript" src="/lib/jquery-3.4.1.min.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
@@ -117,6 +124,13 @@
 						<input id="datetime-submit" type="submit" value="Update"></input>
 					</form>
 
+					<div class="collapse-wrapper" id="map-wrapper">
+						<button class="toggle">
+							Toggle Map
+						</button>
+						<div id="mapid" class="collapse"></div>
+					</div>
+
 					<div id="sky-chart" class="hidden-anchor"></div><h2>Sky chart</h2>
 					<section id="celestial-container">
 						<div id="celestial-map"></div>
@@ -130,7 +144,7 @@
 
 					<div id="watchlist" class="hidden-anchor"></div><h2>Watchlist</h2>
 
-					<div class="table-settings" id="watchlist-settings">
+					<div class="collapse-wrapper" id="watchlist-settings">
 
 						<button class="toggle">
 							Filters and settings
@@ -205,7 +219,7 @@
 
 					<div id="catalog" class="hidden-anchor"></div><h2>Catalog</h2>
 
-					<div class="table-settings" id="catalog-settings">
+					<div class="collapse-wrapper" id="catalog-settings">
 
 						<button class="toggle">
 							Filters and settings
