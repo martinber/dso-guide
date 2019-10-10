@@ -191,7 +191,7 @@ header #user-controls
 	display: block;
 }
 
-#login-welcome, #login-logout
+#login-welcome, #login-logout, #change-password-link
 {
 	display: none;
 	float: right;
