@@ -68,12 +68,12 @@ export function TableManager(
         });
     }
 
-    make_toggle($("#watchlist-advanced"));
-    make_toggle($("#catalog-advanced"));
+    make_toggle($("#watchlist-settings"));
+    make_toggle($("#catalog-settings"));
 
     // Watchlist filters
 
-    $("#watchlist-filter-form").submit(e => {
+    $("#watchlist-settings-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
         // TODO
@@ -125,7 +125,7 @@ export function TableManager(
         );
     }
 
-    $("#catalog-filter-form").submit(e => {
+    $("#catalog-settings-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
         catalog_filter_and_update(

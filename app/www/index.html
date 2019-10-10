@@ -76,6 +76,7 @@
 					<a id="register-link" href="/register.html">Register</a>
 					<span id="login-welcome">Welcome!</span>
 					<button id="login-logout">Logout</button>
+					<a id="change-password-link" href="/changepassword.html">Change Password</a>
 				</div>
 			</div>
 		</header>
@@ -98,33 +99,31 @@
 
 				<div id="content">
 
-					<section id="user-data">
+					<form class="observation-form" id="datetime-form" action="">
+						<div>
+							<label for="datetime-date">Date:</label>
+							<input id="datetime-date" name="date" type="date" required />
+						</div>
+						<div>
+							<label for="datetime-time">Time:</label>
+							<input id="datetime-time" name="time" type="time" required />
+						</div>
+						<input id="datetime-submit" type="submit" value="Update"></input>
+					</form>
 
-						<form class="observation-form" id="location-form" action="">
-							<div>
-								<label for="location-lat">Latitude:</label>
-								<input id="location-lat" name="lat" step="0.00000001"
-										type="number" min="-90" max="90" value="0.0" required />
-							</div>
-							<div>
-								<label for="location-long">Longitude:</label>
-								<input id="location-long" name="long" step="0.00000001"
-										type="number" min="-180" max="180" value="0.0" required />
-							</div>
-							<input id="location-submit" type="submit" value="Update"></input>
-						</form>
-
-						<form class="observation-form" id="datetime-form" action="">
-							<div>
-								<label for="datetime-date">Date:</label>
-								<input id="datetime-date" name="date" type="date" required />
-							</div>
-							<div>
-								<label for="datetime-time">Time:</label>
-								<input id="datetime-time" name="time" type="time" required />
-							</div>
-							<input id="datetime-submit" type="submit" value="Update"></input>
-						</form>
+					<form class="observation-form" id="location-form" action="">
+						<div>
+							<label for="location-lat">Latitude:</label>
+							<input id="location-lat" name="lat" step="0.00000001"
+									type="number" min="-90" max="90" value="0.0" required />
+						</div>
+						<div>
+							<label for="location-long">Longitude:</label>
+							<input id="location-long" name="long" step="0.00000001"
+									type="number" min="-180" max="180" value="0.0" required />
+						</div>
+						<input id="location-submit" type="submit" value="Update"></input>
+					</form>
 
 					<div class="collapse-wrapper" id="map-wrapper">
 						<button class="toggle">
@@ -132,8 +131,6 @@
 						</button>
 						<div id="mapid" class="collapse"></div>
 					</div>
-
-					</section>
 
 					<div id="sky-chart" class="hidden-anchor"></div><h2>Sky chart</h2>
 					<section id="celestial-container">
@@ -148,13 +145,13 @@
 
 					<div id="watchlist" class="hidden-anchor"></div><h2>Watchlist</h2>
 
-					<div class="collapse-wrapper" id="watchlist-advanced">
+					<div class="collapse-wrapper" id="watchlist-settings">
 
 						<button class="toggle">
-							Advanced
+							Filters and settings
 						</button>
 
-						<form class="collapse table-form" id="watchlist-advanced-form" action="">
+						<form class="collapse table-form" id="watchlist-settings-form" action="">
 
 							<fieldset>
 								<legend>Visible columns</legend>
@@ -164,40 +161,39 @@
 											name="mag" checked \>
 									<label for="watchlist-visible-col-mag">Magnitude</label>
 								</div>
-
 								<div>
 									<input type="checkbox" id="watchlist-visible-col-ra-dec"
 											name="ra-dec" checked \>
 									<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
 								</div>
-
 								<div>
 									<input type="checkbox" id="watchlist-visible-col-alt-az"
 											name="alt-az" checked \>
 									<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
 								</div>
-
 								<div>
 									<input type="checkbox" id="watchlist-visible-col-notes"
 											name="notes" checked \>
 									<label for="watchlist-visible-col-notes">Notes</label>
 								</div>
+								<div>
+									<input type="checkbox" id="watchlist-visible-plot"
+											name="plot" checked \>
+									<label for="watchlist-visible-plot">Plot</label>
+								</div>
 
 							</fieldset>
+
+							<div>
+								<label for="watchlist-search">Filter by name:</label>
+								<input type="search" id="watchlist-search"
+										name="search" autocomplete="off" \>
+							</div>
 
 							<input type="submit" value="Apply"></input>
 
 						</form>
 					</div>
-
-					<form class="table-form" id="watchlist-filter-form">
-						<div>
-							<label for="watchlist-search">Filter by name:</label>
-							<input type="search" id="watchlist-search"
-									name="search" autocomplete="off" \>
-						</div>
-						<input type="submit" value="Apply"></input>
-					</form>
 
 					<div class="table-pagination" id="watchlist-pagination">
 						<span class="table-stats">Showing objects
@@ -224,60 +220,58 @@
 
 					<div id="catalog" class="hidden-anchor"></div><h2>Catalog</h2>
 
-					<div class="collapse-wrapper" id="catalog-advanced">
+					<div class="collapse-wrapper" id="catalog-settings">
 
 						<button class="toggle">
-							Advanced
+							Filters and settings
 						</button>
 
-						<form class="collapse table-form" id="catalog-advanced-form" action="">
+						<form class="collapse table-form" id="catalog-settings-form" action="">
 
 							<fieldset>
 								<legend>Visible columns</legend>
 
 								<div>
-									<input type="checkbox" id="watchlist-visible-col-mag"
+									<input type="checkbox" id="catalog-visible-col-mag"
 											name="mag" checked \>
-									<label for="watchlist-visible-col-mag">Magnitude</label>
+									<label for="catalog-visible-col-mag">Magnitude</label>
 								</div>
-
 								<div>
-									<input type="checkbox" id="watchlist-visible-col-ra-dec"
+									<input type="checkbox" id="catalog-visible-col-ra-dec"
 											name="ra-dec" checked \>
-									<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
+									<label for="catalog-visible-col-ra-dec">RA/DEC</label>
 								</div>
-
 								<div>
-									<input type="checkbox" id="watchlist-visible-col-alt-az"
+									<input type="checkbox" id="catalog-visible-col-alt-az"
 											name="alt-az" checked \>
-									<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
+									<label for="catalog-visible-col-alt-az">ALT/AZ</label>
 								</div>
-
 								<div>
-									<input type="checkbox" id="watchlist-visible-col-notes"
+									<input type="checkbox" id="catalog-visible-col-notes"
 											name="notes" checked \>
-									<label for="watchlist-visible-col-notes">Notes</label>
+									<label for="catalog-visible-col-notes">Notes</label>
+								</div>
+								<div>
+									<input type="checkbox" id="catalog-visible-plot"
+											name="plot" checked \>
+									<label for="catalog-visible-plot">Plot</label>
 								</div>
 
 							</fieldset>
 
+							<fieldset id="catalog-select-fieldset">
+								<legend>Enabled catalogs</legend>
+							</fieldset>
+
+							<div>
+								<label for="catalog-search">Filter by name:</label>
+								<input type="search" id="catalog-search"
+										name="search" autocomplete="off" \>
+							</div>
 							<input type="submit" value="Apply"></input>
 
 						</form>
 					</div>
-
-					<form class="table-form" id="catalog-filter-form">
-						<fieldset id="catalog-select-fieldset">
-							<legend>Enabled catalogs</legend>
-						</fieldset>
-
-						<div>
-							<label for="catalog-search">Filter by name:</label>
-							<input type="search" id="catalog-search"
-									name="search" autocomplete="off" \>
-						</div>
-						<input type="submit" value="Apply"></input>
-					</form>
 
 					<div class="table-pagination" id="catalog-pagination">
 						<span class="table-stats">Showing objects

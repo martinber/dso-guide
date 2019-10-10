@@ -264,7 +264,7 @@ function main(ctx) {
                 "display": "none",
                 "visibility": "hidden"
             });
-            $("#login-welcome, #login-logout").css({
+            $("#login-welcome, #login-logout, #change-password-link").css({
                 "display": "inherit",
                 "visibility": "visible"
             });
