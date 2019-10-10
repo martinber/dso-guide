@@ -99,6 +99,18 @@
 
 				<div id="content">
 
+					<form class="observation-form" id="datetime-form" action="">
+						<div>
+							<label for="datetime-date">Date:</label>
+							<input id="datetime-date" name="date" type="date" required />
+						</div>
+						<div>
+							<label for="datetime-time">Time:</label>
+							<input id="datetime-time" name="time" type="time" required />
+						</div>
+						<input id="datetime-submit" type="submit" value="Update"></input>
+					</form>
+
 					<form class="observation-form" id="location-form" action="">
 						<div>
 							<label for="location-lat">Latitude:</label>
@@ -111,18 +123,6 @@
 									type="number" min="-180" max="180" value="0.0" required />
 						</div>
 						<input id="location-submit" type="submit" value="Update"></input>
-					</form>
-
-					<form class="observation-form" id="datetime-form" action="">
-						<div>
-							<label for="datetime-date">Date:</label>
-							<input id="datetime-date" name="date" type="date" required />
-						</div>
-						<div>
-							<label for="datetime-time">Time:</label>
-							<input id="datetime-time" name="time" type="time" required />
-						</div>
-						<input id="datetime-submit" type="submit" value="Update"></input>
 					</form>
 
 					<div class="collapse-wrapper" id="map-wrapper">
