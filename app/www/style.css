@@ -200,7 +200,7 @@ header #user-controls
 
 /* INFO BANNER ------------------------------------------------------------- */
 
-#info-banner
+#status-banner
 {
 	position: fixed;
 	bottom: 0;
@@ -221,7 +221,7 @@ body
 	/* margin-bottom: ???; */ /* Done on javascript at startup */
 }
 
-#info-toggle
+#status-toggle
 {
 	position: absolute;
 	top: -2em;
@@ -240,7 +240,7 @@ body
 }
 
 /* Used to add a icon to the button */
-#info-toggle:before
+#status-toggle:before
 {
 	position: absolute;
 	left: 0em;
@@ -251,14 +251,14 @@ body
 	height: 100%;
 	padding-left: 0.5em;
 	opacity: 0.8;
-	background-image: url('resources/info-toggle.svg');
+	background-image: url('resources/toggle-arrow.svg');
 	background-position: left;
 	background-repeat: no-repeat;
 	background-origin: content-box; /* So the image is inside the padding */
 	background-size: contain;
 }
 
-#info-toggle:active
+#status-toggle:active
 {
 	background-color: var(--red-1);
 }
@@ -488,7 +488,7 @@ main .inner {
 	height: 100%;
 	padding-right: 0.5em; /* Actually is a left padding because of the rotation */
 	opacity: 0.8;
-	background-image: url('resources/info-toggle.svg');
+	background-image: url('resources/toggle-arrow.svg');
 	background-position: left;
 	background-repeat: no-repeat;
 	background-origin: content-box; /* So the image is inside the padding */

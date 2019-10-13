@@ -65,6 +65,10 @@ star chart
 
 - Send errors to server and log
 
+- Smaller stars on mobile
+
+- Hide aladin on a sidebar
+
 ## Color palettes
 
 https://colorhunt.co/palette/24652

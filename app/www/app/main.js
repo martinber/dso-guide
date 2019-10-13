@@ -130,8 +130,8 @@ function main(ctx) {
 
     // Leave space so the banner is not shown above the footer
 
-    let info_banner_height = $("#info-banner").css("height");
-    $("body").css("margin-bottom", info_banner_height);
+    let status_banner_height = $("#status-banner").css("height");
+    $("body").css("margin-bottom", status_banner_height);
 
     // Set current time and date of forms
 
@@ -157,7 +157,7 @@ function main(ctx) {
 
     // Status bar
 
-    $("#info-toggle").click(e => {
+    $("#status-toggle").click(e => {
         if (status_is_visible()) {
             status_hide();
         } else {
