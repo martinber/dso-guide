@@ -4048,4 +4048,5 @@ function d3_eventDispatch(target) {
 
 })();
 this.Celestial = Celestial;
+this.Celestial.Kepler = Kepler;
 })();
