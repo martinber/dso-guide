@@ -52,10 +52,18 @@ star chart
 
 - Check the tr references on DSOs, they are not going to work with filters
 
-- Fix notes CSS
-
 - Add note saying that times are always e.g. UTC-6. Including future times, even
   if in the future DST is applied
+
+- Printed version
+
+- Captcha
+
+- Server admin scripts
+
+- Getting started and about page
+
+- Send errors to server and log
 
 ## Color palettes
 
