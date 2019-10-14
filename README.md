@@ -67,7 +67,7 @@ star chart
 
 - Smaller stars on mobile
 
-- Hide aladin on a sidebar
+- Late loading of aladin
 
 ## Color palettes
 

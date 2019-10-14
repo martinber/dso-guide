@@ -11,7 +11,13 @@ import {
 import { object_styles } from "./const.js";
 import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
-import { aladin_catalogs_init, ui_markers_update } from "./sky.js";
+import {
+    aladin_catalogs_init,
+    ui_markers_update,
+    aladin_is_visible,
+    aladin_show,
+    aladin_hide
+} from "./sky.js";
 import { eq_to_geo, calculate_rise_set } from "./tools.js";
 import { draw_day_night_plots } from "./plot.js";
 
@@ -167,6 +173,16 @@ function main(ctx) {
 
     status_hide();
 
+    // Aladin toggle
+
+    $("#aladin-toggle").click(e => {
+        if (aladin_is_visible()) {
+            aladin_hide();
+        } else {
+            aladin_show();
+        }
+    });
+
     // Datetime form
 
     $("#datetime-submit").click(e => {
@@ -302,6 +318,7 @@ function logged_in(ctx) {
 function ui_aladin_goto(ctx, dso) {
 
     let geo_coords = eq_to_geo(dso.coords)
+    aladin_show();
     ctx.aladin.gotoRaDec(
         geo_coords[0],
         geo_coords[1],

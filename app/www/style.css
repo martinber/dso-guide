@@ -12,6 +12,7 @@
 
   --status-z-index: 30;
   --header-z-index: 29;
+  --aladin-z-index: 31;
 }
 
 
@@ -207,7 +208,7 @@ header #user-controls
 	left: 0;
 	width: 100%;
 
-	z-index: var(--status-z-index); /* Otherwise the aladin map is on top */
+	z-index: var(--status-z-index);
 	padding: 0.7em;
 	background-color: var(--red-2);
 	color: var(--gray-4);
@@ -368,13 +369,71 @@ main .inner {
 	display: none;
 }
 
+#aladin-container
+{
+	width: 80vh;
+	max-width: 85%;
+	height: 70vh;
+	position: fixed;
+	bottom: 3em;
+	left: 0;
+	transition: all ease-in-out 0.1s;
+	z-index: var(--aladin-z-index);
+
+	transform: translateX(-100%);
+	visibility: hidden;
+}
+
 #aladin-map
 {
-	margin: 0 auto;
-	width: 80vh;
-	max-width: 100%;
-	height: 50vh;
+	width: 100%;
+	height: 100%;
 	border: none !important; /* Set by aladin stylesheet */
+}
+
+#aladin-toggle
+{
+	position: absolute;
+	right: 0;
+	bottom: 5%;
+	transform: rotate(270deg) translateX(100%) translateY(100%);
+	transform-origin: right bottom 0;
+
+	height: 2em;
+	margin: 0;
+	background-color: var(--red-2);
+	color: var(--gray-4);
+	box-shadow: 0px 0px 3px #00000055;
+	visibility: visible; /* So this is shown even of the parent is hidden */
+
+	/* Leave space for the icon */
+	text-align: left;
+	padding-left: 1.9em;
+}
+
+/* Used to add a icon to the button */
+#aladin-toggle:before
+{
+	position: absolute;
+	left: 0em;
+	top: 0em;
+	transform: rotate(180deg);
+
+	content: "";
+	width: 1.3em;
+	height: 100%;
+	padding-right: 0.5em; /* Actually is a left padding because of the rotation */
+	opacity: 0.8;
+	background-image: url('resources/toggle-arrow.svg');
+	background-position: left;
+	background-repeat: no-repeat;
+	background-origin: content-box; /* So the image is inside the padding */
+	background-size: contain;
+}
+
+#aladin-toggle:active
+{
+	background-color: var(--red-1);
 }
 
 /* Override aladin style */

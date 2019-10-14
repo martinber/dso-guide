@@ -7,6 +7,29 @@ import { celestial_config } from "./config.js";
 import { eq_to_geo } from "./tools.js";
 
 /**
+ * Returns true if the aladin banner is visible
+ */
+export function aladin_is_visible() {
+    return $("#aladin-container").css("visibility") != "hidden";
+}
+
+/**
+ * Show status banner
+ */
+export function aladin_show() {
+    $("#aladin-container").css("visibility", "visible");
+    $("#aladin-container").css("transform", "translateX(0)");
+}
+
+/**
+ * Show status banner
+ */
+export function aladin_hide() {
+    $("#aladin-container").css("visibility", "hidden");
+    $("#aladin-container").css("transform", "translateX(-100%)");
+}
+
+/**
  * Create an Aladin catalog for each style available for watchlist objects.
  *
  * Returns an object with each catalog, available as
