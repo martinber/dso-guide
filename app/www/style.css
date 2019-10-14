@@ -764,6 +764,13 @@ legend {
 
 }
 
+.table-no-results {
+	margin-top: 1em;
+	padding: 0.5em;
+	width: 100%;
+	background-color: var(--gray-1);
+}
+
 .table-pagination
 {
 	margin: 0;

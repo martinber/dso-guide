@@ -143,16 +143,6 @@ export function TableManager(
 
     watchlist_create_header($("#watchlist-table thead tr"));
 
-    $("#watchlist-table tbody").append(
-        $("<tr>").append(
-            $("<td>", {
-                colspan: "99",
-                text: `Nothing here, add some objects from the catalog below \
-                       or check your filters above.`
-            })
-        )
-    );
-
     catalog_create_header($("#catalog-table thead tr"));
 
     catalog_filter_and_update(
@@ -294,6 +284,16 @@ function watchlist_update(
     let tbody = $("#watchlist-table tbody");
     tbody.empty();
 
+    if (watchlist_view.length == 0) {
+        $("#watchlist-no-results").css("display", "inherit");
+        $("#watchlist-table").css("display", "none");
+        $("#watchlist-pagination").css("display", "none");
+    } else {
+        $("#watchlist-no-results").css("display", "none");
+        $("#watchlist-table").css("display", "inherit");
+        $("#watchlist-pagination").css("display", "inherit");
+    }
+
     for (let i = start; i < end; i++) {
         let watch_dso = watchlist_view[i];
 
@@ -327,17 +327,6 @@ function watchlist_update(
         }
 
     }
-    /*
-            $("#catalog-table tbody").append(
-                $("<tr>").append(
-                    $("<td>", {
-                        colspan: "99",
-                        text: `Your search gave no results, check your filter \
-                               settings too`
-                    })
-                )
-            );
-            */
 }
 
 
@@ -410,6 +399,16 @@ function catalog_update(
 
     let tbody = $("#catalog-table tbody");
     tbody.empty();
+
+    if (catalog_view.length == 0) {
+        $("#catalog-no-results").css("display", "inherit");
+        $("#catalog-table").css("display", "none");
+        $("#catalog-pagination").css("display", "none");
+    } else {
+        $("#catalog-no-results").css("display", "none");
+        $("#catalog-table").css("display", "inherit");
+        $("#catalog-pagination").css("display", "inherit");
+    }
 
     for (let i = start; i < end; i++) {
         let dso = catalog_view[i];
