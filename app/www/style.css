@@ -98,8 +98,9 @@ button[disabled=disabled], button:disabled, input[type="submit"]:disabled
 }
 /* MAP ---------------------------------------------------------------- */
 #mapid {
-    height: 50vh;
-    width: 80%;
+	height: 50vh;
+	width: 80%;
+	cursor: pointer;
 }
 
 /* HEADER ------------------------------------------------------------- */
@@ -263,7 +264,19 @@ body
 {
 	background-color: var(--red-1);
 }
-
+/* LEAFLET -------------------------------------------------------------- */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+	/*background: #796c6c;*/
+    font-family: 'Saira Condensed', sans-serif;
+	background-color: #131313;
+	color: white;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	border-radius: 0;
+	overflow: auto;
+}
+#map-location-submit{
+	float: right;
+}
 /* REGISTER -------------------------------------------------------------- */
 
 #user-controls {
