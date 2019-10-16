@@ -114,10 +114,14 @@ function init_map() {
     new_map.addLayer(osm);
 
     function on_map_click(e) {
-        let popup = L.popup()
+        console.log(e.latlng["lat"])
+        let popup = L.popup({ className: ".leaflet-popup-content-wrapper" })
         	.setLatLng(e.latlng)
-        	.setContent(e.latlng.toString())
+            .setContent(`${e.latlng["lat"].toFixed(4)}, ${e.latlng["lng"].toFixed(4)} <br> \
+                        <input id="map-location-submit" type="submit" value="Update"></input>`)
         	.openOn(new_map);
+
+            //.setContent("you clicked on<br>",e.latlng.toString())
     }
 
     new_map.on('click', on_map_click);
@@ -197,14 +201,7 @@ function main(ctx) {
 
     // Location form
 
-    $("#location-submit").click(e => {
-        e.preventDefault(); // Disable built-in HTML action
-
-        let data = {
-            lat: parseFloat($("#location-lat").val()),
-            lon: parseFloat($("#location-long").val())
-        }
-
+    function submit_location(data) {
         if (logged_in(ctx)) {
             $.ajax({
                 type: "PUT",
@@ -230,8 +227,29 @@ function main(ctx) {
         ui_celestial_location_update(data.lat, data.lon);
         ui_plot_bg_update(ctx, null, [data.lat, data.lon]);
         ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
+    }
+
+    $("#location-submit").click(e => {
+        e.preventDefault(); // Disable built-in HTML action
+
+        let data = {
+            lat: parseFloat($("#location-lat").val()),
+            lon: parseFloat($("#location-long").val())
+        }
+
+        submit_location(data);
     });
 
+    $("#map-location-submit").click(e => {
+        e.preventDefault(); // Disable built-in HTML action
+/*
+        let data = {
+            lat:
+            lon:
+        }
+*/
+        submit_location(data);
+    });
     let make_toggle = div => {
         let button = div.find(".toggle");
         let collapse = div.find(".collapse");
