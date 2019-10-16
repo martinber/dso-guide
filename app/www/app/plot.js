@@ -246,9 +246,9 @@ export function draw_day_night_plots(
     // As the plot is centered on midnight, quite probably min_hs < 0 or
     // max_hs > 24
 
-    let midnight_hs = fractional_hours(sun_times[0].lowest);
-    let min_hs = midnight_hs;
-    let max_hs = midnight_hs;
+    let jan_midnight_hs = fractional_hours(sun_times[0].lowest);
+    let min_hs = jan_midnight_hs;
+    let max_hs = jan_midnight_hs;
     for (let sun_time of sun_times) {
         switch (sun_time.type) {
             case "above":
@@ -257,15 +257,24 @@ export function draw_day_night_plots(
 
             case "below":
                 // Always night
-                min_hs = midnight_hs - 12;
-                max_hs = midnight_hs + 12;
+                min_hs = jan_midnight_hs - 12;
+                max_hs = jan_midnight_hs + 12;
                 break;
 
             case "normal":
                 // Starting from midnight, measure time to sunrise and multiply
                 // by two
+                //
+                // Here it is important to use the time of midnight of this
+                // specific day, because if I use jan_midnight_hs a bug can
+                // happen sometimes on really short nights on very high latitude
+                // places, when jan_midnight_hs falls actually during the day
+
+                let midnight_hs = fractional_hours(sun_time.lowest);
                 let rise_hs = fractional_hours(sun_time.rise)
                 let set_hs = fractional_hours(sun_time.set)
+
+                console.log(jan_midnight_hs, midnight_hs, rise_hs, set_hs);
 
                 while (rise_hs < midnight_hs) {
                     rise_hs += 24;
@@ -332,6 +341,13 @@ export function draw_day_night_plots(
 
             case "normal":
                 // Check sunset and sunrise times
+                //
+                // Here it is important to use the time of midnight of this
+                // specific day, because if I use jan_midnight_hs a bug can
+                // happen sometimes on really short nights on very high latitude
+                // places, when jan_midnight_hs falls actually during the day
+
+                let midnight_hs = fractional_hours(sun_time.lowest);
                 let rise_hs = fractional_hours(sun_time.rise)
                 let set_hs = fractional_hours(sun_time.set)
                 while (rise_hs < midnight_hs) {
