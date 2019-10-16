@@ -19,7 +19,9 @@ import {
     aladin_hide
 } from "./sky.js";
 import { eq_to_geo, calculate_rise_set } from "./tools.js";
-import { draw_day_night_plots } from "./plot.js";
+import { draw_day_night_plots, draw_visibility_plot } from "./plot.js";
+
+// TODO: REmove draw_visibility_plot
 
 $(document).ready(() => {
 
@@ -232,6 +234,39 @@ function main(ctx) {
         }
 
         submit_location(data);
+
+        // TODO big visibility plot
+
+        let tmp_plot_bg = {
+            sun_threshold_alt: -10, // Sunrise and sunset happens 10° below the
+                                    // horizon
+            year: 2019,
+            location: [40, 0],
+            bg_canvas: null, // Background image of daylight plot
+            min_hs: null, // Fractional hours at the top of the plot
+            max_hs: null // Fractional hours at the bottom of the plot
+        }
+
+        let result = draw_day_night_plots(
+            tmp_plot_bg.location,
+            [800, 500],
+            tmp_plot_bg.sun_threshold_alt,
+            tmp_plot_bg.year
+        );
+        tmp_plot_bg.bg_canvas = result[0];
+        tmp_plot_bg.min_hs = result[1];
+        tmp_plot_bg.max_hs = result[2];
+
+        draw_visibility_plot(
+            $(".plot-popup-canvas")[0],
+            tmp_plot_bg.bg_canvas,
+            ctx.manager.get_catalog_view()[0],
+            tmp_plot_bg.location,
+            15,
+            tmp_plot_bg.year,
+            tmp_plot_bg.min_hs,
+            tmp_plot_bg.max_hs
+        );
     });
 
     $("#map-location-submit").click(e => {
@@ -313,7 +348,6 @@ function main(ctx) {
             }
         });
     });
-
 }
 
 
