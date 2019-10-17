@@ -13,6 +13,7 @@
 	--status-z-index: 30;
 	--header-z-index: 29;
 	--aladin-z-index: 31;
+	--popup-z-index: 32;
 }
 
 
@@ -478,61 +479,116 @@ main .inner {
 	width: 100%;
 }
 
-.test-canvas {
+.test-canvas
+{
 	height: 2em;
 	width: 4em;
 	margin: 1em;
 	border: 1px solid white;
 }
 
-.plot-popup {
+.plot-popup
+{
 	width: 90vw;
-	max-width: 40em;
+	max-width: 50em;
 	height: 90vh;
-	max-height: 30em;
+	max-height: 40em;
 	min-height: 20em;
 	background-color: var(--black);
 	border: 4px solid var(--red-2);
 
+	z-index: var(--popup-z-index);
 	position: fixed;
 	left: 50%;
 	top: 50%;
+	margin: 0;
 	transform: translateX(-50%) translateY(-50%);
+}
 
+.plot-popup-scrollable
+{
+	overflow: auto;
 	padding: 1em;
+	width: 100%;
+	height: 100%;
+}
+
+.plot-popup h2
+{
+	font-size: 1.9em;
+	margin: 0;
+	margin-bottom: 0.5em;
+	float: left;
+}
+
+.plot-popup-description
+{
+	clear: left;
 }
 
 .plot-popup-close {
-	width: 16px;
-	height: 16px;
 	position: absolute;
-	top: 4px;
-	right: 4px;
+	top: 0;
+	right: 0;
+	padding: 0.3em;
+	background: transparent;
+	width: 1.7em;
+	height: 1.7em;
 }
 
-.plot-popup-values {
+.plot-popup-close img
+{
+	width: 100%;
+	height: 100%;
+}
+
+.plot-popup-values
+{
 	float: right;
 	margin: 1em;
+	font-size: 1.3em;
 }
 
-.plot-popup-grid {
+@media screen and (max-width: 500px)
+{
+
+	.plot-popup-values
+	{
+		float: inherit;
+		margin: 0;
+	}
+
+	.plot-popup h2
+	{
+		float: inherit;
+	}
+
+}
+
+.plot-popup-grid
+{
 	display: grid;
-	grid-template-columns: 4em 1fr;
-	grid-gap: 0.5em;
+	grid-template-columns: 4rem 1fr;
+	grid-gap: 0.5rem;
+
+	min-width: 38em;
 }
 
-.plot-popup-hours {
+.plot-popup-hours
+{
 	grid-column: 1;
 	grid-row: 1;
 
-	text-align: right;
+	position: relative; /* Children are absolutely positioned relative to this */
 }
 
-.plot-popup-hours span {
+.plot-popup-hours span
+{
 	display: block;
 }
 
-.plot-popup-canvas {
+.plot-popup-canvas
+{
 	grid-column: 2;
 	grid-row: 1;
 
@@ -541,10 +597,36 @@ main .inner {
 	border: 4px solid var(--gray-1);
 }
 
-.plot-popup-table {
+.plot-popup-table
+{
 	grid-column: 1 / 3;
 	grid-row: 2;
 
+	table-layout: fixed;
+}
+
+.plot-popup-table th
+{
+	font-size: 1.3em;
+	font-weight: 500;
+	vertical-align: baseline;
+}
+
+.plot-popup-table tbody th
+{
+	text-align: right;
+	vertical-align: baseline;
+}
+
+.plot-popup-table tbody td
+{
+	text-align: center;
+	vertical-align: baseline;
+}
+
+.plot-popup-table thead th:nth-child(1)
+{
+  width: 4.5rem; /* plot-popup-hours width + grid_gap */
 }
 
 /* SIDEBAR ------------------------------------------------------------ */
