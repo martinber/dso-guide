@@ -771,7 +771,7 @@ function watchlist_create_row(
                         click: () => save_callback(watch_dso)
                     }),
                     $("<button>", {
-                        text: "GoTo",
+                        text: "Survey",
                         class: "objects-goto",
                         click: () => goto_callback(watch_dso.dso)
                     })
@@ -855,7 +855,7 @@ function catalog_create_row(
                         click: () => add_callback(dso)
                     }),
                     $("<button>", {
-                        text: "GoTo",
+                        text: "Survey",
                         class: "objects-goto",
                         click: () => goto_callback(dso)
                     })

@@ -67,7 +67,17 @@ star chart
 
 - Smaller stars on mobile
 
-- Late loading of aladin
+- Fix catalog table to use width 100%
+
+- Add horizontal padding to text fields
+
+- Show "Select location" if no plot yet
+
+- Add background to aladin container
+
+- Lighter milky way on celestial
+
+- Broken aladin fullscreen?
 
 ## Color palettes
 

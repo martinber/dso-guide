@@ -16,7 +16,7 @@ export function status_show() {
 }
 
 /**
- * Show status banner
+ * Hide status banner
  */
 export function status_hide() {
     $("#status-banner").css("visibility", "hidden");
