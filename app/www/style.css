@@ -489,9 +489,9 @@ main .inner {
 
 .plot-popup
 {
-	width: 90vw;
+	width: 95vw;
 	max-width: 50em;
-	height: 90vh;
+	height: 95vh;
 	max-height: 40em;
 	min-height: 20em;
 	background-color: var(--black);

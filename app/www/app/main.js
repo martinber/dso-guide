@@ -19,9 +19,7 @@ import {
     aladin_hide
 } from "./sky.js";
 import { eq_to_geo, calculate_rise_set } from "./tools.js";
-import { draw_day_night_plots, draw_visibility_plot } from "./plot.js";
-
-// TODO: REmove draw_visibility_plot
+import { draw_day_night_plots, show_visibility_popup } from "./plot.js";
 
 $(document).ready(() => {
 
@@ -257,12 +255,12 @@ function main(ctx) {
         tmp_plot_bg.min_hs = result[1];
         tmp_plot_bg.max_hs = result[2];
 
-        draw_visibility_plot(
-            $(".plot-popup-canvas")[0],
+        show_visibility_popup(
             tmp_plot_bg.bg_canvas,
             ctx.manager.get_catalog_view()[0],
             tmp_plot_bg.location,
             15,
+            tmp_plot_bg.sun_threshold_alt,
             tmp_plot_bg.year,
             tmp_plot_bg.min_hs,
             tmp_plot_bg.max_hs

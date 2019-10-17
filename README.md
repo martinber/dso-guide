@@ -48,8 +48,6 @@ star chart
 
 - Implement filters and sort
 
-- Improve GoTo, right now you lose the position where you were on the list
-
 - Check the tr references on DSOs, they are not going to work with filters
 
 - Add note saying that times are always e.g. UTC-6. Including future times, even
