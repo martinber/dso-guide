@@ -37,7 +37,7 @@ star chart
 
 - Rebuild database, rename `star_id` to `dso_id` or `obj_id`
 
-- Flask logging, remove the debug setting
+- Flask logging
 
 - Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
   `hostmaster`, `root`, `info`.
@@ -47,8 +47,6 @@ star chart
 - Bigger logo
 
 - Implement filters and sort
-
-- Improve GoTo, right now you lose the position where you were on the list
 
 - Check the tr references on DSOs, they are not going to work with filters
 
@@ -78,6 +76,17 @@ star chart
 - Lighter milky way on celestial
 
 - Broken aladin fullscreen?
+
+- Check carefully the grid align of the visibility plot. Draw the grid when
+  generating the day-night plot to compare.
+
+- On leaflet do a modulo 360? on longitude
+
+- Check that location submits if location invalid
+
+- Check z-index of leaflet
+
+- Check plot calculations
 
 ## Color palettes
 

@@ -25,6 +25,8 @@ let MAX_ROWS = 100;
  *   watch_dso as argument
  * - goto_callback(dso): Called when user clicks the goto button, gives dso as
  *   argument
+ * - plot_callback(dso): Called when user clicks the plot canvas, gives dso as
+ *   argument
  * - style_change_callback(watch_dso, style): Called when user changes the style
  *   using the dropdown, gives as an argument the watch_dso and the new style
  * - notes_change_callback(watch_dso): Called when user does something on the
@@ -40,6 +42,7 @@ export function TableManager(
     delete_callback,
     save_callback,
     goto_callback,
+    plot_callback,
     style_change_callback,
     notes_change_callback
 ) {
@@ -135,7 +138,8 @@ export function TableManager(
             this._dso_threshold_alt,
             this._plot_bg,
             add_callback,
-            goto_callback
+            goto_callback,
+            plot_callback,
         )
     });
 
@@ -152,7 +156,8 @@ export function TableManager(
         this._dso_threshold_alt,
         this._plot_bg,
         add_callback,
-        goto_callback
+        goto_callback,
+        plot_callback
     )
 
     /**
@@ -187,6 +192,7 @@ export function TableManager(
             delete_callback,
             save_callback,
             goto_callback,
+            plot_callback,
             style_change_callback,
             notes_change_callback
         );
@@ -222,6 +228,7 @@ export function TableManager(
             delete_callback,
             save_callback,
             goto_callback,
+            plot_callback,
             style_change_callback,
             notes_change_callback
         );
@@ -235,7 +242,8 @@ export function TableManager(
             this._dso_threshold_alt,
             this._plot_bg,
             add_callback,
-            goto_callback
+            goto_callback,
+            plot_callback
         )
     }
 
@@ -274,6 +282,7 @@ function watchlist_update(
     delete_callback,
     save_callback,
     goto_callback,
+    plot_callback,
     style_change_callback,
     notes_change_callback
 ) {
@@ -306,6 +315,7 @@ function watchlist_update(
             delete_callback,
             save_callback,
             goto_callback,
+            plot_callback,
             style_change_callback,
             notes_change_callback
         );
@@ -337,7 +347,8 @@ function catalog_filter_and_update(
     dso_threshold_alt,
     plot_bg,
     add_callback,
-    goto_callback
+    goto_callback,
+    plot_callback
 ) {
 
     // ctx.manager.catalog_set_sort(sort.name);
@@ -380,7 +391,8 @@ function catalog_filter_and_update(
         dso_threshold_alt,
         plot_bg,
         add_callback,
-        goto_callback
+        goto_callback,
+        plot_callback
     );
 }
 
@@ -391,7 +403,8 @@ function catalog_update(
     dso_threshold_alt,
     plot_bg,
     add_callback,
-    goto_callback
+    goto_callback,
+	plot_callback
 ) {
     let page = 1;
     let start = (page - 1) * MAX_ROWS;
@@ -422,7 +435,8 @@ function catalog_update(
             added,
             plot_canvas,
             add_callback,
-            goto_callback
+            goto_callback,
+            plot_callback
         );
 
         dso.set_catalog_tr(tr);
@@ -534,7 +548,8 @@ function create_ra_dec_cell(ra_dec) {
 /**
  * Create table cell with visibility plot
  */
-function create_plot_cell(canvas) {
+function create_plot_cell(canvas, dso, plot_callback) {
+    $(canvas).click(() => plot_callback(dso));
 
     return $("<td>", {
         class: "objects-plot",
@@ -693,7 +708,9 @@ function catalog_create_header(tr) {
  * - save_callback(watch_dso): Called when user clicks the save button, gives
  *   watch_dso as argument
  * - goto_callback(dso): Called when user clicks the goto button, gives
- *   watch_dso as argument
+ *   dso as argument
+ * - plot_callback(dso): Called when user clicks the plot canvas, gives
+ *   dso as argument
  * - style_change_callback(watch_dso, style): Called when user changes the style
  *   using the dropdown, gives as an argument the watch_dso and the new style
  * - notes_change_callback(watch_dso): Called when user does something on the
@@ -707,6 +724,7 @@ function watchlist_create_row(
     delete_callback,
     save_callback,
     goto_callback,
+    plot_callback,
     style_change_callback,
     notes_change_callback
 ) {
@@ -744,7 +762,7 @@ function watchlist_create_row(
                 break;
 
             case "plot":
-                tr.append(create_plot_cell(plot_canvas));
+                tr.append(create_plot_cell(plot_canvas, watch_dso.dso, plot_callback));
                 break;
 
             case "notes":
@@ -797,6 +815,8 @@ function watchlist_create_row(
  *   argument
  * - goto_callback(dso): Called when user clicks the goto button, gives dso as
  *   argument
+ * - plot_callback(dso): Called when user clicks the plot canvas, gives dso as
+ *   argument
  */
 function catalog_create_row(
     dso,
@@ -806,6 +826,7 @@ function catalog_create_row(
     plot_canvas,
     add_callback,
     goto_callback,
+    plot_callback
 ) {
     let tr =  $("<tr>");
     for (let col of catalog_columns) {
@@ -841,7 +862,7 @@ function catalog_create_row(
                 break;
 
             case "plot":
-                tr.append(create_plot_cell(plot_canvas));
+                tr.append(create_plot_cell(plot_canvas, dso, plot_callback));
                 break;
 
             case "controls":
