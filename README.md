@@ -77,6 +77,9 @@ star chart
 
 - Broken aladin fullscreen?
 
+- Check carefully the grid align of the visibility plot. Draw the grid when
+  generating the day-night plot to compare.
+
 ## Color palettes
 
 https://colorhunt.co/palette/24652

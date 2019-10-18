@@ -360,8 +360,8 @@ export function show_visibility_popup(
 
     // Draw the canvas
 
-    let canvas = popup.find(".plot-popup-canvas");
-    draw_visibility_plot(canvas[0], back_canvas, dso, lat_lon, threshold_alt,
+    let canvas = popup.find(".plot-popup-canvas")[0];
+    draw_visibility_plot(canvas, back_canvas, dso, lat_lon, threshold_alt,
         year, min_hs, max_hs);
 
     // Calculate rise and set times for every 15th day of each month
@@ -438,6 +438,74 @@ export function show_visibility_popup(
     for (let month_index = 0; month_index < 12; month_index++) {
         tr.append($("<td>", { text: format_time(sun_times[month_index].set) } ));
     }
+
+    // Show the Y axis labels, I'm going to show about 8 of them
+
+    let span_hs = max_hs - min_hs; // Vertical span of the plot in hours
+
+    // Decide the interval on hours between labels, to avoid having too many of
+    // them cramped
+
+    let interval_hs = 0;
+    if (span_hs > 20) {
+        interval_hs = 3;
+    } else if (span_hs > 10) {
+        interval_hs = 2;
+    } else {
+        interval_hs = 1;
+    }
+
+    let current = Math.ceil(min_hs);
+    while (current < max_hs) {
+        // current can be bigger than 24 and less than 0
+        let hours = current % 24;
+        if (hours < 0) {
+            hours += 24;
+        }
+
+        let label = $("<span>", { text: `${hours}:00hs` });
+        let canvas_height = canvas.scrollHeight;
+        let position = ((current - min_hs) / span_hs) * canvas_height;
+        label.css("top", `${position}px`);
+        popup.find(".plot-popup-hours").append(label)
+
+        current += interval_hs;
+    }
+
+    // Draw horizontal grid, one line per hour
+
+    let ctx = canvas.getContext("2d", { alpha: false} );
+    current = Math.ceil(min_hs);
+    while (current < max_hs) {
+        // current can be bigger than 24 and less than 0
+        let hours = current % 24;
+        if (hours < 0) {
+            hours += 24;
+        }
+
+        let position = ((current - min_hs) / span_hs) * canvas.height;
+        ctx.strokeStyle = "#FFFFFF10";
+        ctx.beginPath();
+        ctx.moveTo(0, position);
+        ctx.lineTo(canvas.width, position);
+        ctx.closePath();
+        ctx.stroke();
+
+        current += 1;
+    }
+
+    // Draw vertical grid, one line per hour
+
+    for (let month = 1; month < 12; month++) {
+        let position = month * canvas.width / 12;
+        ctx.strokeStyle = "#FFFFFF10";
+        ctx.beginPath();
+        ctx.moveTo(position, 0);
+        ctx.lineTo(position, canvas.height);
+        ctx.closePath();
+        ctx.stroke();
+    }
+
 
 }
 

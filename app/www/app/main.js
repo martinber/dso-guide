@@ -239,7 +239,7 @@ function main(ctx) {
             sun_threshold_alt: -10, // Sunrise and sunset happens 10° below the
                                     // horizon
             year: 2019,
-            location: [40, 0],
+            location: [data.lat, data.lon],
             bg_canvas: null, // Background image of daylight plot
             min_hs: null, // Fractional hours at the top of the plot
             max_hs: null // Fractional hours at the bottom of the plot
@@ -257,7 +257,7 @@ function main(ctx) {
 
         show_visibility_popup(
             tmp_plot_bg.bg_canvas,
-            ctx.manager.get_catalog_view()[0],
+            ctx.manager.get_catalog_view()[8],
             tmp_plot_bg.location,
             15,
             tmp_plot_bg.sun_threshold_alt,

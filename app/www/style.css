@@ -479,20 +479,12 @@ main .inner {
 	width: 100%;
 }
 
-.test-canvas
-{
-	height: 2em;
-	width: 4em;
-	margin: 1em;
-	border: 1px solid white;
-}
-
 .plot-popup
 {
 	width: 95vw;
 	max-width: 50em;
 	height: 95vh;
-	max-height: 40em;
+	max-height: 45em;
 	min-height: 20em;
 	background-color: var(--black);
 	border: 4px solid var(--red-2);
@@ -584,7 +576,10 @@ main .inner {
 
 .plot-popup-hours span
 {
-	display: block;
+	position: absolute;
+	right: 0;
+	top: 0; /* Modified by JS to set appropiate position */
+	transform: translateY(-50%); /* So it's centered vertically */
 }
 
 .plot-popup-canvas
@@ -594,7 +589,6 @@ main .inner {
 
 	width: 100%;
 	height: 100%;
-	border: 4px solid var(--gray-1);
 }
 
 .plot-popup-table
@@ -602,7 +596,9 @@ main .inner {
 	grid-column: 1 / 3;
 	grid-row: 2;
 
+	border-collapse: collapse;
 	table-layout: fixed;
+	width: 100%;
 }
 
 .plot-popup-table th
