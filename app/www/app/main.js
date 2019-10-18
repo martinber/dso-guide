@@ -99,12 +99,6 @@ $(document).ready(() => {
     // Init Celestial and Aladin
 
     Celestial.display(celestial_config);
-    ctx.aladin = A.aladin("#aladin-map", {
-        fov: 1,
-        target: "M81", // TODO replace with coordinates so we dont use a request
-        reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
-        showReticle: false,
-    });
 });
 
 // Not used right now, idea is centering the map on someone's saved lon lat
@@ -161,7 +155,7 @@ function main(ctx) {
         if (aladin_is_visible()) {
             aladin_hide();
         } else {
-            aladin_show();
+            ctx.aladin = aladin_show(ctx.aladin);
         }
     });
 
@@ -340,7 +334,7 @@ function logged_in(ctx) {
 function ui_aladin_goto(ctx, dso) {
 
     let geo_coords = eq_to_geo(dso.coords)
-    aladin_show();
+    ctx.aladin = aladin_show(ctx.aladin);
     ctx.aladin.gotoRaDec(
         geo_coords[0],
         geo_coords[1],

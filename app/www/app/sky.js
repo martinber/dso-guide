@@ -14,15 +14,34 @@ export function aladin_is_visible() {
 }
 
 /**
- * Show status banner
+ * Show aladin sidebar
+ *
+ * Takes the aladin object or null if aladin was never shown.
+ * Returns the aladin object.
+ *
+ * This way I can do late loading of the aladin applet if this function is used
+ * as:
+ *
+ * ctx.aladin = aladin_show(ctx.aladin);
  */
-export function aladin_show() {
+export function aladin_show(aladin) {
     $("#aladin-container").css("visibility", "visible");
     $("#aladin-container").css("transform", "translateX(0)");
+
+    if (aladin == null) {
+        return A.aladin("#aladin-map", {
+            fov: 1,
+            target: "M81", // TODO replace with coordinates so we dont use a request
+            reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
+            showReticle: false,
+        });
+    } else {
+        return aladin;
+    }
 }
 
 /**
- * Show status banner
+ * Hide aladin sidebar
  */
 export function aladin_hide() {
     $("#aladin-container").css("visibility", "hidden");
