@@ -267,14 +267,16 @@ body
 /* LEAFLET -------------------------------------------------------------- */
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
 	/*background: #796c6c;*/
-    font-family: 'Saira Condensed', sans-serif;
+	font-family: 'Saira Condensed', sans-serif;
+	font-size: initial;
 	background-color: #131313;
 	color: white;
 	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
 	border-radius: 0;
 	overflow: auto;
+    padding-bottom: 0.5em;
 }
-#map-location-submit{
+.map-location-submit{
 	float: right;
 }
 /* REGISTER -------------------------------------------------------------- */

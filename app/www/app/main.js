@@ -44,6 +44,9 @@ $(document).ready(() => {
         // different shape and color)
         aladin_catalogs: aladin_catalogs_init(),
 
+        // OpenStreetView map
+        map : null,
+
         // For plots. Redrawing the background takes time because we are doing
         // calculations of the sunrise and sunset for every day on the year, so
         // I keep the background and the parameters used to generate it here
@@ -55,6 +58,7 @@ $(document).ready(() => {
             bg_canvas: null, // Background image of daylight plot
             min_hs: null, // Fractional hours at the top of the plot
             max_hs: null // Fractional hours at the bottom of the plot
+
         }
     };
 
@@ -102,32 +106,6 @@ $(document).ready(() => {
         showReticle: false,
     });
 });
-
-function init_map() {
-    let new_map = L.map('mapid');
-    // Add OSM tile leayer to the Leaflet map.
-    let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-    let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}); // change max zoom TODO
-
-    new_map.setView(new L.LatLng($("#location-lat").val(), $("#location-long").val()),2);
-    new_map.addLayer(osm);
-
-    function on_map_click(e) {
-        console.log(e.latlng["lat"])
-        let popup = L.popup({ className: ".leaflet-popup-content-wrapper" })
-        	.setLatLng(e.latlng)
-            .setContent(`${e.latlng["lat"].toFixed(4)}, ${e.latlng["lng"].toFixed(4)} <br> \
-                        <input id="map-location-submit" type="submit" value="Update"></input>`)
-        	.openOn(new_map);
-
-            //.setContent("you clicked on<br>",e.latlng.toString())
-    }
-
-    new_map.on('click', on_map_click);
-
-    return new_map;
-}
 
 // Not used right now, idea is centering the map on someone's saved lon lat
 
@@ -201,6 +179,71 @@ function main(ctx) {
 
     // Location form
 
+    $("#location-submit").click(e => {
+        e.preventDefault(); // Disable built-in HTML action
+
+        let data = {
+            lat: parseFloat($("#location-lat").val()),
+            lon: parseFloat($("#location-long").val())
+        }
+
+        submit_location(data);
+    });
+
+    // Location map
+
+    function init_map() {
+        let new_map = L.map('mapid');
+        // Add OSM tile leayer to the Leaflet map.
+        let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+        let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}); // change max zoom TODO
+
+        new_map.setView(new L.LatLng($("#location-lat").val(), $("#location-long").val()),2);
+        new_map.addLayer(osm);
+
+        function on_map_click(e) {
+            let popup = L.popup({ className: ".leaflet-popup-content-wrapper" })
+            	.setLatLng(e.latlng)
+                .setContent(`${e.latlng["lat"].toFixed(4)}, ${e.latlng["lng"].toFixed(4)} <br> \
+                            <input class="map-location-submit" type="submit" value="Update"></input>`)
+            	.openOn(new_map);
+
+            let map_data = {lat: e.latlng["lat"], lon: e.latlng["lng"]}
+
+            $(".map-location-submit").click(e => {
+                $("#location-lat").val(map_data["lat"])
+                $("#location-long").val(map_data["lon"])
+                submit_location(map_data);
+            });
+        }
+
+        new_map.on('click', on_map_click);
+
+        return new_map;
+    }
+
+    let make_toggle = div => {
+        let button = div.find(".toggle");
+        let collapse = div.find(".collapse");
+
+        button.click(e => {
+            if (collapse.css("visibility") == "hidden") {
+                collapse.css("visibility", "visible");
+                collapse.css("display", "block");
+                ctx.map = init_map(ctx);
+            } else {
+                collapse.css("visibility", "hidden");
+                collapse.css("display", "none");
+                ctx.map.off()
+                ctx.map.remove()
+            }
+        });
+    }
+    make_toggle($("#map-wrapper"));
+
+    // Location update
+
     function submit_location(data) {
         if (logged_in(ctx)) {
             $.ajax({
@@ -228,45 +271,6 @@ function main(ctx) {
         ui_plot_bg_update(ctx, null, [data.lat, data.lon]);
         ctx.table_manager.update_datetime_location(null, [data.lat, data.lon]);
     }
-
-    $("#location-submit").click(e => {
-        e.preventDefault(); // Disable built-in HTML action
-
-        let data = {
-            lat: parseFloat($("#location-lat").val()),
-            lon: parseFloat($("#location-long").val())
-        }
-
-        submit_location(data);
-    });
-
-    $("#map-location-submit").click(e => {
-        e.preventDefault(); // Disable built-in HTML action
-/*
-        let data = {
-            lat:
-            lon:
-        }
-*/
-        submit_location(data);
-    });
-    let make_toggle = div => {
-        let button = div.find(".toggle");
-        let collapse = div.find(".collapse");
-
-        button.click(e => {
-            if (collapse.css("visibility") == "hidden") {
-                collapse.css("visibility", "visible");
-                collapse.css("display", "block");
-                let new_map = init_map();
-            } else {
-                collapse.css("visibility", "hidden");
-                collapse.css("display", "none");
-            }
-        });
-    }
-
-    make_toggle($("#map-wrapper"));
 
     // Login buttons
 
