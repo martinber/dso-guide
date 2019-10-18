@@ -296,6 +296,11 @@ export function draw_day_night_plots(
     return [canvas, min_hs, max_hs];
 }
 
+/**
+ * Show popup with bit plot
+ *
+ * Close previous popup if any
+ */
 export function show_visibility_popup(
     back_canvas,
     dso,
@@ -304,8 +309,13 @@ export function show_visibility_popup(
     sun_threshold_alt,
     year,
     min_hs,
-    max_hs
+    max_hs,
+    close_callback
 ) {
+
+    // Close previous popup if any
+
+    $(".plot-popup").remove();
 
     let popup = $("<figure>", { class: "plot-popup" }).html(
         `<div class="plot-popup-scrollable">
@@ -505,7 +515,5 @@ export function show_visibility_popup(
         ctx.closePath();
         ctx.stroke();
     }
-
-
 }
 

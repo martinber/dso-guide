@@ -55,7 +55,9 @@ $(document).ready(() => {
             bg_canvas: null, // Background image of daylight plot
             min_hs: null, // Fractional hours at the top of the plot
             max_hs: null // Fractional hours at the bottom of the plot
-        }
+        },
+
+        dso_threshold_alt: 15
     };
 
     // Load JSON data of objects, then start on the main() function
@@ -72,12 +74,13 @@ $(document).ready(() => {
             ctx.manager,
             null, // date
             null, // location
-            15, // dso_threshold_alt
+            ctx.dso_threshold_alt,
             ctx.plot_bg,
             dso => server_watchlist_add(ctx, dso.id),
             watch_dso => server_watchlist_delete(ctx, watch_dso),
             watch_dso => server_watchlist_save(ctx, watch_dso),
             dso => ui_aladin_goto(ctx, dso),
+            dso => ui_show_plot_popup(ctx, dso),
             (watch_dso, style) => ui_style_change_callback(ctx, watch_dso, style),
             (watch_dso, notes) => ui_notes_change_callback(ctx, watch_dso, notes)
         );
@@ -232,39 +235,6 @@ function main(ctx) {
         }
 
         submit_location(data);
-
-        // TODO big visibility plot
-
-        let tmp_plot_bg = {
-            sun_threshold_alt: -10, // Sunrise and sunset happens 10° below the
-                                    // horizon
-            year: 2019,
-            location: [data.lat, data.lon],
-            bg_canvas: null, // Background image of daylight plot
-            min_hs: null, // Fractional hours at the top of the plot
-            max_hs: null // Fractional hours at the bottom of the plot
-        }
-
-        let result = draw_day_night_plots(
-            tmp_plot_bg.location,
-            [800, 500],
-            tmp_plot_bg.sun_threshold_alt,
-            tmp_plot_bg.year
-        );
-        tmp_plot_bg.bg_canvas = result[0];
-        tmp_plot_bg.min_hs = result[1];
-        tmp_plot_bg.max_hs = result[2];
-
-        show_visibility_popup(
-            tmp_plot_bg.bg_canvas,
-            ctx.manager.get_catalog_view()[8],
-            tmp_plot_bg.location,
-            15,
-            tmp_plot_bg.sun_threshold_alt,
-            tmp_plot_bg.year,
-            tmp_plot_bg.min_hs,
-            tmp_plot_bg.max_hs
-        );
     });
 
     $("#map-location-submit").click(e => {
@@ -375,6 +345,30 @@ function ui_aladin_goto(ctx, dso) {
 
     // Scroll page to map
     window.location.hash = "sky-surveys";
+}
+
+/**
+ * Show given dso on the visibility plot
+ */
+function ui_show_plot_popup(ctx, dso) {
+
+    if (ctx.plot_bg.bg_canvas == null) {
+        console.error("User clicked on plot before selecting location");
+
+        status_text(`<b>Error</b>, select a location first`);
+        status_show();
+    } else {
+        show_visibility_popup(
+            ctx.plot_bg.bg_canvas,
+            dso,
+            ctx.plot_bg.location,
+            ctx.dso_threshold_alt,
+            ctx.plot_bg.sun_threshold_alt,
+            ctx.plot_bg.year,
+            ctx.plot_bg.min_hs,
+            ctx.plot_bg.max_hs
+        );
+    }
 }
 
 /**

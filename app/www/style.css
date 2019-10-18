@@ -754,6 +754,7 @@ legend {
 	width: 5em;
 	height: 2em;
 	border: 1px solid var(--gray-25);
+	cursor: pointer;
 }
 
 /* TABLE -------------------------------------------------------------- */
