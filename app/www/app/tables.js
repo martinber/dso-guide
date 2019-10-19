@@ -79,8 +79,19 @@ export function TableManager(
     $("#watchlist-settings-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
-        // TODO
-        // catalog_filter_and_update(this._dso_manager, add_callback, goto_callback)
+        watchlist_filter_and_update(
+            this._dso_manager,
+            this._date,
+            this._location,
+            this._dso_threshold_alt,
+            this._plot_bg,
+            delete_callback,
+            save_callback,
+            goto_callback,
+            plot_callback,
+            style_change_callback,
+            notes_change_callback
+        )
     });
 
     // Catalog filters
@@ -149,6 +160,7 @@ export function TableManager(
 
     catalog_create_header($("#catalog-table thead tr"));
 
+    //TODO
     catalog_filter_and_update(
         this._dso_manager,
         this._date,
@@ -164,7 +176,6 @@ export function TableManager(
      * Add object to watchlist table
      */
     this.watchlist_add = function(watch_dso) {
-        // TODO
         this.watchlist_update();
     }
 
@@ -172,7 +183,6 @@ export function TableManager(
      * Remove object from watchlist table
      */
     this.watchlist_remove = function(watch_dso) {
-        // TODO
         this.watchlist_update();
     }
 
@@ -217,10 +227,9 @@ export function TableManager(
             this._location = location;
         }
 
-        // TODO improve performance
-        // for each in watchlist update
-        watchlist_update(
-            this._dso_manager.get_watchlist_view(),
+        // TODO
+        watchlist_filter_and_update(
+            this._dso_manager,
             this._date,
             this._location,
             this._dso_threshold_alt,
@@ -233,8 +242,6 @@ export function TableManager(
             notes_change_callback
         );
 
-        // TODO I'm filtering here, this is wrong
-        // for each in catalog update
         catalog_filter_and_update(
             this._dso_manager,
             this._date,
@@ -271,6 +278,46 @@ function watchlist_change_callback(watch_dso, added) {
     if (tr != null) {
         tr.find(".objects-add").prop("disabled", added);
     }
+}
+
+function watchlist_filter_and_update(
+    dso_manager,
+    date,
+    location,
+    dso_threshold_alt,
+    plot_bg,
+    delete_callback,
+    save_callback,
+    goto_callback,
+    plot_callback,
+    style_change_callback,
+    notes_change_callback
+) {
+    let search_string = $("#watchlist-search").val();
+
+    let filtering_search = search_string.length > 0
+
+    dso_manager.watchlist_set_filter(watch_dso => {
+        if (filtering_search) {
+            return watch_dso.dso.name.toLowerCase().includes(search_string.toLowerCase())
+        } else {
+            return true
+        }
+    });
+
+    watchlist_update(
+        dso_manager.get_watchlist_view(),
+        date,
+        location,
+        dso_threshold_alt,
+        plot_bg,
+        delete_callback,
+        save_callback,
+        goto_callback,
+        plot_callback,
+        style_change_callback,
+        notes_change_callback
+    );
 }
 
 function watchlist_update(
@@ -350,10 +397,6 @@ function catalog_filter_and_update(
     goto_callback,
     plot_callback
 ) {
-
-    // ctx.manager.catalog_set_sort(sort.name);
-    // ctx.manager.catalog_set_filter(dso => dso.appears_on.length > 0);
-    // ctx.manager.catalog_set_filter(dso => dso.mag < 2);
     let search_string = $("#catalog-search").val();
 
     let selected_catalogs = [];

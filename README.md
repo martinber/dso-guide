@@ -38,7 +38,8 @@ Search catalogs of deep sky objects and plan your observations.
 
 ### Now
 
-- Rebuild database, rename `star_id` to `dso_id` or `obj_id`
+- Rebuild database, check best practices (backups? migrations?), rename
+  `star_id` to `dso_id` or `obj_id`
 
 - Flask logging
 
@@ -76,7 +77,9 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Flask logging
 
-- Table sort
+- Table sort, allow ordering of watchlist
+
+- Check tat sometimes forms send GET instead of PUT
 
 - Add explanation of lat/lon format (hovering over help icon?)
 
@@ -85,6 +88,9 @@ Search catalogs of deep sky objects and plan your observations.
 - Show ocular sizes on aladin
 
 - Bigger logo
+
+- Optimize watchlist and catalog tables adding, deleting, updating. Also when
+  changing location
 
 - Check what happens with timezones
 
