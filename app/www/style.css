@@ -290,11 +290,13 @@ body
 
 /* CHANGE PASSWORD ---------------------------------------------------- */
 
-#password-controls {
+#password-controls
+{
 	margin: 1em auto;
 }
 
-#passchange-form {
+#passchange-form
+{
 	max-width: 20em;
 	display: block;
 	margin: 1em auto;
@@ -302,15 +304,18 @@ body
 	padding: 1em;
 }
 
-#passchange-form div {
+#passchange-form div
+{
 	margin: 1em 0;
 }
 
-#username, #old-password, #new-password, #confirm-new-password {
+#username, #old-password, #new-password, #confirm-new-password
+{
 	width: 100%;
 }
 
-#change-password {
+#change-password
+{
 	margin: 0;
 	margin-top: 1em;
 }
@@ -326,9 +331,17 @@ footer
 
 /* MAP ---------------------------------------------------------------- */
 
-#leaflet-map {
+#map-wrapper
+{
+	margin: 0.2em;
+	margin-top: 0.4em;
+}
+
+#leaflet-map
+{
 	height: 50vh;
-	width: 80%;
+	width: 100%;
+	max-width: 90vh;
 	cursor: pointer;
 	z-index: var(--leaflet-z-index);
 }
@@ -403,6 +416,7 @@ main .inner {
 
 	transform: translateX(-100%);
 	visibility: hidden;
+	background-color: var(--black); /* Visible when fully zoomed out */
 }
 
 #aladin-map

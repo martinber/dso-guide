@@ -71,8 +71,6 @@ star chart
 
 - Show "Select location" if no plot yet
 
-- Add background to aladin container
-
 - Lighter milky way on celestial
 
 - Broken aladin fullscreen?
