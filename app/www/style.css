@@ -61,6 +61,7 @@ textarea, input[type="text"], input[type="date"], input[type="email"],
 	background-color: var(--gray-2);
 	color: var(--gray-4);
 	height: 2em;
+    padding: 0 0.2em;
 }
 
 textarea:focus, input[type="text"]:focus, input[type="date"]:focus,

@@ -54,18 +54,10 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Getting started and about page
 
-- Add horizontal padding to text fields
-
 - Check carefully the grid align of the visibility plot. Draw the grid when
   generating the day-night plot to compare.
 
 - Check plot calculations
-
-- On leaflet do a modulo 360? on longitude
-
-- Check that location submits if location invalid
-
-- Check location coordinates precision
 
 ### Later
 
@@ -110,6 +102,8 @@ Search catalogs of deep sky objects and plan your observations.
 - Show this project to Aladin and Celestial devs.
 
 - Make the Celestial chart configurable (grid, constellations, star sizes, etc.)
+
+- Show form location on map, e.g. when logging in
 
 ## References
 

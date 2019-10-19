@@ -103,12 +103,6 @@ $(document).ready(() => {
     Celestial.display(celestial_config);
 });
 
-// Not used right now, idea is centering the map on someone's saved lon lat
-
-function update_map_location(new_map) {
-    new_map.setView(new L.LatLng(parseFloat($("#location-lat").val()), parseFloat($("#location-long").val())),2)
-}
-
 function main(ctx) {
 
     // Leave space so the banner is not shown above the footer
@@ -162,7 +156,7 @@ function main(ctx) {
 
     // Datetime form
 
-    $("#datetime-submit").click(e => {
+    $("#datetime-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
         let [year, month, day] = $("#datetime-date").val().split("-");
         let [hour, min] = $("#datetime-time").val().split(":");
@@ -174,7 +168,7 @@ function main(ctx) {
 
     // Location form
 
-    $("#location-submit").click(e => {
+    $("#location-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
         let data = {
@@ -197,23 +191,34 @@ function main(ctx) {
         new_map.setView(new L.LatLng($("#location-lat").val(), $("#location-long").val()),2);
         new_map.addLayer(osm);
 
-        function on_map_click(e) {
+        new_map.on('click', e => {
+            let lat = e.latlng["lat"];
+            let lon = e.latlng["lng"];
+
+            // Leaflet gives longitudes bigger than 180 or smaller than -180 if
+            // the user scrolls horizontally
+            while (lon < -180) {
+                lon += 360;
+            }
+            while (lon > 180) {
+                lon -= 360;
+            }
+
+            // Show popup
             let popup = L.popup({ className: ".leaflet-popup-content-wrapper" })
                 .setLatLng(e.latlng)
-                .setContent(`${e.latlng["lat"].toFixed(4)}, ${e.latlng["lng"].toFixed(4)} <br> \
+                .setContent(`${lat.toFixed(4)}, ${lon.toFixed(4)} <br> \
                             <input class="leaflet-submit" type="submit" value="Update"></input>`)
                 .openOn(new_map);
 
-            let map_data = {lat: e.latlng["lat"], lon: e.latlng["lng"]}
-
+            // Update location forms and submit to server
             $(".leaflet-submit").click(e => {
-                $("#location-lat").val(map_data["lat"])
-                $("#location-long").val(map_data["lon"])
-                submit_location(map_data);
+                // Copy only 4 decimal places
+                $("#location-lat").val(lat.toFixed(4))
+                $("#location-long").val(lon.toFixed(4))
+                submit_location({ lat: lat, lon: lon });
             });
-        }
-
-        new_map.on('click', on_map_click);
+        });
 
         return new_map;
     }
