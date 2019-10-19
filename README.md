@@ -57,8 +57,6 @@ Search catalogs of deep sky objects and plan your observations.
 - Check carefully the grid align of the visibility plot. Draw the grid when
   generating the day-night plot to compare.
 
-- Check plot calculations
-
 ### Later
 
 - Flask logging
@@ -104,6 +102,8 @@ Search catalogs of deep sky objects and plan your observations.
 - Make the Celestial chart configurable (grid, constellations, star sizes, etc.)
 
 - Show form location on map, e.g. when logging in
+
+- Indicate current day/time on plot
 
 ## References
 

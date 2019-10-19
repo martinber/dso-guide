@@ -420,7 +420,7 @@ function ui_plot_bg_update(ctx, datetime, location) {
     }
 
     if (datetime != null && ctx.plot_bg.year != datetime.getYear()) {
-        ctx.plot_bg.year = datetime.getYear();
+        ctx.plot_bg.year = datetime.getFullYear();
         redraw = true;
     }
 

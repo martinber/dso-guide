@@ -297,7 +297,7 @@ export function draw_day_night_plots(
 }
 
 /**
- * Show popup with bit plot
+ * Show popup with big plot
  *
  * Close previous popup if any
  */
@@ -379,6 +379,7 @@ export function show_visibility_popup(
 
     let dso_times = [];
     for (let month_index = 0; month_index < 12; month_index++) {
+
         dso_times.push(
             calculate_rise_set(
                 threshold_alt, eq_to_geo(dso.coords),
