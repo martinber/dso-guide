@@ -643,7 +643,7 @@ main .inner {
 
 .plot-popup-table thead th:nth-child(1)
 {
-  width: 4.5rem; /* plot-popup-hours width + grid_gap */
+	width: 4.5rem; /* plot-popup-hours width + grid_gap */
 }
 
 /* SIDEBAR ------------------------------------------------------------ */
@@ -784,6 +784,7 @@ legend {
 {
 	width: 100%;
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 
 .objects-table th
@@ -891,26 +892,35 @@ legend {
 	border: 1px solid var(--gray-2);
 }
 
-.objects-table td.objects-notes textarea:focus {
+.objects-table td.objects-notes textarea:focus
+{
 	background-color: var(--gray-2);
 	border: 1px solid var(--red-1);
 }
 
-.objects-table td.objects-appears-on ul {
+.objects-table td.objects-appears-on
+{
+	width: 100%; /* Expand notes column until there is no space remaining */
+}
+
+.objects-table td.objects-appears-on ul
+{
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	white-space: pre-wrap;
 }
 
-.objects-table td.objects-appears-on li {
+.objects-table td.objects-appears-on li
+{
 	display: inline-block;
 	margin: 0 0.2em;
 	padding: 0.2em;
 	border: 1px solid var(--gray-25);
 }
 
-@media screen and (max-width: 750px) {
+@media screen and (max-width: 750px)
+{
 
 	.objects-table thead
 	{
@@ -939,7 +949,8 @@ legend {
 
 }
 
-.table-no-results {
+.table-no-results
+{
 	margin-top: 1em;
 	padding: 0.5em;
 	width: 100%;
