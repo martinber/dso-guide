@@ -8,7 +8,7 @@ export let celestial_config = {
     // projection
     width: 0,
 
-    projection: "stereographic",
+    projection: "azimuthalEquidistant",
 
     // optional initial geographic position [lat,lon] in degrees
     geopos: [0, 0],
@@ -46,7 +46,6 @@ export let celestial_config = {
     // spanish. Default:en or empty string for english
     lang: "",
 
-    // TODO
     // ID of parent element, e.g. div, null = html-body
     container: "celestial-container",
 
@@ -95,7 +94,8 @@ export let celestial_config = {
         propernamelimit: 1.5,
 
         // Maximum size (radius) of star circle in pixels
-        size: 7,
+        // Should make it configurable
+        size: Math.min($(window).width(), $(window).height()) / 100,
 
         // Scale exponent for star size, larger = more linear
         exponent: -0.28,
@@ -229,20 +229,20 @@ export let celestial_config = {
         show: true,
 
         // Style for MW layers
-        style: { fill: "#ffffff", opacity: 0.15 }
+        style: { fill: "#ffffff", opacity: 0.05 }
 
     },
 
     // Display & styles for graticule & some planes
     lines: {
-        graticule: { show: true, stroke: "#cccccc", width: 0.6, opacity: 0.8,
+        graticule: { show: true, stroke: "#cccccc", width: 0.6, opacity: 0.3,
             // grid values: "outline", "center", or [lat,...] specific position
             lon: {pos: [""], fill: "#eee", font: "10px Helvetica, Arial, sans-serif"},
             // grid values: "outline", "center", or [lon,...] specific position
             lat: {pos: [""], fill: "#eee", font: "10px Helvetica, Arial, sans-serif"}},
 
-        equatorial: { show: true, stroke: "#aaaaaa", width: 1.3, opacity: 0.7 },
-        ecliptic: { show: true, stroke: "#66cc66", width: 1.3, opacity: 0.7 },
+        equatorial: { show: true, stroke: "#aaaaaa", width: 1.3, opacity: 0.4 },
+        ecliptic: { show: true, stroke: "#66cc66", width: 1.3, opacity: 0.4 },
         galactic: { show: false, stroke: "#cc6666", width: 1.3, opacity: 0.7 },
         supergalactic: { show: false, stroke: "#cc66cc", width: 1.3, opacity: 0.7 }
     },

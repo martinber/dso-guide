@@ -46,8 +46,6 @@ Search catalogs of deep sky objects and plan your observations.
 - Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
   `hostmaster`, `root`, `info`.
 
-- Filter watchlist
-
 - Check the tr references on DSOs, they are not going to work with filters
 
 - Code review
@@ -56,11 +54,7 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Getting started and about page
 
-- Smaller stars on mobile
-
 - Add horizontal padding to text fields
-
-- Lighter milky way on celestial
 
 - Check carefully the grid align of the visibility plot. Draw the grid when
   generating the day-night plot to compare.
@@ -114,6 +108,8 @@ Search catalogs of deep sky objects and plan your observations.
 - Generate atlases for every object: [example](https://www.deepskylog.org/atlas.pdf.php?zoom=17&object=M+18)
 
 - Show this project to Aladin and Celestial devs.
+
+- Make the Celestial chart configurable (grid, constellations, star sizes, etc.)
 
 ## References
 
