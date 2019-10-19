@@ -13,7 +13,7 @@ import { DsoManager, sort } from "./dso.js";
 import { TableManager } from "./tables.js";
 import {
     aladin_catalogs_init,
-    ui_markers_update,
+    markers_update,
     aladin_is_visible,
     aladin_show,
     aladin_hide
@@ -106,7 +106,6 @@ $(document).ready(() => {
 // Not used right now, idea is centering the map on someone's saved lon lat
 
 function update_map_location(new_map) {
-    console.log(new_map)
     new_map.setView(new L.LatLng(parseFloat($("#location-lat").val()), parseFloat($("#location-long").val())),2)
 }
 
@@ -157,7 +156,7 @@ function main(ctx) {
         if (aladin_is_visible()) {
             aladin_hide();
         } else {
-            ctx.aladin = aladin_show(ctx.aladin);
+            ui_aladin_load_and_show(ctx);
         }
     });
 
@@ -200,10 +199,10 @@ function main(ctx) {
 
         function on_map_click(e) {
             let popup = L.popup({ className: ".leaflet-popup-content-wrapper" })
-            	.setLatLng(e.latlng)
+                .setLatLng(e.latlng)
                 .setContent(`${e.latlng["lat"].toFixed(4)}, ${e.latlng["lng"].toFixed(4)} <br> \
                             <input class="leaflet-submit" type="submit" value="Update"></input>`)
-            	.openOn(new_map);
+                .openOn(new_map);
 
             let map_data = {lat: e.latlng["lat"], lon: e.latlng["lng"]}
 
@@ -330,12 +329,32 @@ function logged_in(ctx) {
 }
 
 /**
+ * Load aladin if necessary and show it
+ *
+ * I use this to do late loading of the aladin applet
+ */
+function ui_aladin_load_and_show(ctx) {
+    if (ctx.aladin == null) {
+        ctx.aladin = A.aladin("#aladin-map", {
+            fov: 1,
+            target: "M81", // TODO replace with coordinates so we dont use a request
+            reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
+            showReticle: false,
+        });
+
+        markers_update(ctx.manager, ctx.aladin, ctx.aladin_catalogs);
+    }
+
+    aladin_show();
+}
+
+/**
  * Show given dso on the aladin map
  */
 function ui_aladin_goto(ctx, dso) {
 
     let geo_coords = eq_to_geo(dso.coords)
-    ctx.aladin = aladin_show(ctx.aladin);
+    ui_aladin_load_and_show(ctx);
     ctx.aladin.gotoRaDec(
         geo_coords[0],
         geo_coords[1],
@@ -437,7 +456,7 @@ function ui_style_change_callback(ctx, watch_dso, style_id) {
     watch_dso.style = style_id;
 
     // Update the map
-    ui_markers_update(ctx);
+    markers_update(ctx.manager, ctx.aladin, ctx.aladin_catalogs);
 }
 
 /**
@@ -500,7 +519,7 @@ function server_watchlist_get(ctx) {
 
         ctx.table_manager.watchlist_update();
 
-        ui_markers_update(ctx);
+        markers_update(ctx.manager, ctx.aladin, ctx.aladin_catalogs);
 
     }).fail((xhr, status, error) => {
         console.error("server_watchlist_get() failed", xhr, status, error);
@@ -539,8 +558,7 @@ function server_watchlist_delete(ctx, watch_dso) {
         });
     }
 
-    ui_markers_update(ctx);
-
+    markers_update(ctx.manager, ctx.aladin, ctx.aladin_catalogs);
 }
 
 /**
@@ -580,7 +598,7 @@ function server_watchlist_add(ctx, id) {
         });
     }
 
-    ui_markers_update(ctx);
+    markers_update(ctx.manager, ctx.aladin, ctx.aladin_catalogs);
 }
 
 /**
@@ -619,5 +637,5 @@ function server_watchlist_save(ctx, watch_dso) {
 
     ctx.table_manager.watchlist_set_saved(watch_dso);
 
-    ui_markers_update(ctx);
+    markers_update(ctx.manager, ctx.aladin, ctx.aladin_catalogs);
 }

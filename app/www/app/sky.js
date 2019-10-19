@@ -15,29 +15,10 @@ export function aladin_is_visible() {
 
 /**
  * Show aladin sidebar
- *
- * Takes the aladin object or null if aladin was never shown.
- * Returns the aladin object.
- *
- * This way I can do late loading of the aladin applet if this function is used
- * as:
- *
- * ctx.aladin = aladin_show(ctx.aladin);
  */
-export function aladin_show(aladin) {
+export function aladin_show() {
     $("#aladin-container").css("visibility", "visible");
     $("#aladin-container").css("transform", "translateX(0)");
-
-    if (aladin == null) {
-        return A.aladin("#aladin-map", {
-            fov: 1,
-            target: "M81", // TODO replace with coordinates so we dont use a request
-            reticleColor: "rgb(0, 0, 0)", // Used on coordinates text
-            showReticle: false,
-        });
-    } else {
-        return aladin;
-    }
 }
 
 /**
@@ -65,7 +46,6 @@ export function aladin_catalogs_init() {
      */
     function aladin_marker_draw(draw_function, source, context, view_params) {
 
-        // console.log(draw_function, source, context);
         context.strokeStyle = "#FF3333";
         context.lineWidth = 3;
         context.fillStyle = "rgba(255, 204, 255, 0.4)"
@@ -99,12 +79,14 @@ export function aladin_catalogs_init() {
 
 /**
  * Update the objects to show on the maps
+ *
+ * aladin can be null, because the aladin applet is not always loaded
  */
-export function ui_markers_update(ctx) {
+export function markers_update(dso_manager, aladin, aladin_catalogs) {
 
     // Format the array elements to what Celestial expects
     let objs = [];
-    for (let watch_dso of ctx.manager.get_watchlist()) {
+    for (let watch_dso of dso_manager.get_watchlist()) {
 
         let dim = watch_dso.dso.dimensions;
 
@@ -135,10 +117,12 @@ export function ui_markers_update(ctx) {
         Celestial.container.selectAll(`.${style.class_string}`).remove();
     }
 
-    ctx.aladin.removeLayers();
-    for (let catalog in ctx.aladin_catalogs) {
-        ctx.aladin_catalogs[catalog].clear()
-        ctx.aladin.addCatalog(ctx.aladin_catalogs[catalog]);
+    if (aladin != null) {
+        aladin.removeLayers();
+        for (let catalog in aladin_catalogs) {
+            aladin_catalogs[catalog].clear()
+            aladin.addCatalog(aladin_catalogs[catalog]);
+        }
     }
 
     // Separate objs given on different lists depending on the style used
@@ -205,25 +189,27 @@ export function ui_markers_update(ctx) {
 
     // Adding objects to aladin
 
-    // For each group, each one with a style/class
-    for (let class_string in objs_by_class) {
+    if (aladin != null) {
+        // For each group, each one with a style/class
+        for (let class_string in objs_by_class) {
 
-        // For each object in the group
-        for (let obj of objs_by_class[class_string]) {
+            // For each object in the group
+            for (let obj of objs_by_class[class_string]) {
 
-            ctx.aladin_catalogs[class_string].addSources(
-                A.marker(
-                    obj.geometry.coordinates[0],
-                    obj.geometry.coordinates[1],
-                    {
-                        popupTitle: obj.properties.name,
-                        popupDesc:
-                            `${obj.watch_dso.dso.type.long_name}<br /> \
-                            Magnitude: ${obj.watch_dso.dso.mag}`,
-                        useMarkerDefaultIcon: false
-                    }
-                )
-            );
+                aladin_catalogs[class_string].addSources(
+                    A.marker(
+                        obj.geometry.coordinates[0],
+                        obj.geometry.coordinates[1],
+                        {
+                            popupTitle: obj.properties.name,
+                            popupDesc:
+                                `${obj.watch_dso.dso.type.long_name}<br /> \
+                                Magnitude: ${obj.watch_dso.dso.mag}`,
+                            useMarkerDefaultIcon: false
+                        }
+                    )
+                );
+            }
         }
     }
 }

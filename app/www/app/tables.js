@@ -160,7 +160,8 @@ export function TableManager(
 
     catalog_create_header($("#catalog-table thead tr"));
 
-    //TODO
+    // Using catalog_filter_and_update() instead of catalog_update() because I
+    // want to load the default filters (to hide unlisted objects)
     catalog_filter_and_update(
         this._dso_manager,
         this._date,
@@ -227,9 +228,8 @@ export function TableManager(
             this._location = location;
         }
 
-        // TODO
-        watchlist_filter_and_update(
-            this._dso_manager,
+        watchlist_update(
+            this._dso_manager.get_watchlist_view(),
             this._date,
             this._location,
             this._dso_threshold_alt,
@@ -242,8 +242,8 @@ export function TableManager(
             notes_change_callback
         );
 
-        catalog_filter_and_update(
-            this._dso_manager,
+        catalog_update(
+            this._dso_manager.get_catalog_view(),
             this._date,
             this._location,
             this._dso_threshold_alt,
@@ -447,7 +447,7 @@ function catalog_update(
     plot_bg,
     add_callback,
     goto_callback,
-	plot_callback
+    plot_callback
 ) {
     let page = 1;
     let start = (page - 1) * MAX_ROWS;

@@ -79,13 +79,13 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Table sort, allow ordering of watchlist
 
-- Check tat sometimes forms send GET instead of PUT
+- Check that sometimes forms send GET instead of PUT
 
 - Add explanation of lat/lon format (hovering over help icon?)
 
 - Option to hide columns. Careful with column widths on CSS
 
-- Show ocular sizes on aladin
+- Show ocular sizes on aladin, also show horizon
 
 - Bigger logo
 
