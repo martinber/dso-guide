@@ -189,7 +189,7 @@ function main(ctx) {
     // Location map
 
     function init_map() {
-        let new_map = L.map('mapid');
+        let new_map = L.map('leaflet-map');
         // Add OSM tile leayer to the Leaflet map.
         let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
@@ -202,12 +202,12 @@ function main(ctx) {
             let popup = L.popup({ className: ".leaflet-popup-content-wrapper" })
             	.setLatLng(e.latlng)
                 .setContent(`${e.latlng["lat"].toFixed(4)}, ${e.latlng["lng"].toFixed(4)} <br> \
-                            <input class="map-location-submit" type="submit" value="Update"></input>`)
+                            <input class="leaflet-submit" type="submit" value="Update"></input>`)
             	.openOn(new_map);
 
             let map_data = {lat: e.latlng["lat"], lon: e.latlng["lng"]}
 
-            $(".map-location-submit").click(e => {
+            $(".leaflet-submit").click(e => {
                 $("#location-lat").val(map_data["lat"])
                 $("#location-long").val(map_data["lon"])
                 submit_location(map_data);

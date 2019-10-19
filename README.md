@@ -84,9 +84,9 @@ star chart
 
 - Check that location submits if location invalid
 
-- Check z-index of leaflet
-
 - Check plot calculations
+
+- Check location coordinates precision
 
 ## Color palettes
 
