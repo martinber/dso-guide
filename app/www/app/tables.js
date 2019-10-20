@@ -47,12 +47,266 @@ export function TableManager(
     notes_change_callback
 ) {
 
-    this._dso_manager = dso_manager;
-    this._dso_manager.set_watchlist_change_callback(watchlist_change_callback);
     this._date = date;
     this._location = location;
-    this._plot_bg = plot_bg;
-    this._dso_threshold_alt = dso_threshold_alt;
+    this._current_catalog_page = 1;
+    dso_manager.set_watchlist_change_callback(watchlist_change_callback);
+
+    /**
+     * Add object to watchlist table
+     */
+    this.watchlist_add = function(watch_dso) {
+        this._watchlist_update();
+    }
+
+    /**
+     * Remove object from watchlist table
+     */
+    this.watchlist_remove = function(watch_dso) {
+        this._watchlist_update();
+    }
+
+    /**
+     * Update plots and ALT/AZ calculations for the catalog and watchlist
+     *
+     * Give as argument a Date() and [lat, long]. If one of the arguments is
+     * null it will keep the previous value
+     *
+     * Important: The date and location provided is used to update the ALT/AZ
+     * calculations, but plots use the date and location available on the
+     * plot_bg object, so you should update that object and redraw the
+     * plot_bg.bg_canvas before calling this function
+     */
+    this.update_datetime_location = function(date, location) {
+        if (date != null) {
+            this._date = date;
+        }
+        if (location != null) {
+            this._location = location;
+        }
+
+        this._watchlist_update();
+        this._catalog_update();
+    }
+
+    /**
+     * Mark object as unsaved, e.g. enable save button
+     */
+    this.watchlist_set_unsaved = function(watch_dso) {
+        // Enable the save button
+        let tr = watch_dso.get_watchlist_tr();
+        tr.find(".objects-save").prop("disabled", false);
+    }
+
+    /**
+     * Mark object as saved, e.g. disable save button
+     */
+    this.watchlist_set_saved = function(watch_dso) {
+        // Disable the save button
+        let tr = watch_dso.get_watchlist_tr();
+        tr.find(".objects-save").prop("disabled", true);
+    }
+
+    /**
+     * Clear and reload the watchlist table
+     *
+     * Update completely from the DsoManager list.
+     *
+     * Does not read the filters form, so it will use the previous filters
+     */
+    this._watchlist_update = function() {
+
+        let watchlist_view = dso_manager.get_watchlist_view();
+
+        let tbody = $("#watchlist-table tbody");
+        tbody.empty();
+
+        if (watchlist_view.length == 0) {
+            $("#watchlist-no-results").css("display", "inherit");
+            $("#watchlist-table").css("display", "none");
+        } else {
+            $("#watchlist-no-results").css("display", "none");
+            $("#watchlist-table").css("display", "inherit");
+        }
+
+        for (let watch_dso of watchlist_view) {
+
+            let plot_canvas = $("<canvas>", { class: "small-visibility-plot" })[0];
+            let tr = watchlist_create_row(
+                watch_dso,
+                this._date,
+                this._location,
+                plot_canvas,
+                delete_callback,
+                save_callback,
+                goto_callback,
+                plot_callback,
+                style_change_callback,
+                notes_change_callback
+            );
+
+            watch_dso.set_watchlist_tr(tr);
+            tbody.append(tr);
+
+            if (plot_bg.bg_canvas != null) {
+                draw_visibility_plot(
+                    plot_canvas,
+                    plot_bg.bg_canvas,
+                    watch_dso.dso,
+                    plot_bg.location,
+                    dso_threshold_alt,
+                    plot_bg.year,
+                    plot_bg.min_hs,
+                    plot_bg.max_hs
+                );
+            }
+        }
+    }
+
+    /**
+     * Clear and reload the catalog table on a given page
+     *
+     * Update completely from the DsoManager list.
+     *
+     * The page shown is given by this._current_catalog_page, checks if the
+     * page is valid, otherwise updates the variable and shows the closest one
+     *
+     *
+     * Does not read the filters form, so it will use the previous filters
+     */
+    this._catalog_update = function() {
+
+        let tbody = $("#catalog-table tbody");
+        tbody.empty();
+        let catalog_view = dso_manager.get_catalog_view();
+
+        if (catalog_view.length == 0) {
+            $("#catalog-no-results").css("display", "inherit");
+            $("#catalog-table").css("display", "none");
+            $("#catalog-pagination").css("display", "none");
+            return;
+        } else {
+            $("#catalog-no-results").css("display", "none");
+            $("#catalog-table").css("display", "inherit");
+            $("#catalog-pagination").css("display", "inherit");
+        }
+
+        // Pagination calculations
+
+        let pages_total = Math.ceil(catalog_view.length/MAX_ROWS);
+        if (this._current_catalog_page < 1) {
+            this._current_catalog_page = 1;
+        }
+        if (this._current_catalog_page > pages_total) {
+            this._current_catalog_page = pages_total;
+        }
+        let page = this._current_catalog_page;
+
+        let start = (page - 1) * MAX_ROWS;
+        let end = Math.min(page * MAX_ROWS, catalog_view.length);
+
+        // Update pagination div numbers
+
+        $("#catalog-pagination .table-page").text(`${page}`);
+        $("#catalog-pagination .table-pages-total").text(`${pages_total}`);
+
+        $("#catalog-pagination .table-from").text(`${start + 1}`);
+        $("#catalog-pagination .table-to").text(`${end}`);
+        $("#catalog-pagination .table-total").text(`${catalog_view.length}`);
+
+        // Add rows to table
+
+        for (let i = start; i < end; i++) {
+            let dso = catalog_view[i];
+
+            let plot_canvas = $("<canvas>", { class: "small-visibility-plot" })[0];
+            let added = dso.on_watchlist;
+            let tr = catalog_create_row(
+                dso,
+                this._date,
+                this._location,
+                added,
+                plot_canvas,
+                add_callback,
+                goto_callback,
+                plot_callback
+            );
+
+            dso.set_catalog_tr(tr);
+            tbody.append(tr);
+
+            if (plot_bg.bg_canvas != null) {
+                draw_visibility_plot(
+                    plot_canvas,
+                    plot_bg.bg_canvas,
+                    dso,
+                    plot_bg.location,
+                    dso_threshold_alt,
+                    plot_bg.year,
+                    plot_bg.min_hs,
+                    plot_bg.max_hs
+                );
+            }
+        }
+    }
+
+    /**
+     * Reads the settings selected on the watchlist filters form
+     *
+     * Does not update the table, so you should update the watchlist table to
+     * display the results
+     */
+    this._read_watchlist_filters = function() {
+        let search_string = $("#watchlist-search").val();
+
+        let filtering_search = search_string.length > 0
+
+        dso_manager.watchlist_set_filter(watch_dso => {
+            if (filtering_search) {
+                return watch_dso.dso.name.toLowerCase().includes(search_string.toLowerCase())
+            } else {
+                return true
+            }
+        });
+    }
+
+    /**
+     * Reads the settings selected on the catalog filters form
+     *
+     * Does not update the table, so you should update the catalog table to
+     * display the results
+     */
+    this._read_catalog_filters = function() {
+        let search_string = $("#catalog-search").val();
+
+        let selected_catalogs = [];
+        $("#catalog-select-fieldset input").each(function() {
+            if (this.checked) {
+                selected_catalogs.push(this.name);
+            }
+        });
+
+        // True or false if we are filtering or not
+        let filtering_catalogs = selected_catalogs.length > 0 && !selected_catalogs.includes("Unlisted");
+        let filtering_search = search_string.length > 0
+
+        dso_manager.catalog_set_filter(dso => {
+            if (filtering_catalogs) {
+                if (!selected_catalogs.some(
+                        catalog => dso.appears_on.includes(catalog))) {
+                    // The dso does not appear on any of the selected catalogs
+                    return false;
+                }
+            }
+
+            if (filtering_search) {
+                if (!dso.name.toLowerCase().includes(search_string.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
 
     // Table filters toggle
 
@@ -79,19 +333,8 @@ export function TableManager(
     $("#watchlist-settings-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
-        watchlist_filter_and_update(
-            this._dso_manager,
-            this._date,
-            this._location,
-            this._dso_threshold_alt,
-            this._plot_bg,
-            delete_callback,
-            save_callback,
-            goto_callback,
-            plot_callback,
-            style_change_callback,
-            notes_change_callback
-        )
+        this._read_watchlist_filters();
+        this._watchlist_update();
     });
 
     // Catalog filters
@@ -100,7 +343,7 @@ export function TableManager(
         let fieldset = $("#catalog-select-fieldset");
 
         let catalogs = [];
-        for (let dso of this._dso_manager.get_catalog()) {
+        for (let dso of dso_manager.get_catalog()) {
             for (let catalog of dso.appears_on) {
                 if (!catalogs.includes(catalog)) {
                     catalogs.push(catalog);
@@ -142,135 +385,41 @@ export function TableManager(
     $("#catalog-settings-form").submit(e => {
         e.preventDefault(); // Disable built-in HTML action
 
-        catalog_filter_and_update(
-            this._dso_manager,
-            this._date,
-            this._location,
-            this._dso_threshold_alt,
-            this._plot_bg,
-            add_callback,
-            goto_callback,
-            plot_callback,
-        )
+        this._read_catalog_filters();
+        this._catalog_update();
+    });
+
+    // Table paginations
+
+    $("#watchlist-pagination .table-prev").click(() => {
+        this._current_watchlist_page -= 1;
+        this._watchlist_update();
+    });
+    $("#watchlist-pagination .table-next").click(() => {
+        this._current_watchlist_page += 1;
+        this._watchlist_update();
+    });
+    $("#catalog-pagination .table-prev").click(() => {
+        this._current_catalog_page -= 1;
+        this._catalog_update();
+    });
+    $("#catalog-pagination .table-next").click(() => {
+        this._current_catalog_page += 1;
+        this._catalog_update();
     });
 
     // Initialize tables
 
     watchlist_create_header($("#watchlist-table thead tr"));
-
     catalog_create_header($("#catalog-table thead tr"));
 
-    // Using catalog_filter_and_update() instead of catalog_update() because I
-    // want to load the default filters (to hide unlisted objects)
-    catalog_filter_and_update(
-        this._dso_manager,
-        this._date,
-        this._location,
-        this._dso_threshold_alt,
-        this._plot_bg,
-        add_callback,
-        goto_callback,
-        plot_callback
-    )
+    // Read the filters because I want to load the default filters (to hide
+    // unlisted objects)
+    this._read_catalog_filters();
+    this._catalog_update();
+    this._read_watchlist_filters();
+    this._watchlist_update();
 
-    /**
-     * Add object to watchlist table
-     */
-    this.watchlist_add = function(watch_dso) {
-        this.watchlist_update();
-    }
-
-    /**
-     * Remove object from watchlist table
-     */
-    this.watchlist_remove = function(watch_dso) {
-        this.watchlist_update();
-    }
-
-    /**
-     * Update the watchlist table completely from the DsoManager list
-     */
-    this.watchlist_update = function() {
-
-        $("#watchlist-table tbody").empty();
-
-        watchlist_update(
-            this._dso_manager.get_watchlist_view(),
-            this._date,
-            this._location,
-            this._dso_threshold_alt,
-            this._plot_bg,
-            delete_callback,
-            save_callback,
-            goto_callback,
-            plot_callback,
-            style_change_callback,
-            notes_change_callback
-        );
-    }
-
-    /**
-     * Update plots and ALT/AZ calculations for the catalog and watchlist
-     *
-     * Give as argument a Date() and [lat, long]. If one of the arguments is
-     * null it will keep the previous value
-     *
-     * Important: The date and location provided is used to update the ALT/AZ
-     * calculations, but plots use the date and location available on the
-     * plot_bg object, so you should update that object and redraw the
-     * plot_bg.bg_canvas before calling this function
-     */
-    this.update_datetime_location = function(date, location) {
-        if (date != null) {
-            this._date = date;
-        }
-        if (location != null) {
-            this._location = location;
-        }
-
-        watchlist_update(
-            this._dso_manager.get_watchlist_view(),
-            this._date,
-            this._location,
-            this._dso_threshold_alt,
-            this._plot_bg,
-            delete_callback,
-            save_callback,
-            goto_callback,
-            plot_callback,
-            style_change_callback,
-            notes_change_callback
-        );
-
-        catalog_update(
-            this._dso_manager.get_catalog_view(),
-            this._date,
-            this._location,
-            this._dso_threshold_alt,
-            this._plot_bg,
-            add_callback,
-            goto_callback,
-            plot_callback
-        )
-    }
-
-    /**
-     * Mark object as unsaved, e.g. enable save button
-     */
-    this.watchlist_set_unsaved = function(watch_dso) {
-        // Enable the save button
-        let tr = watch_dso.get_watchlist_tr();
-        tr.find(".objects-save").prop("disabled", false);
-    }
-
-    /**
-     * Mark object as saved, e.g. disable save button
-     */
-    this.watchlist_set_saved = function(watch_dso) {
-        // Disable the save button
-        let tr = watch_dso.get_watchlist_tr();
-        tr.find(".objects-save").prop("disabled", true);
-    }
 }
 
 function watchlist_change_callback(watch_dso, added) {
@@ -279,227 +428,6 @@ function watchlist_change_callback(watch_dso, added) {
         tr.find(".objects-add").prop("disabled", added);
     }
 }
-
-function watchlist_filter_and_update(
-    dso_manager,
-    date,
-    location,
-    dso_threshold_alt,
-    plot_bg,
-    delete_callback,
-    save_callback,
-    goto_callback,
-    plot_callback,
-    style_change_callback,
-    notes_change_callback
-) {
-    let search_string = $("#watchlist-search").val();
-
-    let filtering_search = search_string.length > 0
-
-    dso_manager.watchlist_set_filter(watch_dso => {
-        if (filtering_search) {
-            return watch_dso.dso.name.toLowerCase().includes(search_string.toLowerCase())
-        } else {
-            return true
-        }
-    });
-
-    watchlist_update(
-        dso_manager.get_watchlist_view(),
-        date,
-        location,
-        dso_threshold_alt,
-        plot_bg,
-        delete_callback,
-        save_callback,
-        goto_callback,
-        plot_callback,
-        style_change_callback,
-        notes_change_callback
-    );
-}
-
-function watchlist_update(
-    watchlist_view,
-    date,
-    location,
-    dso_threshold_alt,
-    plot_bg,
-    delete_callback,
-    save_callback,
-    goto_callback,
-    plot_callback,
-    style_change_callback,
-    notes_change_callback
-) {
-    let page = 1;
-    let start = (page - 1) * MAX_ROWS;
-    let end = Math.min(page * MAX_ROWS, watchlist_view.length);
-
-    let tbody = $("#watchlist-table tbody");
-    tbody.empty();
-
-    if (watchlist_view.length == 0) {
-        $("#watchlist-no-results").css("display", "inherit");
-        $("#watchlist-table").css("display", "none");
-        $("#watchlist-pagination").css("display", "none");
-    } else {
-        $("#watchlist-no-results").css("display", "none");
-        $("#watchlist-table").css("display", "inherit");
-        $("#watchlist-pagination").css("display", "inherit");
-    }
-
-    for (let i = start; i < end; i++) {
-        let watch_dso = watchlist_view[i];
-
-        let plot_canvas = $("<canvas>", { class: "small-visibility-plot" })[0];
-        let tr = watchlist_create_row(
-            watch_dso,
-            date,
-            location,
-            plot_canvas,
-            delete_callback,
-            save_callback,
-            goto_callback,
-            plot_callback,
-            style_change_callback,
-            notes_change_callback
-        );
-
-        watch_dso.set_watchlist_tr(tr);
-        tbody.append(tr);
-
-        if (plot_bg.bg_canvas != null) {
-            draw_visibility_plot(
-                plot_canvas,
-                plot_bg.bg_canvas,
-                watch_dso.dso,
-                plot_bg.location,
-                dso_threshold_alt,
-                plot_bg.year,
-                plot_bg.min_hs,
-                plot_bg.max_hs
-            );
-        }
-
-    }
-}
-
-
-function catalog_filter_and_update(
-    dso_manager,
-    date,
-    location,
-    dso_threshold_alt,
-    plot_bg,
-    add_callback,
-    goto_callback,
-    plot_callback
-) {
-    let search_string = $("#catalog-search").val();
-
-    let selected_catalogs = [];
-    $("#catalog-select-fieldset input").each(function() {
-        if (this.checked) {
-            selected_catalogs.push(this.name);
-        }
-    });
-
-    // True or false if we are filtering or not
-    let filtering_catalogs = selected_catalogs.length > 0 && !selected_catalogs.includes("Unlisted");
-    let filtering_search = search_string.length > 0
-
-    dso_manager.catalog_set_filter(dso => {
-        if (filtering_catalogs) {
-            if (!selected_catalogs.some(
-                    catalog => dso.appears_on.includes(catalog))) {
-                // The dso does not appear on any of the selected catalogs
-                return false;
-            }
-        }
-
-        if (filtering_search) {
-            if (!dso.name.toLowerCase().includes(search_string.toLowerCase())) {
-                return false;
-            }
-        }
-        return true;
-    });
-
-    catalog_update(
-        dso_manager.get_catalog_view(),
-        date,
-        location,
-        dso_threshold_alt,
-        plot_bg,
-        add_callback,
-        goto_callback,
-        plot_callback
-    );
-}
-
-function catalog_update(
-    catalog_view,
-    date,
-    location,
-    dso_threshold_alt,
-    plot_bg,
-    add_callback,
-    goto_callback,
-    plot_callback
-) {
-    let page = 1;
-    let start = (page - 1) * MAX_ROWS;
-    let end = Math.min(page * MAX_ROWS, catalog_view.length);
-
-    let tbody = $("#catalog-table tbody");
-    tbody.empty();
-
-    if (catalog_view.length == 0) {
-        $("#catalog-no-results").css("display", "inherit");
-        $("#catalog-table").css("display", "none");
-        $("#catalog-pagination").css("display", "none");
-    } else {
-        $("#catalog-no-results").css("display", "none");
-        $("#catalog-table").css("display", "inherit");
-        $("#catalog-pagination").css("display", "inherit");
-    }
-
-    for (let i = start; i < end; i++) {
-        let dso = catalog_view[i];
-
-        let plot_canvas = $("<canvas>", { class: "small-visibility-plot" })[0];
-        let added = dso.on_watchlist;
-        let tr = catalog_create_row(
-            dso,
-            date,
-            location,
-            added,
-            plot_canvas,
-            add_callback,
-            goto_callback,
-            plot_callback
-        );
-
-        dso.set_catalog_tr(tr);
-        tbody.append(tr);
-
-        if (plot_bg.bg_canvas != null) {
-            draw_visibility_plot(
-                plot_canvas,
-                plot_bg.bg_canvas,
-                dso,
-                plot_bg.location,
-                dso_threshold_alt,
-                plot_bg.year,
-                plot_bg.min_hs,
-                plot_bg.max_hs
-            );
-        }
-    }
-}
-
 
 /**
  * Create table cell with object name

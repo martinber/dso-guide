@@ -144,37 +144,6 @@
 
 						<form class="collapse table-form" id="watchlist-settings-form" action="">
 
-							<fieldset>
-								<legend>Visible columns</legend>
-
-								<div>
-									<input type="checkbox" id="watchlist-visible-col-mag"
-											name="mag" checked \>
-									<label for="watchlist-visible-col-mag">Magnitude</label>
-								</div>
-								<div>
-									<input type="checkbox" id="watchlist-visible-col-ra-dec"
-											name="ra-dec" checked \>
-									<label for="watchlist-visible-col-ra-dec">RA/DEC</label>
-								</div>
-								<div>
-									<input type="checkbox" id="watchlist-visible-col-alt-az"
-											name="alt-az" checked \>
-									<label for="watchlist-visible-col-alt-az">ALT/AZ</label>
-								</div>
-								<div>
-									<input type="checkbox" id="watchlist-visible-col-notes"
-											name="notes" checked \>
-									<label for="watchlist-visible-col-notes">Notes</label>
-								</div>
-								<div>
-									<input type="checkbox" id="watchlist-visible-plot"
-											name="plot" checked \>
-									<label for="watchlist-visible-plot">Plot</label>
-								</div>
-
-							</fieldset>
-
 							<div>
 								<label for="watchlist-search">Filter by name:</label>
 								<input type="search" id="watchlist-search"
@@ -184,20 +153,6 @@
 							<input type="submit" value="Apply"></input>
 
 						</form>
-					</div>
-
-					<div class="table-pagination" id="watchlist-pagination">
-						<span class="table-stats">Showing objects
-							<strong class="table-from">0</strong>
-							-
-							<strong class="table-to">0</strong>
-							of
-							<strong class="table-total">0</strong></span>
-						<span class="table-controls">
-							<button class="table-prev">Previous</button>
-							-
-							<button class="table-next">Next</button>
-						</span>
 					</div>
 
 					<table class="objects-table" id="watchlist-table">
@@ -223,37 +178,6 @@
 
 						<form class="collapse table-form" id="catalog-settings-form" action="">
 
-							<fieldset>
-								<legend>Visible columns</legend>
-
-								<div>
-									<input type="checkbox" id="catalog-visible-col-mag"
-											name="mag" checked \>
-									<label for="catalog-visible-col-mag">Magnitude</label>
-								</div>
-								<div>
-									<input type="checkbox" id="catalog-visible-col-ra-dec"
-											name="ra-dec" checked \>
-									<label for="catalog-visible-col-ra-dec">RA/DEC</label>
-								</div>
-								<div>
-									<input type="checkbox" id="catalog-visible-col-alt-az"
-											name="alt-az" checked \>
-									<label for="catalog-visible-col-alt-az">ALT/AZ</label>
-								</div>
-								<div>
-									<input type="checkbox" id="catalog-visible-col-notes"
-											name="notes" checked \>
-									<label for="catalog-visible-col-notes">Notes</label>
-								</div>
-								<div>
-									<input type="checkbox" id="catalog-visible-plot"
-											name="plot" checked \>
-									<label for="catalog-visible-plot">Plot</label>
-								</div>
-
-							</fieldset>
-
 							<fieldset id="catalog-select-fieldset">
 								<legend>Enabled catalogs</legend>
 							</fieldset>
@@ -269,12 +193,18 @@
 					</div>
 
 					<div class="table-pagination" id="catalog-pagination">
-						<span class="table-stats">Showing objects
-							<strong class="table-from">0</strong>
+						<span class="table-stats">Page
+							<strong class="table-page">0</strong>
+							of
+							<strong class="table-pages-total">0</strong>
 							-
+							Showing
+							<strong class="table-from">0</strong>
+							to
 							<strong class="table-to">0</strong>
 							of
-							<strong class="table-total">0</strong></span>
+							<strong class="table-total">0</strong>
+							DSOs</span>
 						<span class="table-controls">
 							<button class="table-prev">Previous</button>
 							-

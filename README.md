@@ -55,7 +55,7 @@ Search catalogs of deep sky objects and plan your observations.
 - Getting started and about page
 
 - Check carefully the grid align of the visibility plot. Draw the grid when
-  generating the day-night plot to compare.
+  generating the day-night plot to compare. (X axis is OK)
 
 ### Later
 
