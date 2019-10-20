@@ -29,17 +29,28 @@ def login(user, password, cursor):
 
     Returns false if username/password invalid
     """
-    if cursor.execute('SELECT username FROM users WHERE username=?;', (user,)).fetchone():
+    if cursor.execute(
+            "SELECT username FROM users WHERE username=?;",
+            (user,)
+        ).fetchone():
 
-        database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
-        salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
-        salt = salt['salt']
-        salt = salt.encode('utf-8')
-        pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+        database_password = cursor.execute(
+            "SELECT password FROM users WHERE username=?;",
+            (user,)
+        ).fetchone()
+
+        salt = cursor.execute(
+            "SELECT salt FROM users WHERE username=?;",
+            (user,)
+        ).fetchone()
+
+        salt = salt["salt"]
+        salt = salt.encode("utf-8")
+        pwdhash = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
         pwdhash = binascii.hexlify(pwdhash)
-        pwdhash = pwdhash.decode('utf-8')
+        pwdhash = pwdhash.decode("utf-8")
 
-        if pwdhash == database_password['password']:
+        if pwdhash == database_password["password"]:
             return True
         else:
             return False
@@ -76,12 +87,12 @@ class Database:
         self.conn.commit()
         self.conn.close()
 
-@app.route('/api/v1/login', methods=['GET'])
+@app.route("/api/v1/login", methods=["GET"])
 def api_login():
 
     with Database() as db:
 
-        if request.method == 'GET':
+        if request.method == "GET":
             user = request.authorization["username"].lower()
             password = request.authorization["password"]
             if login(user, password, db.cur):
@@ -91,7 +102,7 @@ def api_login():
         else:
             return "Method not allowed \n", 405
 
-@app.route('/api/v1/location', methods=['GET', 'PUT'])
+@app.route("/api/v1/location", methods=["GET", "PUT"])
 def api_location():
 
     with Database() as db:
@@ -102,16 +113,24 @@ def api_location():
 
         if login(user, password, db.cur):
 
-            if request.method == 'GET':
-                results = db.cur.execute("SELECT lat, lon FROM users WHERE username=?;", (user,)).fetchone()
+            if request.method == "GET":
+
+                results = db.cur.execute(
+                    "SELECT lat, lon FROM users WHERE username=?;",
+                    (user,)
+                ).fetchone()
+
                 return jsonify(results), 200
 
-            elif request.method == 'PUT':
-                latitude = query_parameters.get('lat')
-                longitude = query_parameters.get('lon')
+            elif request.method == "PUT":
+                latitude = query_parameters.get("lat")
+                longitude = query_parameters.get("lon")
 
                 try:
-                    db.cur.execute("UPDATE users SET lat=?, lon=? WHERE username=?;", (latitude, longitude, user))
+                    db.cur.execute(
+                        "UPDATE users SET lat=?, lon=? WHERE username=?;",
+                        (latitude, longitude, user)
+                    )
                     return "Operation Successful \n", 200
 
                 except sqlite3.IntegrityError:
@@ -121,17 +140,17 @@ def api_location():
         else:
             return "Unauthorized \n", 401
 
-@app.route('/api/v1/users', methods=['POST'])
+@app.route("/api/v1/users", methods=["POST"])
 def api_addusers():
 
     with Database() as db:
 
         query_parameters = request.json
 
-        if request.method == 'POST':
-            user = query_parameters.get('username').lower()
-            password = query_parameters.get('password')
-            pattern = r'[^\_\-a-z0-9]'
+        if request.method == "POST":
+            user = query_parameters.get("username").lower()
+            password = query_parameters.get("password")
+            pattern = r"[^\_\-a-z0-9]"
 
             if re.search(pattern, user):
                 return "Character not accepted \n", 406
@@ -140,23 +159,27 @@ def api_addusers():
                 if len(password) < 8:
                     return "Too short \n", 411
                 else:
-                    salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
-                    pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+                    salt = hashlib.sha256(os.urandom(8)).hexdigest().encode("ascii")
+                    pwdhash = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
                     pwdhash = binascii.hexlify(pwdhash)
-                    pwdhash = pwdhash.decode('utf-8')
-                    salt = salt.decode('utf-8')
+                    pwdhash = pwdhash.decode("utf-8")
+                    salt = salt.decode("utf-8")
                     lat = 0
                     lon = 0
 
                     try:
-                        db.cur.execute('INSERT INTO users values (?, ?, ?, ?, ?);', (user, pwdhash, lat, lon, salt))
+                        db.cur.execute(
+                            "INSERT INTO users VALUES (?, ?, ?, ?, ?);",
+                            (user, pwdhash, lat, lon, salt)
+                        )
                         return "Operation Successful \n", 200
+
                     except sqlite3.IntegrityError:
                         return "User already exists \n ", 500
         else:
             return "Method not allowed \n", 405
 
-@app.route('/api/v1/watchlist', methods=['DELETE', 'POST', 'GET'])
+@app.route("/api/v1/watchlist", methods=["DELETE", "POST", "GET"])
 def api_watchlist():
 
     query_parameters = request.json
@@ -167,35 +190,58 @@ def api_watchlist():
 
         if login(user, password, db.cur):
 
-            if request.method == 'GET':
-                results = db.cur.execute('SELECT watchlist.star_id, watchlist.notes,\
-                 watchlist.style FROM watchlist INNER JOIN users on \
-                 users.username=watchlist.username where users.username = ?;', (user,)).fetchall()
+            if request.method == "GET":
+
+                results = db.cur.execute(
+                    """SELECT watchlist.star_id, watchlist.notes, watchlist.style
+                       FROM watchlist
+                       INNER JOIN users ON users.username=watchlist.username
+                       WHERE users.username = ?;""",
+                    (user,)
+                ).fetchall()
+
                 return jsonify(results)
 
-            elif request.method == 'POST':
-                star_id = query_parameters.get('star_id')
-                notes = query_parameters.get('notes')
-                style = query_parameters.get('style')
+            elif request.method == "POST":
+
+                star_id = query_parameters.get("star_id")
+                notes = query_parameters.get("notes")
+                style = query_parameters.get("style")
+
                 try:
-                    if db.cur.execute('SELECT * FROM watchlist where username = ? and star_id = ?;', (user, star_id)).fetchall():
+                    if db.cur.execute(
+                            """SELECT * FROM watchlist
+                               WHERE username = ? AND star_id = ?;""",
+                            (user, star_id)
+                        ).fetchall():
+
                         return "Already exists \n", 200
+
                     else:
-                        db.cur.execute('INSERT INTO watchlist values(?, ?, ?, ?);', (star_id, notes, style, user))
+                        db.cur.execute(
+                            "INSERT INTO watchlist VALUES (?, ?, ?, ?);",
+                            (star_id, notes, style, user)
+                        )
+
                         return "Operation Successful \n", 200
+
                 except sqlite3.IntegrityError:
                     return "Wrong constraints", 500
 
-            elif request.method == 'DELETE':
-                db.cur.execute('DELETE FROM watchlist where username = ?;', (user,))
+            elif request.method == "DELETE":
+                db.cur.execute(
+                    "DELETE FROM watchlist WHERE username = ?;",
+                    (user,)
+                )
                 return "Operation Successful \n", 200
+
             else:
                 return "Method not allowed \n", 405
 
         else:
             return "Unauthorized \n", 401
 
-@app.route('/api/v1/password', methods=['PUT'])
+@app.route("/api/v1/password", methods=["PUT"])
 def api_password():
 
     query_parameters = request.json
@@ -206,20 +252,24 @@ def api_password():
         password = request.authorization["password"]
 
         if login(user, password, db.cur):
-            if request.method == 'PUT':
-                new_password = query_parameters.get('new_password')
+            if request.method == "PUT":
+                new_password = query_parameters.get("new_password")
 
                 if len(new_password) < 8:
                     return "Too short \n", 411
 
                 else:
-                    salt = hashlib.sha256(os.urandom(8)).hexdigest().encode('ascii')
-                    pwdhash = hashlib.pbkdf2_hmac('sha256', new_password.encode('utf-8'), salt, 100000)
+                    salt = hashlib.sha256(os.urandom(8)).hexdigest().encode("ascii")
+                    pwdhash = hashlib.pbkdf2_hmac("sha256", new_password.encode("utf-8"), salt, 100000)
                     pwdhash = binascii.hexlify(pwdhash)
-                    pwdhash = pwdhash.decode('utf-8')
-                    salt = salt.decode('utf-8')
+                    pwdhash = pwdhash.decode("utf-8")
+                    salt = salt.decode("utf-8")
                     try:
-                        db.cur.execute('UPDATE users SET password = ?, salt = ? WHERE username = ? ;', (pwdhash, salt, user))
+                        db.cur.execute(
+                            """UPDATE users SET password = ?, salt = ?
+                               WHERE username = ? ;""",
+                            (pwdhash, salt, user)
+                        )
                         return "Operation Successful \n", 200
 
                     except sqlite3.IntegrityError:
@@ -229,7 +279,7 @@ def api_password():
         else:
             return "Unauthorized \n", 401
 
-@app.route('/api/v1/watchlist/<int:star_id>', methods=['DELETE','PUT'])
+@app.route("/api/v1/watchlist/<int:star_id>", methods=["DELETE", "PUT"])
 def api_objects(star_id):
 
     query_parameters = request.json
@@ -239,28 +289,36 @@ def api_objects(star_id):
         password = request.authorization["password"]
 
         if login(user, password, db.cur):
-            if request.method == 'PUT':
-                print(star_id, type(star_id))
-                print(query_parameters.get('star_id'), type(query_parameters.get('star_id')))
-                if (star_id != query_parameters.get('star_id')):
+            if request.method == "PUT":
+                if (star_id != query_parameters.get("star_id")):
                     return "Wrong parameters \n", 409
 
                 else:
-                    notes = query_parameters.get('notes')
-                    style = query_parameters.get('style')
+                    notes = query_parameters.get("notes")
+                    style = query_parameters.get("style")
 
                     try:
-                        db.cur.execute('UPDATE watchlist SET notes = ?, style = ? \
-                        WHERE username = ? and star_id = ?;',(notes, style, user, star_id))
+                        db.cur.execute(
+                            """UPDATE watchlist
+                               SET notes = ?, style = ?
+                               WHERE username = ? AND star_id = ?;""",
+                            (notes, style, user, star_id)
+                        )
                         return "Operation Successful \n", 200
+
                     except sqlite3.IntegrityError:
                         return "Wrong constraints \n", 500
 
-            elif request.method == 'DELETE':
+            elif request.method == "DELETE":
 
                 try:
-                    db.cur.execute('DELETE from watchlist WHERE username = ? and star_id = ?;', (user, star_id))
+                    db.cur.execute(
+                        """DELETE FROM watchlist
+                           WHERE username = ? AND star_id = ?;""",
+                        (user, star_id)
+                    )
                     return "Operation Successful \n", 200
+
                 except sqlite3.IntegrityError:
                     return "Could not delete the object \n", 500
             else:
