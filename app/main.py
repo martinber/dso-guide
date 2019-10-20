@@ -1,7 +1,7 @@
-import flask
-from flask import request, jsonify, render_template
+from flask import Flask, request, jsonify
 import sqlite3
-import hashlib, os, binascii
+import hashlib
+import binascii
 import re
 import os
 import logging.handlers
@@ -11,9 +11,10 @@ import traceback
 DB_PATH = os.environ.get('DSO_DB_PATH', './dso-guide.db')
 LOG_PATH = os.environ.get('DSO_LOG_PATH', './dso-guide.log')
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 app.config["DEBUG"] = True
 
+# TODO
 def dict_factory(cursor, row):
     #devuelve los valores encontrados por el cursor
     #en forma de diccionarios para mejorar el output de jsonify
@@ -23,9 +24,12 @@ def dict_factory(cursor, row):
     return d
 
 def login(user, password, cursor):
-    """ Devuelve true o false """
-    user = user.lower()
-    if cursor.execute('SELECT username FROM users WHERE username=?;',(user,)).fetchone():
+    """
+    Authenticate username and password
+
+    Returns false if username/password invalid
+    """
+    if cursor.execute('SELECT username FROM users WHERE username=?;', (user,)).fetchone():
 
         database_password = cursor.execute('SELECT password FROM users WHERE username=?;',(user,)).fetchone()
         salt = cursor.execute('SELECT salt FROM users WHERE username=?;',(user,)).fetchone()
@@ -74,15 +78,14 @@ class Database:
 
 @app.route('/api/v1/login', methods=['GET'])
 def api_login():
+
     with Database() as db:
 
-        query_parameters = request.json
-
         if request.method == 'GET':
-            user = request.authorization["username"]
+            user = request.authorization["username"].lower()
             password = request.authorization["password"]
             if login(user, password, db.cur):
-                return "login succesful", 200
+                return "Login successful", 200
             else:
                 return "Unauthorized", 401
         else:
@@ -94,14 +97,13 @@ def api_location():
     with Database() as db:
 
         query_parameters = request.json
-
-        user = request.authorization["username"]
+        user = request.authorization["username"].lower()
         password = request.authorization["password"]
 
         if login(user, password, db.cur):
 
             if request.method == 'GET':
-                results = db.cur.execute(("SELECT lat, lon FROM users WHERE username=?;"), (user,)).fetchone()
+                results = db.cur.execute("SELECT lat, lon FROM users WHERE username=?;", (user,)).fetchone()
                 return jsonify(results), 200
 
             elif request.method == 'PUT':
@@ -159,9 +161,8 @@ def api_watchlist():
 
     query_parameters = request.json
 
-
     with Database() as db:
-        user = request.authorization["username"]
+        user = request.authorization["username"].lower()
         password = request.authorization["password"]
 
         if login(user, password, db.cur):
@@ -201,7 +202,7 @@ def api_password():
 
     with Database() as db:
 
-        user = request.authorization["username"]
+        user = request.authorization["username"].lower()
         password = request.authorization["password"]
 
         if login(user, password, db.cur):
@@ -234,7 +235,7 @@ def api_objects(star_id):
     query_parameters = request.json
 
     with Database() as db:
-        user = request.authorization["username"]
+        user = request.authorization["username"].lower()
         password = request.authorization["password"]
 
         if login(user, password, db.cur):

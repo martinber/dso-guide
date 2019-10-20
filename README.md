@@ -107,6 +107,9 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Indicate current day/time on plot
 
+- The backend opens and closes connection to the database on each request, check
+	if it is a good idea
+
 ## Installation
 
 - Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
