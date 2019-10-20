@@ -61,7 +61,7 @@ textarea, input[type="text"], input[type="date"], input[type="email"],
 	background-color: var(--gray-2);
 	color: var(--gray-4);
 	height: 2em;
-    padding: 0 0.2em;
+	padding: 0 0.2em;
 }
 
 textarea:focus, input[type="text"]:focus, input[type="date"]:focus,
@@ -801,17 +801,36 @@ legend {
 }
 
 /* Used to add a icon to the button */
-.objects-table th:before
+.objects-table th.sort-reverse:before
 {
 	position: absolute;
 	left: 0em;
 	top: 0em;
-	visibility: hidden;
 
 	content: "";
 	width: 1em;
 	height: 100%;
 	padding-left: 0.5em;
+	opacity: 0.8;
+	background-image: url('resources/sort-triangle.svg');
+	background-position: left;
+	background-repeat: no-repeat;
+	background-origin: content-box; /* So the image is inside the padding */
+	background-size: contain;
+}
+
+/* Used to add a icon to the button */
+.objects-table th.sort-forward:before
+{
+	position: absolute;
+	left: 0em;
+	top: 0em;
+	transform: rotate(180deg);
+
+	content: "";
+	width: 1em;
+	height: 100%;
+	padding-right: 0.5em; /* Actually is a left padding because of the rotation */
 	opacity: 0.8;
 	background-image: url('resources/sort-triangle.svg');
 	background-position: left;

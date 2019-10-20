@@ -56,7 +56,7 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Flask logging
 
-- Table sort, allow ordering of watchlist
+- Allow manual ordering of watchlist, reflect it on server
 
 - Check that sometimes forms send GET instead of PUT
 

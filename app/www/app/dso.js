@@ -5,19 +5,6 @@
 import { eq_to_geo, geo_to_eq } from "./tools.js";
 
 /**
- * Definitions of available sorting functions, they receive two Dsos and are
- * used on Array.sort()
- */
-export let sort = {
-    name: (a, b) => a.name.localeCompare(b.name, undefined, { numeric: "true" }),
-    mag: (a, b) => a.mag - b.mag,
-    type: (a, b) => a.type.long_name.localeCompare(b.type.long_name),
-    ra: (a, b) => a.coords[0] - b.coords[0],
-    dec: (a, b) => a.coords[0] - b.coords[0],
-    appears_on: (a, b) => a.appears_on.length - b.appears_on.length,
-};
-
-/**
  * Definitions of possible DSO types
  */
 function Type(short_name) {
@@ -162,12 +149,10 @@ export function DsoManager(dsos_data, catalogs_data) {
     this._change_callback = () => {};
 
     // Catalog sorting and filtering function being used on Dsos
-    // For now they do nothing
     this._catalog_sort = (a, b) => 0;
     this._catalog_filter = dso => true;
 
-    // Watchlist sorting and filtering function being used on Dsos (not WatchDsos)
-    // For now they do nothing
+    // Watchlist sorting and filtering function being used on WatchDsos (not Dsos)
     this._watchlist_sort = (a, b) => 0;
     this._watchlist_filter = dso => true;
 
@@ -238,18 +223,46 @@ export function DsoManager(dsos_data, catalogs_data) {
 
     }
 
+    /**
+     * Set sorting function for catalog
+     *
+     * Used when calling get_catalog_view(). The function in given to
+     * Array.prototipe.sort(), so it should take two Dsos and return less than 0
+     * if A is before B or more than 0 if A is after B
+     */
     this.catalog_set_sort = function(f) {
         this._catalog_sort = f;
     }
 
+    /**
+     * Set filtering function for catalog
+     *
+     * Used when calling get_catalog_view(). The function in given to
+     * Array.prototipe.filter(), so it should take a Dso and return true or
+     * false.
+     */
     this.catalog_set_filter = function(f) {
         this._catalog_filter = f;
     }
 
+    /**
+     * Set sorting function for watchlist
+     *
+     * Used when calling get_watchlist_view(). The function in given to
+     * Array.prototipe.sort(), so it should take two WatchDsos and return less
+     * than 0 if A is before B or more than 0 if A is after B
+     */
     this.watchlist_set_sort = function(f) {
         this._watchlist_sort = f;
     }
 
+    /**
+     * Set filtering function for watchlist
+     *
+     * Used when calling get_watchlist_view(). The function in given to
+     * Array.prototipe.filter(), so it should take a WatchDso and return true or
+     * false.
+     */
     this.watchlist_set_filter = function(f) {
         this._watchlist_filter = f;
     }
@@ -283,7 +296,7 @@ export function DsoManager(dsos_data, catalogs_data) {
     this.get_watchlist_view = function() {
         return this._watchlist
             .filter(this._watchlist_filter)
-            .sort(watch_dso => this._watchlist_sort(watch_dso.dso));
+            .sort(this._watchlist_sort);
     }
 
     /**

@@ -9,7 +9,7 @@ import {
     status_text
 } from "./status.js";
 import { object_styles } from "./const.js";
-import { DsoManager, sort } from "./dso.js";
+import { DsoManager } from "./dso.js";
 import { TableManager } from "./tables.js";
 import {
     aladin_catalogs_init,

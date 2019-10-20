@@ -5,37 +5,6 @@
 import { draw_circle, draw_cross, draw_square, draw_dot } from "./shapes.js";
 
 /**
- * List of columns on the wishlist, including the string that is shown to the
- * user on the table header
- */
-export const watchlist_columns = [
-    { name: "name", string: "Name" },
-    { name: "mag", string: "Mag" },
-    { name: "type", string: "Type" },
-    { name: "ra-dec", string: "RA/DEC" },
-    { name: "alt-az", string: "ALT/AZ" },
-    { name: "style", string: "Style" },
-    { name: "controls", string: "Controls" },
-    { name: "notes", string: "Notes" },
-    { name: "plot", string: "Plot" },
-];
-
-/**
- * List of columns on the wishlist, including the string that is shown to the
- * user on the table header
- */
-export const catalog_columns = [
-    { name: "name", string: "Name" },
-    { name: "mag", string: "Mag" },
-    { name: "type", string: "Type" },
-    { name: "ra-dec", string: "RA/DEC" },
-    { name: "alt-az", string: "ALT/AZ" },
-    { name: "controls", string: "Controls" },
-    { name: "appears_on", string: "Appears on" },
-    { name: "plot", string: "Plot" },
-];
-
-/**
  * Available styles for object highlighting. Each one has an integer ID
  * represented by the index on this table.
  */

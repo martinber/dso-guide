@@ -2,11 +2,85 @@
  * DOM tables manager for Watchlist and Catalog
  */
 
-import { watchlist_columns, catalog_columns, object_styles } from "./const.js";
+import { object_styles } from "./const.js";
 import { format_eq, format_hor } from "./tools.js";
 import { draw_visibility_plot } from "./plot.js";
 
 let MAX_ROWS = 100;
+
+/**
+ * Takes a sorting function and reverses the result
+ *
+ * Used as Array.prototype.sort(sort_reverse(f))
+ */
+function sort_reverse(f) {
+    return (a, b) => -f(a, b);
+}
+
+/**
+ * List of columns on the watchlist, including the string that is shown to the
+ * user on the table header
+ */
+const watchlist_columns = [
+    { name: "name", string: "Name",
+        sort: (a, b) => a.dso.name.localeCompare(b.dso.name, undefined, { numeric: "true" })
+    },
+    { name: "mag", string: "Mag",
+        sort: (a, b) => a.dso.mag - b.dso.mag
+    },
+    { name: "type", string: "Type",
+        sort: (a, b) => a.dso.type.long_name.localeCompare(b.dso.type.long_name)
+    },
+    { name: "ra-dec", string: "RA/DEC",
+        sort: (a, b) => a.dso.coords[0] - b.dso.coords[0]
+    },
+    { name: "alt-az", string: "ALT/AZ",
+        sort: null // Not implemented
+    },
+    { name: "style", string: "Style",
+        sort: (a, b) => a.style - b.style
+    },
+    { name: "controls", string: "Controls",
+        sort: null // Not implemented
+    },
+    { name: "notes", string: "Notes",
+        sort: (a, b) => a.notes.localeCompare(b.notes)
+    },
+    { name: "plot", string: "Plot",
+        sort: null // Not implemented
+    },
+];
+
+/**
+ * List of columns on the wishlist, including the string that is shown to the
+ * user on the table header
+ */
+const catalog_columns = [
+    { name: "name", string: "Name",
+        sort: (a, b) => a.name.localeCompare(b.name, undefined, { numeric: "true" })
+    },
+    { name: "mag", string: "Mag",
+        sort: (a, b) => a.mag - b.mag
+    },
+    { name: "type", string: "Type",
+        sort: (a, b) => a.type.long_name.localeCompare(b.type.long_name)
+    },
+    { name: "ra-dec", string: "RA/DEC",
+        sort: (a, b) => a.coords[0] - b.coords[0]
+    },
+    { name: "alt-az", string: "ALT/AZ",
+        sort: null // Not implemented
+    },
+    { name: "controls", string: "Controls",
+        sort: null // Not implemented
+    },
+    { name: "appears_on", string: "Appears on",
+        sort: (a, b) => -(a.appears_on.length - b.appears_on.length),
+    },
+    { name: "plot", string: "Plot",
+        sort: null // Not implemented
+    },
+];
 
 /**
  * Manages the Watchlist and Catalog tables
@@ -408,18 +482,84 @@ export function TableManager(
         this._catalog_update();
     });
 
-    // Initialize tables
+    // Create table headers and implement sorting
 
-    watchlist_create_header($("#watchlist-table thead tr"));
-    catalog_create_header($("#catalog-table thead tr"));
+    let tr = $("#watchlist-table thead tr")
+    for (let column of watchlist_columns) {
+        let th = $("<th>", {
+            text: column.string,
+        })
+        tr.append(th);
+
+        th.click(event => {
+            if (column.sort == null) {
+                // Column can't be sorted
+                return;
+            }
+
+            let forward = true;
+            if (th.hasClass("sort-forward")) {
+                forward = false
+            }
+
+            $("#watchlist-table th").removeClass("sort-forward");
+            $("#watchlist-table th").removeClass("sort-reverse");
+            if (forward) {
+                th.addClass("sort-forward");
+                dso_manager.watchlist_set_sort(column.sort);
+            } else {
+                th.addClass("sort-reverse");
+                dso_manager.watchlist_set_sort(sort_reverse(column.sort));
+            }
+
+            this._watchlist_update();
+        });
+    }
+
+    tr = $("#catalog-table thead tr")
+    for (let column of catalog_columns) {
+        let th = $("<th>", {
+            text: column.string,
+        })
+        tr.append(th);
+
+        th.click(event => {
+            if (column.sort == null) {
+                // Column can't be sorted
+                return;
+            }
+
+            let forward = true;
+            if (th.hasClass("sort-forward")) {
+                forward = false
+            }
+
+            $("#catalog-table th").removeClass("sort-forward");
+            $("#catalog-table th").removeClass("sort-reverse");
+            if (forward) {
+                th.addClass("sort-forward");
+                dso_manager.catalog_set_sort(column.sort);
+            } else {
+                th.addClass("sort-reverse");
+                dso_manager.catalog_set_sort(sort_reverse(column.sort));
+            }
+
+            this._catalog_update();
+        });
+
+        // Default sort
+        if (column.name == "appears_on") {
+            th.addClass("sort-forward");
+            dso_manager.catalog_set_sort(column.sort);
+        }
+    }
 
     // Read the filters because I want to load the default filters (to hide
     // unlisted objects)
-    this._read_catalog_filters();
-    this._catalog_update();
     this._read_watchlist_filters();
     this._watchlist_update();
-
+    this._read_catalog_filters();
+    this._catalog_update();
 }
 
 /**
@@ -637,38 +777,6 @@ function create_style_cell(selected_style, watch_dso, style_change_callback) {
     td.append(select);
 
     return td;
-}
-
-/**
- * Create watchlist header
- *
- * Give as an argument the already created "table thead tr"
- */
-function watchlist_create_header(tr) {
-
-    for (let row of watchlist_columns) {
-        tr.append(
-            $("<th>", {
-                text: row.string,
-            })
-        );
-    }
-}
-
-/**
- * Create catalog header
- *
- * Give as an argument the already created "table thead tr"
- */
-function catalog_create_header(tr) {
-
-    for (let row of catalog_columns) {
-        tr.append(
-            $("<th>", {
-                text: row.string,
-            })
-        );
-    }
 }
 
 /**
