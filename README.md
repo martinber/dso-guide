@@ -43,11 +43,6 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Flask logging
 
-- Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
-  `hostmaster`, `root`, `info`.
-
-- Check the tr references on DSOs, they are not going to work with filters
-
 - Code review
 
 - Server admin scripts
@@ -104,6 +99,11 @@ Search catalogs of deep sky objects and plan your observations.
 - Show form location on map, e.g. when logging in
 
 - Indicate current day/time on plot
+
+## Installation
+
+- Reserve names: `admin`, `administrator`, `dso-guide`, `dsoguide`, `webmaster`,
+  `hostmaster`, `root`, `info`. `test` is reserved for testing.
 
 ## References
 

@@ -422,6 +422,11 @@ export function TableManager(
 
 }
 
+/**
+ * Called when the user adds an object to the watchlist
+ *
+ * Disables the add button on the catalog for the recently added object
+ */
 function watchlist_change_callback(watch_dso, added) {
     let tr = watch_dso.dso.get_catalog_tr();
     if (tr != null) {
