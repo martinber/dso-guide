@@ -10,7 +10,8 @@
 	--red-3: #AF4242;
 	--red-4: #FF6C6C;
 
-	--leaflet-z-index: 28;
+	--leaflet-z-index: 27;
+	--location-warning-z-index: 28;
 	--header-z-index: 29;
 	--status-z-index: 30;
 	--aladin-z-index: 31;
@@ -336,6 +337,23 @@ footer
 {
 	margin: 0.2em;
 	margin-top: 0.4em;
+
+	position: relative;
+}
+
+#location-warning
+{
+	padding: 0.5em;
+	margin: 0.2em;
+	background-color: var(--red-2);
+	color: var(--gray-4);
+	box-shadow: 0px 0px 3px #00000055;
+	max-width: 50%;
+	z-index: var(--location-warning-z-index);
+
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 #leaflet-map

@@ -47,9 +47,6 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Getting started and about page
 
-- Find a way to add a warning indicating that user should select location before
-	taking a look at ALT/AZ or plots
-
 ### Later
 
 - Check if we can assume `Content-Type: application/json`
@@ -57,6 +54,10 @@ Search catalogs of deep sky objects and plan your observations.
 - Better Flask logging
 
 - Links to catalogs
+
+- Add close button to location warning
+
+- Sometimes leaflet map shows antarctica when opening
 
 - Allow manual ordering of watchlist, reflect it on server
 

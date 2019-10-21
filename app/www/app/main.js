@@ -448,6 +448,8 @@ function ui_plot_bg_update(ctx, datetime, location) {
  */
 function ui_celestial_location_update(lat, long) {
     Celestial.skyview({location: [lat, long]});
+    $("#location-warning").css("display", "none");
+    $("#location-warning").css("visibility", "hidden");
 }
 
 /**
