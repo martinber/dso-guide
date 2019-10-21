@@ -242,7 +242,7 @@ export function draw_day_night_plots(
 
     // Draw night
     //
-    // I ignore the fact that some months have more day than others, I just
+    // I ignore the fact that some months have more days than others, I just
     // iterate over each element on sun_times and I give each one the same
     // width.
 

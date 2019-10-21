@@ -47,17 +47,12 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Getting started and about page
 
-- Check carefully the grid align of the visibility plot. Draw the grid when
-  generating the day-night plot to compare. (X axis is OK)
-
 - Find a way to add a warning indicating that user should select location before
 	taking a look at ALT/AZ or plots
 
-- Minimum FOV for Aladin
-
-- Close Github issue, happened when missing header `Content-Type: application/json`
-
 ### Later
+
+- Check if we can assume `Content-Type: application/json`
 
 - Better Flask logging
 

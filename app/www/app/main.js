@@ -366,9 +366,9 @@ function ui_aladin_goto(ctx, dso) {
     );
 
     // Set FOV to the biggest of width,height of object, convert dimensions from
-    // arcminutes to degrees
+    // arcminutes to degrees. Also set minimum to 3 arcminutes.
     let dim = dso.dimensions;
-    ctx.aladin.setFov(Math.max(dim[0], dim[1]) / 60);
+    ctx.aladin.setFov(Math.max(dim[0], dim[1], 3) / 60);
 
     // Scroll page to map
     window.location.hash = "sky-surveys";
