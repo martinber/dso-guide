@@ -39,9 +39,7 @@ Search catalogs of deep sky objects and plan your observations.
 ### Now
 
 - Rebuild database, check best practices (backups? migrations?), rename
-  `star_id` to `dso_id` or `obj_id`
-
-- Flask logging
+  `star_id` to `dso_id` or `obj_id`. Rename db on repository to `dso-guide.db`.
 
 - Code review
 
@@ -55,9 +53,15 @@ Search catalogs of deep sky objects and plan your observations.
 - Find a way to add a warning indicating that user should select location before
 	taking a look at ALT/AZ or plots
 
+- Minimum FOV for Aladin
+
+- Close Github issue, happened when missing header `Content-Type: application/json`
+
 ### Later
 
-- Flask logging
+- Better Flask logging
+
+- Links to catalogs
 
 - Allow manual ordering of watchlist, reflect it on server
 
@@ -111,6 +115,8 @@ Search catalogs of deep sky objects and plan your observations.
 ## References
 
 - [Catalogs and observation lists](http://www.messier.seds.org/xtra/similar/catalogs.html)
+
+- [Logging with Flask](https://stackoverflow.com/a/39284642)
 
 - https://realpython.com/handling-email-confirmation-in-flask/
 

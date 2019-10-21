@@ -24,5 +24,6 @@ WORKDIR /app
 RUN chown -R nginx:nginx /app
 
 ENV DSO_DB_PATH="/app/deepsky.db"
+ENV DSO_LOG_PATH="/app/dso-guide.log"
 
 CMD ["/usr/bin/supervisord"]

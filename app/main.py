@@ -4,8 +4,12 @@ import sqlite3
 import hashlib, os, binascii
 import re
 import os
+import logging.handlers
+import time
+import traceback
 
 DB_PATH = os.environ.get('DSO_DB_PATH', './dso-guide.db')
+LOG_PATH = os.environ.get('DSO_LOG_PATH', './dso-guide.log')
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -262,6 +266,101 @@ def api_objects(star_id):
                 return "Method not allowed \n", 405
         else:
             return "Unauthorized \n", 401
+
+# Logging: https://stackoverflow.com/a/39284642
+
+handler = logging.handlers.RotatingFileHandler(LOG_PATH, maxBytes=10000, backupCount=3)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+logger.addHandler(handler)
+
+@app.after_request
+def log_requests(response):
+    """ Logging after every request. """
+    # TODO: Should avoid duplication of registry in the log,
+    # since that 500 is already logged via @app.errorhandler
+    # I cant use the condition `if response.status_code != 500` because
+    # sometimes I return 500 without exceptions
+
+    try:
+        timestamp = time.strftime('[%Y-%b-%d %H:%M]')
+
+        username = None
+        if request.authorization:
+            username = request.authorization.get("username")
+        username = username or "{unauthenticated}"
+
+        request_data = None
+        if "password" in request.full_path:
+            request_data = "{not logging data because of plaintext password}"
+        else:
+            try:
+                request_data = request.json
+            except:
+                request_data = "{invalid JSON}"
+
+        logger.error(
+            '%s %s %s %s %s %s %s\n%s\n%s',
+            timestamp,
+            request.remote_addr,
+            request.method,
+            request.scheme,
+            request.full_path,
+            username,
+            response.status,
+            request_data,
+            response.data
+        )
+
+    except:
+        timestamp = time.strftime('[%Y-%b-%d %H:%M]')
+        tb = traceback.format_exc()
+        logger.error("Error logging %s %s", timestamp, tb)
+
+
+    return response
+
+@app.errorhandler(Exception)
+def log_exceptions(e):
+    """ Logging after every Exception. """
+
+    try:
+        timestamp = time.strftime('[%Y-%b-%d %H:%M]')
+        tb = traceback.format_exc()
+
+        username = None
+        if request.authorization:
+            username = request.authorization.get("username")
+        username = username or "{unauthenticated}"
+
+        request_data = None
+        if "password" in request.full_path:
+            request_data = "{not logging data because of plaintext password}"
+        else:
+            try:
+                request_data = request.json
+            except:
+                request_data = "{invalid JSON}"
+
+
+        logger.error(
+            '%s %s %s %s %s 5xx INTERNAL SERVER ERROR\n%s\n%s\n%s',
+            timestamp,
+            request.remote_addr,
+            request.method,
+            request.scheme,
+            request.full_path,
+            username,
+            request_data,
+            tb
+        )
+
+    except:
+        timestamp = time.strftime('[%Y-%b-%d %H:%M]')
+        tb = traceback.format_exc()
+        logger.error("Error logging %s %s", timestamp, tb)
+
+    return "Internal Server Error", 500
 
 if __name__ == "__main__":
 
