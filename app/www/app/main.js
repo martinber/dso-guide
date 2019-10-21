@@ -490,7 +490,7 @@ function server_location_get(ctx) {
 
         $("#location-lat").val(`${json.lat}`);
         $("#location-long").val(`${json.lon}`);
-        ui_celestial_datetime_update(json.lat, json.lon);
+        ui_celestial_location_update(json.lat, json.lon);
         ui_plot_bg_update(ctx, null, [json.lat, json.lon]);
         ctx.table_manager.update_datetime_location(null, [json.lat, json.lon]);
 

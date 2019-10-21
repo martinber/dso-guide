@@ -237,6 +237,8 @@ export function TableManager(
         }
     }
 
+    this.watchlist_update = this._watchlist_update;
+
     /**
      * Clear and reload the catalog table on a given page
      *
