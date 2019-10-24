@@ -11,30 +11,33 @@ cur.execute('''
         username text UNIQUE NOT NULL CHECK
         (
             TYPEOF(username) = "text"
-            AND LENGTH(username) >= 4 AND
-            LENGTH(username) <= 32
+            AND LENGTH(username) >= 4
+            AND LENGTH(username) <= 32
         ),
         password text NOT NULL CHECK
         (
             TYPEOF(password) == "text"
         ),
-        lat float CHECK
+        lat real NOT NULL CHECK
         (
-            TYPEOF(lat) == "real"
-            OR TYPEOF(lat) == "integer"
+            (TYPEOF(lat) == "real" OR TYPEOF(lat) == "integer")
             AND lat >= -90
             AND lat <= 90
         ),
-        lon float CHECK
+        lon real NOT NULL CHECK
         (
-            TYPEOF(lon) == "real"
-            OR TYPEOF(lat) == "integer"
+            (TYPEOF(lon) == "real" OR TYPEOF(lat) == "integer")
             AND lon >= -180
             AND lon <= 180
         ),
-        salt text CHECK
+        salt text NOT NULL CHECK
         (
             TYPEOF(salt) == "text"
+        ),
+        disabled integer NOT NULL CHECK
+        (
+            TYPEOF(disabled) == "int"
+            AND (disabled == 0 OR disabled == 1)
         )
     );
     '''
@@ -43,16 +46,16 @@ cur.execute('''
 cur.execute('''
     CREATE TABLE watchlist
     (
-        star_id int NOT NULL CHECK
+        dso_id integer NOT NULL CHECK
         (
-            TYPEOF(star_id) == "integer"
-            AND star_id >= 0
+            TYPEOF(dso_id) == "integer"
+            AND dso_id >= 0
         ),
-        notes text CHECK
+        notes text NOT NULL CHECK
         (
             TYPEOF(notes) == "text"
         ),
-        style int CHECK
+        style integer NOT NULL CHECK
         (
             TYPEOF(style) == "integer"
         ),
