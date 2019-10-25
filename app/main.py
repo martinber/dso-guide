@@ -59,16 +59,16 @@ def login(user, password, cursor):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "404 Page not found \n", 404
+    return "404 Page not found", 404
 @app.errorhandler(401)
 def invalid_credentials(e):
-    return "Unauthorized \n", 401
+    return "Unauthorized", 401
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return "Method not allowed \n", 405
+    return "Method not allowed", 405
 @app.errorhandler(500)
 def internal_server_error(e):
-    return "Internal Server Error \n", 500
+    return "Internal Server Error", 500
 
 class Database:
 
@@ -96,11 +96,11 @@ def api_login():
             user = request.authorization["username"].lower()
             password = request.authorization["password"]
             if login(user, password, db.cur):
-                return "Login successful", 200
+                return "Login Successful", 200
             else:
                 return "Unauthorized", 401
         else:
-            return "Method not allowed \n", 405
+            return "Method not allowed", 405
 
 @app.route("/api/v1/location", methods=["GET", "PUT"])
 def api_location():
@@ -131,14 +131,14 @@ def api_location():
                         "UPDATE users SET lat=?, lon=? WHERE username=?;",
                         (latitude, longitude, user)
                     )
-                    return "Operation Successful \n", 200
+                    return "Operation Successful", 200
 
                 except sqlite3.IntegrityError:
-                    return "Wrong constraints \n ", 500
+                    return "Wrong constraints", 500
             else:
-                return "Method not allowed \n", 405
+                return "Method not allowed", 405
         else:
-            return "Unauthorized \n", 401
+            return "Unauthorized", 401
 
 @app.route("/api/v1/users", methods=["POST"])
 def api_addusers():
@@ -172,12 +172,12 @@ def api_addusers():
                             "INSERT INTO users VALUES (?, ?, ?, ?, ?);",
                             (user, pwdhash, lat, lon, salt)
                         )
-                        return "Operation Successful \n", 200
+                        return "Operation Successful", 200
 
                     except sqlite3.IntegrityError:
-                        return "User already exists \n ", 500
+                        return "User already exists", 500
         else:
-            return "Method not allowed \n", 405
+            return "Method not allowed", 405
 
 @app.route("/api/v1/watchlist", methods=["DELETE", "POST", "GET"])
 def api_watchlist():
@@ -215,7 +215,7 @@ def api_watchlist():
                             (user, star_id)
                         ).fetchall():
 
-                        return "Already exists \n", 200
+                        return "Already exists", 200
 
                     else:
                         db.cur.execute(
@@ -223,7 +223,7 @@ def api_watchlist():
                             (star_id, notes, style, user)
                         )
 
-                        return "Operation Successful \n", 200
+                        return "Operation successful", 200
 
                 except sqlite3.IntegrityError:
                     return "Wrong constraints", 500
@@ -233,13 +233,13 @@ def api_watchlist():
                     "DELETE FROM watchlist WHERE username = ?;",
                     (user,)
                 )
-                return "Operation Successful \n", 200
+                return "Operation successful", 200
 
             else:
-                return "Method not allowed \n", 405
+                return "Method not allowed", 405
 
         else:
-            return "Unauthorized \n", 401
+            return "Unauthorized", 401
 
 @app.route("/api/v1/password", methods=["PUT"])
 def api_password():
@@ -256,7 +256,7 @@ def api_password():
                 new_password = query_parameters.get("new_password")
 
                 if len(new_password) < 8:
-                    return "Too short \n", 411
+                    return "Too short", 411
 
                 else:
                     salt = hashlib.sha256(os.urandom(8)).hexdigest().encode("ascii")
@@ -270,14 +270,14 @@ def api_password():
                                WHERE username = ? ;""",
                             (pwdhash, salt, user)
                         )
-                        return "Operation Successful \n", 200
+                        return "Operation successful", 200
 
                     except sqlite3.IntegrityError:
-                        return "Wrong data \n", 500
+                        return "Wrong data", 500
             else:
-                return "Method not allowed \n", 405
+                return "Method not allowed", 405
         else:
-            return "Unauthorized \n", 401
+            return "Unauthorized", 401
 
 @app.route("/api/v1/watchlist/<int:star_id>", methods=["DELETE", "PUT"])
 def api_objects(star_id):
@@ -291,7 +291,7 @@ def api_objects(star_id):
         if login(user, password, db.cur):
             if request.method == "PUT":
                 if (star_id != query_parameters.get("star_id")):
-                    return "Wrong parameters \n", 409
+                    return "Wrong parameters", 409
 
                 else:
                     notes = query_parameters.get("notes")
@@ -304,10 +304,10 @@ def api_objects(star_id):
                                WHERE username = ? AND star_id = ?;""",
                             (notes, style, user, star_id)
                         )
-                        return "Operation Successful \n", 200
+                        return "Operation successful", 200
 
                     except sqlite3.IntegrityError:
-                        return "Wrong constraints \n", 500
+                        return "Wrong constraints", 500
 
             elif request.method == "DELETE":
 
@@ -317,14 +317,14 @@ def api_objects(star_id):
                            WHERE username = ? AND star_id = ?;""",
                         (user, star_id)
                     )
-                    return "Operation Successful \n", 200
+                    return "Operation successful", 200
 
                 except sqlite3.IntegrityError:
-                    return "Could not delete the object \n", 500
+                    return "Could not delete the object", 500
             else:
-                return "Method not allowed \n", 405
+                return "Method not allowed", 405
         else:
-            return "Unauthorized \n", 401
+            return "Unauthorized", 401
 
 # Logging: https://stackoverflow.com/a/39284642
 
