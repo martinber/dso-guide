@@ -47,6 +47,8 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Getting started and about page
 
+- Add cardinal points
+
 ### Later
 
 - Check if we can assume `Content-Type: application/json`
