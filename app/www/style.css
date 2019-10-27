@@ -524,7 +524,7 @@ main .inner {
 	width: 95vw;
 	max-width: 50em;
 	height: 95vh;
-	max-height: 45em;
+	max-height: 40em;
 	min-height: 20em;
 	background-color: var(--black);
 	border: 4px solid var(--red-2);
@@ -628,7 +628,7 @@ main .inner {
 	grid-row: 1;
 
 	width: 100%;
-	height: 100%;
+	height: 17em;
 }
 
 .plot-popup-table

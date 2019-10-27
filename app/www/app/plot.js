@@ -322,9 +322,11 @@ export function show_visibility_popup(
             <button class="plot-popup-close">
                 <img src="/resources/close.svg" alt="close" />
             </button>
-            <h2></h2>
-            <div class="plot-popup-values"></div>
-            <p class="plot-popup-description"></p>
+            <div class="plot-popup-head">
+                <h2></h2>
+                <div class="plot-popup-values"></div>
+                <p class="plot-popup-description"></p>
+            </div>
             <div class="plot-popup-grid">
                 <div class="plot-popup-hours"></div>
                 <canvas class="plot-popup-canvas"></canvas>
