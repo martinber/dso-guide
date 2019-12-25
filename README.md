@@ -43,6 +43,8 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Code review
 
+- Add contact info
+
 - Server admin scripts
 
 - Getting started and about page
@@ -55,7 +57,15 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Better Flask logging
 
+- Moon calendar
+
 - Links to catalogs
+
+- Filter invisible objects, now or any time of the year
+
+- Export watchlist to file
+
+- More names for DSOs
 
 - Add close button to location warning
 

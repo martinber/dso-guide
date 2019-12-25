@@ -29,7 +29,7 @@
 
 	</head>
 
-    <body>
+	<body>
 
 		<header>
 			<div class="inner">
@@ -49,10 +49,223 @@
 		<main>
 			<div class="inner">
 				<div id="content">
-					<h2>About this webpage</h2>
-					<p>dfjshldjfksdlfk</p>
-					<h2>Plots</h2>
-					<p>dfjshldjfksdlfk</p>
+					<h2>Introduction</h2>
+
+					<h3>What does DSO (Deep-Sky Object) mean?</h3>
+
+					<p>
+						It is something you can see on the sky using binoculars or a
+						telescope. "Deep" means that the object is outside of the solar
+						system.
+					</p>
+					<p>
+						Examples of what DSOs are:
+					</p>
+					<ul>
+						<li>Galaxies</li>
+						<li>Nebulas</li>
+						<li>Clusters of stars</li>
+					</ul>
+					<p>
+						Examples of what DSOs are not:
+					</p>
+					<ul>
+						<li>Single stars</li>
+						<li>Planets</li>
+						<li>Moon, Satellites</li>
+					</ul>
+
+					<h3>Why we made this application?</h3>
+
+					<p>
+						There are lots of interesting things to look in the sky, and you can
+						already find different well-suited applications to discover them.
+					</p>
+					<p>
+						This is a list of things you can see, including software
+						recommendations:
+					</p>
+					<ul>
+						<li>Planets or moon: <a href="https://stellarium.org/">Stellarium</a>
+							or mostly anything.</li>
+						<li>Artificial satellites:
+							<a href="https://heavens-above.com/">Heavens-Above</a>,
+							<a href="https://issdetector.com/">ISS-Detector</a>.</li>
+						<li>Deep-Sky Objects: This application, or see more alternatives
+							below.</li>
+						<li>Meteor showers:
+							<a href="https://www.timeanddate.com/astronomy/meteor-shower/">timeanddate</a>,
+							<a href="https://solarsystem.nasa.gov/asteroids-comets-and-meteors/meteors-and-meteorites/overview/">NASA website</a>.</li>
+					</ul>
+
+					<p>
+						We think that discovering observable DSOs can be hard, there are a
+						lot of articles with "The top 15 Deep Sky Objects for beginners",
+						"Brightest astronomy targets for binoculars and telescopes" or "Top
+						50 southern night sky objects for small telescopes". But we find
+						cumbersome that some objects have different names on different
+						lists, that maybe from your location you can't see most of the DSOs
+						listed, etc.
+					</p>
+
+					<p>
+						DSO Guide tries to gather everything in one place, helping to find
+						what you can see from your date and location. We are trying to
+						answer questions like:
+					</p>
+
+					<ul>
+						<li>What are the brightest DSOs?</li>
+						<li>On which months I can see this?</li>
+						<li>On which months I can see this?</li>
+					</ul>
+
+					<h3>Alternatives</h3>
+
+					<ul>
+						<li><a href="https://telescopius.com/">Telescopius</a>: This is the
+							best alternative, make sure to check it too.</li>
+						<li><a href="https://stellarium.org/">Stellarium</a>: Useful when
+							you know what you want to see. Also has some catalogs on the
+							Search window.</li>
+						<li>DSO Planner: An Android application that can be useful.</li>
+					</ul>
+
+					<h2>Using this application</h2>
+
+					<h3>Header</h3>
+
+					<p>
+						On the top of the page you can register or login. Having an account
+						is optional, with it you can store your location and DSO watchlist.
+					</p>
+
+					<h3>Settings</h3>
+
+					<p>
+						There you can select:
+					</p>
+
+					<ul>
+						<li>Time and date.</li>
+						<li>Your location, enter your coordinates or select from a map.</li>
+					</ul>
+
+					<h3>Sky Chart</h3>
+
+					<p>
+						This circle shows the sky on the selected time and location. Objects
+						added to the watchlist will be shown on this chart automatically if
+						they are above the horizon.
+					</p>
+
+					<h3>Watchlist</h3>
+
+					Foto de ejemplo con objetos
+
+					<p>
+						This is your personal list of DSOs, these will be shown on the
+						<em>Sky Chart</em> and on the <em>Sky Survey</em> window. If you are
+						logged in they will be remembered for next login.
+					</p>
+
+					<p>
+						Columns available on the table:
+					</p>
+
+					<ul>
+						<li>Name: Some objects can have more than one name, but this
+							field generally shows the Messier, NGC or IC names.</li>
+						<li>Magnitude: A smaller number means that the object is
+							brighter.</li>
+						<li>Type: The type of object, being a galaxy, nebula, star cluster,
+							etc.</li>
+						<li>RA/DEC: Shows the Right Ascension and Declination coordinates of
+							the object.</li>
+						<li>ALT/AZ: The altitude above the horizon and the Azimuth. It
+							depends on the time and location chosen.</li>
+						<li>Style: Icon to use when showing the object on the <em>Sky
+								Chart</em> or <em>Sky Survey</em> window.</li>
+					<li>
+						Controls:
+						<ul>
+							<li>Delete the object from the watchlist, you can still find it on
+								the catalog.</li>
+							<li>Save changes made to the object on the server. Necessary if
+								you changed the style or the notes and you want those to be
+								available on next login.</li>
+							<li>Survey: Opens the <em>Sky Survey</em> window where you can see
+								images from the object.</li>
+							<li>Notes: Here you can write information about the object so you
+								can remember if you have already seen it, how, when, etc.</li>
+						</ul>
+					</li>
+					<li>Plot: Shows the <em>Visibility Plot</em> of the object, see below
+						for more information.</li>
+					</ul>
+
+					<p>
+						Click the "Filters and Settings" button to show a search field.
+						Moreover, you can also sort the table by clicking column headers.
+					</p>
+
+					<h3>Catalog</h3>
+
+					<p>
+						Contains the list of every DSO known by this application. We call
+						it the <em>DSO Guide Catalog</em>, but it contains objects from
+						different catalogs. Catalogs are popular lists of DSOs,
+						<a href="http://www.messier.seds.org/xtra/similar/catalogs.html">there
+							are a lot of them.</a>
+						We tried to gather a few so you can easily find popular DSOs.
+					</p>
+
+					<p>
+						For every object on the <em>DSO Guide Catalog</em> you can see the
+						same information available on the Watchlist table, but also:
+					</p>
+
+					<ul>
+						<li>A button to add the object to the Watchlist.</li>
+						<li>A column named "Appears on", this column shows the list of
+							catalogs that contain this object.</li>
+					</ul>
+
+					<p>
+						You can guess that objects included on many catalogs must be
+						popular, so make sure to check objects with lots of entries on
+						"Appears on". At the same time take a look at the Altitude column,
+						or better, take the time to understand the plot to determine of you
+						can observe it.
+					</p>
+
+					<p>
+						Try the <em>Filters and Settings</em> dropdown. For example you
+						might want to filter only objects in the Southern Sky Binocular.
+						Also you can search objects by name.
+					</p>
+
+					<h2>Visibility plot</h2>
+
+					<p>
+						This is perhaps the most unique and difficult to understand feature
+						this program has. It allows you to see at first glance lots of
+						information:
+					</p>
+
+					<ul>
+						<li>Is the object ever visible on my location?</li>
+						<li>Does the object ever reach a high altitude or is it always
+							really low over the horizon?</li>
+						<li>Can I always see it or only on some months?</li>
+						<li>On which months can I see this object at evenings?</li>
+						<li>On which months can I see this object before sunrise?</li>
+					</ul>
+
+					Day night cycle
+					Fotos de lugares en donde nunca se esconde el sol
+					Tabla de tiempos
+					Altitud máxima
 				</div>
 			</div>
 		</main>
