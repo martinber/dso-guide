@@ -428,6 +428,44 @@ main img {
 	margin: 0 auto;
 	width: 100vh;
 	max-width: 100%;
+	position: relative; /* So I can position cardinal points */
+}
+
+#celestial-cardinal-point-N
+{
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#celestial-cardinal-point-S
+{
+	position: absolute;
+	display: block;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#celestial-cardinal-point-W
+{
+	position: absolute;
+	display: block;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+}
+
+#celestial-cardinal-point-E
+{
+	position: absolute;
+	display: block;
+	text-align: right;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
 }
 
 #celestial-form
