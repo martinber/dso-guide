@@ -387,6 +387,19 @@ main .inner {
 	align-items: flex-start;
 }
 
+main .inner#getting-started-inner {
+	max-width: 50em;
+	font-family: 'Saira', sans-serif;
+}
+
+main .inner#getting-started-inner h2, main .inner#getting-started-inner h3 {
+	font-family: 'Saira Condensed', sans-serif;
+}
+
+main img {
+	max-width: 100%;
+}
+
 #content
 {
 	padding: 1em;

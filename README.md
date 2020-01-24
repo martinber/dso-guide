@@ -51,7 +51,12 @@ Search catalogs of deep sky objects and plan your observations.
 
 - Add cardinal points
 
+- "Save" button is disabled when sorting the watchlist
+
 ### Later
+
+- Show all objects on Aladin map so it is easier to discover objects on catalog
+	by looking around.
 
 - Check if we can assume `Content-Type: application/json`
 

@@ -25,7 +25,7 @@
 
 		<link rel="stylesheet" href="normalize.css" />
 		<link rel="stylesheet" href="style.css" />
-		<link href="https://fonts.googleapis.com/css?family=Saira+Condensed:400,800&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Saira|Saira+Condensed:400,800&display=swap" rel="stylesheet">
 
 	</head>
 
@@ -47,7 +47,7 @@
 		</header>
 
 		<main>
-			<div class="inner">
+			<div class="inner" id="getting-started-inner">
 				<div id="content">
 					<h2>Introduction</h2>
 
@@ -82,8 +82,8 @@
 						already find different well-suited applications to discover them.
 					</p>
 					<p>
-						This is a list of things you can see, including software
-						recommendations:
+						This is a list of things you can see, ordered from easy to hard,
+						and including software recommendations:
 					</p>
 					<ul>
 						<li>Planets or moon: <a href="https://stellarium.org/">Stellarium</a>
@@ -91,7 +91,7 @@
 						<li>Artificial satellites:
 							<a href="https://heavens-above.com/">Heavens-Above</a>,
 							<a href="https://issdetector.com/">ISS-Detector</a>.</li>
-						<li>Deep-Sky Objects: This application, or see more alternatives
+						<li>Deep-Sky Objects: This application, see more alternatives
 							below.</li>
 						<li>Meteor showers:
 							<a href="https://www.timeanddate.com/astronomy/meteor-shower/">timeanddate</a>,
@@ -103,9 +103,9 @@
 						lot of articles with "The top 15 Deep Sky Objects for beginners",
 						"Brightest astronomy targets for binoculars and telescopes" or "Top
 						50 southern night sky objects for small telescopes". But we find
-						cumbersome that some objects have different names on different
-						lists, that maybe from your location you can't see most of the DSOs
-						listed, etc.
+						cumbersome to look at those articles: Some objects have different
+						names on different lists, and visibility depends on the month of the
+						year and on your location.</li>
 					</p>
 
 					<p>
@@ -116,8 +116,10 @@
 
 					<ul>
 						<li>What are the brightest DSOs?</li>
+						<li>Can I see it from my location?</li>
 						<li>On which months I can see this?</li>
-						<li>On which months I can see this?</li>
+						<li>Where can I find it tomorrow at 11PM?</li>
+						<li>What the hell is NGC 3532 and how does it look?</li>
 					</ul>
 
 					<h3>Alternatives</h3>
@@ -127,9 +129,16 @@
 							best alternative, make sure to check it too.</li>
 						<li><a href="https://stellarium.org/">Stellarium</a>: Useful when
 							you know what you want to see. Also has some catalogs on the
-							Search window.</li>
-						<li>DSO Planner: An Android application that can be useful.</li>
+							Search window ("Lists" tab).</li>
+						<li><a href="http://www.dsoplanner.com/">DSO Planner</a>: An Android
+							application that can be useful.</li>
 					</ul>
+
+					<p>
+						It is impossible for us to make something that replaces all of those
+						programs, but we hope you find DSO Guide as good complement for
+						them.
+					</p>
 
 					<h2>Using this application</h2>
 
@@ -148,7 +157,7 @@
 
 					<ul>
 						<li>Time and date.</li>
-						<li>Your location, enter your coordinates or select from a map.</li>
+						<li>Your location: enter your coordinates or select from a map.</li>
 					</ul>
 
 					<h3>Sky Chart</h3>
@@ -161,7 +170,9 @@
 
 					<h3>Watchlist</h3>
 
-					Foto de ejemplo con objetos
+					<a href="/resources/watchlist-example.png">
+						<img src="/resources/watchlist-example.png" alt="Example of a watchlist" \>
+					</a>
 
 					<p>
 						This is your personal list of DSOs, these will be shown on the
@@ -211,6 +222,10 @@
 
 					<h3>Catalog</h3>
 
+					<a href="/resources/catalog-example.png">
+						<img src="/resources/catalog-example.png" alt="Image of the catalog" \>
+					</a>
+
 					<p>
 						Contains the list of every DSO known by this application. We call
 						it the <em>DSO Guide Catalog</em>, but it contains objects from
@@ -222,7 +237,7 @@
 
 					<p>
 						For every object on the <em>DSO Guide Catalog</em> you can see the
-						same information available on the Watchlist table, but also:
+						same information already available on the Watchlist table, but also:
 					</p>
 
 					<ul>
@@ -241,11 +256,20 @@
 
 					<p>
 						Try the <em>Filters and Settings</em> dropdown. For example you
-						might want to filter only objects in the Southern Sky Binocular.
-						Also you can search objects by name.
+						might want to filter only objects in the "Southern Sky Binocular"
+						Catalog. Also you can search objects by name.
 					</p>
 
 					<h2>Visibility plot</h2>
+
+					<a href="/resources/plot-example.png">
+						<img src="/resources/plot-example.png" alt="Example of visibility plot" \>
+					</a>
+
+					<p>
+						Every object on the watchlist or catalog has a small miniature of
+						the plot, click it to see a popup.
+					<p>
 
 					<p>
 						This is perhaps the most unique and difficult to understand feature
@@ -262,10 +286,120 @@
 						<li>On which months can I see this object before sunrise?</li>
 					</ul>
 
-					Day night cycle
-					Fotos de lugares en donde nunca se esconde el sol
-					Tabla de tiempos
-					Altitud máxima
+					<p>
+						You can see a DSO if it is over the horizon and if at the same time
+						the Sun is below the horizon (i.e. during the night). This plot
+						helps you to find when that happens in the span of a year.
+					<p>
+
+					<p>
+						The vertical axis has the time of the day in hours, and the
+						horizontal axis shows the day or month. On the screenshot above,
+						points labeled A, B, C and D were added for explanation purposes.
+						See how each point represents an hour on a particular day of the
+						year:
+					<p>
+
+					<ul>
+						<li>A: March 1st at 3:00hs</li>
+						<li>B: May 15th at 8:00hs</li>
+						<li>C: July 10th at 2:00hs</li>
+						<li>D: September 1st at 19:00hs</li>
+					</ul>
+
+					<p>
+						The background of the plot is black, but on some parts it has a blue
+						or red paint over it. If at some point the plot has a blue
+						background it means that the sun is over the horizon (i.e. it is
+						daytime). If at some point the plot has a red background, it means
+						that the DSO is over the horizon. Now take a look what happens at A,
+						B, C and D:
+					<p>
+
+					<ul>
+						<li>
+							A: March 1st at 3:00hs. The DSO is visible, because it is over the
+							horizon and the sun is hidden.
+						</li>
+						<li>
+							B: May 15th at 8:00hs. It is daytime, and the DSO is below the
+							horizon.
+						</li>
+						<li>
+							C: July 10th at 2:00hs. It is nighttime but we can't see the DSO
+							because it is below the horizon.
+						</li>
+						<li>
+							D: September 1st at 19:00hs. The DSO is over the horizon but we
+							can't see it because it is daytime.
+						</li>
+					</ul>
+
+					<p>
+						Note: The background is painted blue during the day. Actually we
+						consider daytime when the sun is higher than -10°, because that's
+						roughly when twilight starts/ends. Similarly, the background is red
+						when the DSO is higher than 15° over the horizon, otherwise
+						buildings/trees/light pollution might block the view.
+					</p>
+
+					<p>
+						That way, by looking at different points you can deduce if the
+						object is visible on a given moment. Now ignore the points, by
+						looking at the background you can deduce:
+					</p>
+
+					<ul>
+						<li>On January, the DSO is visible all the night.</li>
+						<li>
+							On September, the DSO is visible only one or two hours just after
+							sunset and before sunrise.
+						</li>
+						<li>
+							I never stay awake past 1:00am. In that case, the best months to
+							see it are roughly from January to July.
+						</li>
+						<li>
+							Nights are longer from July to August, during Winter, so I live on
+							the Southern Hemisphere.
+						</li>
+					</ul>
+
+					<p>
+						Below the plot you can also see the rise and set times for the sun
+						and the DSO. This information can be approximately infered from the
+						plot.
+					</p>
+
+					<a href="/resources/plot-miniatures-example.png">
+						<img src="/resources/plot-miniatures-example.png" alt="Example of miniatures of the visibility plot" \>
+					</a>
+
+					<p>
+						The interesting thing is that you can look at the plot miniatures of
+						objects on the catalog and guess lots of things without opening the
+						plots:
+					</p>
+
+					<ul>
+						<li>
+							NGC 884 is never visible.
+						</li>
+						<li>
+							M31 is visible maybe during only half an hour. This means that it
+							does not rise far over the horizon.
+						</li>
+						<li>
+							IC 2602 is almost always visible. During September/November only
+							after midnight.
+						</li>
+						<li>
+							M41 is visible during the first and last months of the year. I
+							don't like staying up late so better look at it from January to
+							June. If I wan't to do guided astrophotography, I can leave the
+							camera shooting all night only during December.
+						</li>
+					</ul>
 				</div>
 			</div>
 		</main>
